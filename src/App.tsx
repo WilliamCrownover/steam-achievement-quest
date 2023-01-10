@@ -1,6 +1,7 @@
+import { SteamUser } from './components/SteamUser';
 
 export const App = () => {
   return (
-    <h1>Hello!</h1>
+    <SteamUser/>
   );
 }
