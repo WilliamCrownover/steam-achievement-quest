@@ -1,0 +1,33 @@
+{
+  "name": "steam-achievement-quest",
+  "version": "1.0.0",
+  "description": "An app to help reach 100% achievements complete on your Steam games. Identifies easy and difficult achievements and tracks the user's progress.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "npm start --prefix backend",
+    "client": "npm start --prefix frontend",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "shutdown": "concurrently \"npx kill-port 5000\" \"npx kill-port 3000\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WilliamCrownover/steam-achievement-quest.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WilliamCrownover/steam-achievement-quest/issues"
+  },
+  "homepage": "https://github.com/WilliamCrownover/steam-achievement-quest#readme",
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  },
+  "dependencies": {
+    "@types/jest": "^29.2.5",
+    "@types/node": "^18.11.18",
+    "@types/react": "^18.0.26",
+    "@types/react-dom": "^18.0.10",
+    "typescript": "^4.9.4"
+  }
+}

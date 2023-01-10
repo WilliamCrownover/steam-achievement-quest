@@ -10,7 +10,7 @@ export const SteamUser = () => {
 		};
 
 		getData();
-	})
+	}, [])
 
 	useEffect(() => {
 		console.log('Show me the data', userData)
