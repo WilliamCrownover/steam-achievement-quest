@@ -1,5 +1,4 @@
 
-
 export const getUserGames = async () => {
 	let url = 'http://localhost:5000/getData'
 

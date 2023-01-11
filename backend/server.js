@@ -18,6 +18,7 @@ const requestEndpoint = `
 	&steamid=${process.env.REACT_APP_USER_ID}
 	&format=json
 	&include_appinfo=true
+	&include_played_free_games=true
 `;
 
 app.get('/getData', cors(corsOptions), async (req, res) => {
