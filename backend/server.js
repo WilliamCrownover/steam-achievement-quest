@@ -30,6 +30,16 @@ app.get('/getData', cors(corsOptions), async (req, res) => {
 	res.json(jsonResponse);
 });
 
+app.get('/getGameAchievements/:appId', cors(corsOptions), async (req, res) => {
+	const endpoint = `http://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/?gameid=${req.params.appId}`
+	const fetchOptions = {
+		method: 'GET'
+	}
+	const response = await fetch(endpoint, fetchOptions);
+	const jsonResponse = await response.json();
+	res.json(jsonResponse);
+});
+
 app.listen(PORT, () => {
 	console.log(`Example app listening at http://localhost:${PORT}`);
 });

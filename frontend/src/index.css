@@ -2,3 +2,40 @@
   font-family: 'Libre Franklin', sans-serif;
   box-sizing: border-box;
 }
+
+.gameTitleInfo {
+	display: flex;
+	align-items: center;
+}
+.gameTitleInfo > * {
+	display: inline-block;
+	padding-right: 10px;
+}
+
+.achievementList {
+	display: flex;
+}
+.achievementList h3 {
+	display: inline-block;
+	border: 1px solid black;
+	padding: 3px;
+	min-width: 58px;
+}
+
+/* Achievement Percentage Colors */
+.overNinety {
+	background-color: green;
+}
+.overFifty {
+	background-color: rgb(75, 215, 0);
+}
+.overTen {
+	background-color: yellow;
+}
+.overOne {
+	background-color: red;
+}
+.underOne {
+	background-color: darkred;
+}
+
