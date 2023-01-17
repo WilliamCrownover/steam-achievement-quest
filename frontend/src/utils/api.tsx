@@ -6,7 +6,8 @@ export const getUserGames = async () => {
 		const res = await fetch(url);
 		const json = await res.json();
 		const data = json.response.games;
-		const dataAchievements = await Promise.all(data.map(async (game) => {
+		//Using slice to reduce the length of the array for testing
+		const dataAchievements = await Promise.all(data.slice(0, 28).map(async (game) => {
 			const achievements = await getGameAchievements(game.appid)
 			return { ...game, achievements: achievements }
 		}));
