@@ -1,5 +1,5 @@
-import './index.css';
 import './normalize.css';
+import './index.css';
 import { App } from './App';
 
 import { createRoot } from 'react-dom/client';
