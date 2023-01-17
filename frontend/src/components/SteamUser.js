@@ -24,14 +24,37 @@ export const SteamUser = () => {
 		})
 	}
 
+	const averageAchievementPercent = (list) => {
+		const sum = (prev, cur) => ({percent: prev.percent + cur.percent});
+		const avg = list.reduce(sum).percent/list.length;
+		return avg;
+	}
+
+	const setColorFill = (number) => {
+		switch (true) {
+			case number >= 90:
+				return 'overNinety';
+			case number >= 50:
+				return 'overFifty';
+			case number >= 10:
+				return 'overTen';
+			case number >= 1:
+				return 'overOne';
+			default:
+				return 'underOne'
+		}
+	}
+
 	const displayAchievements = (achievementList) => {
 		if(achievementList === undefined) { return <h3>No Achievements</h3>}
 		if ( achievementList.length > 0) {
+			const averagePercent = averageAchievementPercent(achievementList).toFixed(2);
 			return (
 				<div className='achievementList'>
+					<h3 className={setColorFill(averagePercent) + ' averagePercent'}>{averagePercent}</h3>
 					{achievementList.map((achievement) => {
 						const percent = achievement.percent.toFixed(2)
-						const colorFill = percent >= 90 ? 'overNinety' : percent >= 50 ? 'overFifty' : percent >= 10 ? 'overTen' : percent >= 1 ? 'overOne' : 'underOne';
+						const colorFill = setColorFill(percent);
 						return <h3 title={achievement.name} className={colorFill}>{percent}</h3>
 					})}
 				</div>
