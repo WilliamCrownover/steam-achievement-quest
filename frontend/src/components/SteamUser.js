@@ -31,17 +31,24 @@ export const SteamUser = () => {
 	}
 
 	const setColorFill = (number) => {
+		const percent = parseInt(number)/100;
+		const redIncrease = 255*(1-percent)
+		const greenIncrease = 100+155*(1-percent)
+		const greenDecrease = 100+155*(percent)
+		const greenDecreaseMax = greenIncrease*(percent*10)
 		switch (true) {
 			case number >= 90:
-				return 'overNinety';
+				return 'rgb(0,255,0)';
 			case number >= 50:
-				return 'overFifty';
+				return `rgb(${redIncrease},${greenDecrease},0)`;
 			case number >= 10:
-				return 'overTen';
+				return `rgb(${redIncrease},${greenIncrease},0)`;
 			case number >= 1:
-				return 'overOne';
+				return `rgb(${redIncrease},${greenDecreaseMax},0)`;
+			case number >= 0.11:
+				return 'rgb(200,0,0)'
 			default:
-				return 'underOne'
+				return 'rgb(150,0,0)'
 		}
 	}
 
@@ -50,14 +57,22 @@ export const SteamUser = () => {
 		if ( achievementList.length > 0) {
 			const averagePercent = averageAchievementPercent(achievementList).toFixed(2);
 			return (
-				<div className='achievementList'>
-					<h3 className={setColorFill(averagePercent) + ' averagePercent'}>{averagePercent}</h3>
-					{achievementList.map((achievement) => {
-						const percent = achievement.percent.toFixed(2)
-						const colorFill = setColorFill(percent);
-						return <h3 title={achievement.name} className={colorFill}>{percent}</h3>
-					})}
-				</div>
+				<>
+					<h3 
+						className='averagePercent'
+						style={{backgroundColor: setColorFill(averagePercent)}}
+					>
+						{averagePercent}
+					</h3>
+					<div className='achievementList'>
+						{achievementList.map((achievement) => {
+							const name = achievement.name;
+							const percent = achievement.percent.toFixed(2);
+							const colorFill = setColorFill(percent);
+							return <h3 key={name} title={name} style={{backgroundColor: colorFill}}>{percent}</h3>
+						})}
+					</div>
+				</>
 			)
 		} else { return <h3>No Achievements</h3> }
 	}

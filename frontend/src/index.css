@@ -29,31 +29,13 @@ p {
 
 .achievementList {
 	display: flex;
+	flex-wrap: wrap;
 }
 .achievementList h3 {
 	display: inline-block;
-	border: 1px solid black;
 	padding: 3px;
 	min-width: 58px;
 }
 .averagePercent {
 	margin-right: 10px;
 }
-
-/* Achievement Percentage Colors */
-.overNinety {
-	background-color: green;
-}
-.overFifty {
-	background-color: rgb(75, 215, 0);
-}
-.overTen {
-	background-color: yellow;
-}
-.overOne {
-	background-color: red;
-}
-.underOne {
-	background-color: darkred;
-}
-
