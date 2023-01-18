@@ -52,14 +52,27 @@ export const SteamUser = () => {
 		}
 	}
 
+	const totalComplete = (achievementList) => {
+		let total = 0;
+		achievementList.forEach((achievement) => {
+			if(achievement.achieved) total += 1;
+		})
+		return total;
+	}
+
 	const displayAchievements = (achievementList) => {
 		if(achievementList === undefined) { return <h3>No Achievements</h3>}
 		if ( achievementList.length > 0) {
 			const averagePercent = averageAchievementPercent(achievementList).toFixed(2);
+			const totalAchievements = achievementList.length;
+			const completedTotal = totalComplete(achievementList);
+			const percentComplete = ((completedTotal/totalAchievements)*100).toFixed(2);
 			return (
 				<>
+					<h3>{totalAchievements} Total Achievements</h3>
+					<h3>{completedTotal} Completed - {percentComplete}%</h3>
 					<h3 
-						className='averagePercent'
+						className={`averagePercent ${percentComplete === '100.00' && 'achieved'}`}
 						style={{backgroundColor: setColorFill(averagePercent)}}
 					>
 						{averagePercent}
@@ -69,7 +82,8 @@ export const SteamUser = () => {
 							const name = achievement.name;
 							const percent = achievement.percent.toFixed(2);
 							const colorFill = setColorFill(percent);
-							return <h3 key={name} title={name} style={{backgroundColor: colorFill}}>{percent}</h3>
+							const achieved = achievement.achieved && 'achieved'
+							return <h3 key={name} title={name} style={{backgroundColor: colorFill}} className={achieved}>{percent}</h3>
 						})}
 					</div>
 				</>
