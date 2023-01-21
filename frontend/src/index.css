@@ -36,9 +36,26 @@ p {
 	padding: 3px;
 	min-width: 58px;
 }
-.averagePercent {
-	margin-right: 10px;
-}
 .achieved {
 	color: white;
+}
+
+.difficultyBar {
+	display: flex;
+	width: 100%;
+}
+.segment{
+	height: 25px;
+}
+.easy {
+	background-color: rgb(0, 255, 0);
+}
+.medium {
+	background-color: rgb(255, 255, 0);
+}
+.hard {
+	background-color: rgb(255, 155, 0);
+}
+.impossible {
+	background-color: rgb(255, 0, 0);
 }

@@ -13,10 +13,16 @@ export const SteamUser = () => {
 			const gamesWithAchievementsData = allData.filter(game => game.achievements !== undefined);
 			const gamesWithoutAchievementsData = allData.filter(game => game.achievements === undefined);
 			// const sorted = data.sort((a,b) => a.name.localeCompare(b.name)).sort((a,b) => b.playtime_forever-a.playtime_forever);
-			gamesWithAchievementsData.sort((a, b) => b.achievements[b.achievements.length - 1].percent - a.achievements[a.achievements.length - 1].percent).sort((a, b) => a.achievements.length - b.achievements.length);
+			// gamesWithAchievementsData.sort((a, b) => b.achievements[b.achievements.length - 1].percent - a.achievements[a.achievements.length - 1].percent).sort((a, b) => a.achievements.length - b.achievements.length);
+			gamesWithAchievementsData
+			.sort((a, b) => b.achievementDifficultyDistribution.impossiblePercent - a.achievementDifficultyDistribution.impossiblePercent)
+			.sort((a, b) => b.achievementDifficultyDistribution.hardPercent - a.achievementDifficultyDistribution.hardPercent)
+			.sort((a, b) => b.achievementDifficultyDistribution.mediumPercent - a.achievementDifficultyDistribution.mediumPercent)
+			.sort((a, b) => b.achievementDifficultyDistribution.easyPercent - a.achievementDifficultyDistribution.easyPercent);
 			gamesWithoutAchievementsData.sort((a, b) => a.name.localeCompare(b.name));
 			setGameWithAchievements(gamesWithAchievementsData);
 			setGameWithoutAchievements(gamesWithoutAchievementsData);
+			console.log(gamesWithAchievementsData);
 			setLoading(false);
 		};
 
@@ -77,20 +83,29 @@ export const SteamUser = () => {
 				<h1>Loading!</h1>
 			) : (
 				<>
-					{gameWithAchievements.flatMap((game) =>
-						<div key={game.appid}>
-							{displayTitleInfo(game)}
-							<h3>{game.totalAchievements} Total Achievements</h3>
-							<h3>{game.totalCompletedAchievements} Completed - {game.percentComplete}%</h3>
-							<h3
-								className={`averagePercent ${game.percentComplete === '100.00' && 'achieved'}`}
-								style={{ backgroundColor: setColorFill(game.averagePercent) }}
-							>
-								{game.averagePercent}
-							</h3>
-							{displayAchievements(game.achievements)}
-						</div>
-					)}
+					{gameWithAchievements.flatMap((game) => {
+						const distribution = game.achievementDifficultyDistribution;
+						return (
+							<div key={game.appid}>
+								{displayTitleInfo(game)}
+								<h3>{game.totalAchievements} Total Achievements</h3>
+								<h3>{game.totalCompletedAchievements} Completed - {game.percentComplete}%</h3>
+								<div className='difficultyBar'>
+									<div className='segment easy' style={{width: `${distribution.easyPercent}%`}}/>
+									<div className='segment medium' style={{width: `${distribution.mediumPercent}%`}}/>
+									<div className='segment hard' style={{width: `${distribution.hardPercent}%`}}/>
+									<div className='segment impossible' style={{width: `${distribution.impossiblePercent}%`}}/>
+								</div>
+								<h3
+									className={`${game.percentComplete === '100.00' && 'achieved'}`}
+									style={{ backgroundColor: setColorFill(game.averagePercent) }}
+								>
+									{game.averagePercent}
+								</h3>
+								{displayAchievements(game.achievements)}
+							</div>
+						)
+					})}
 					{gameWithoutAchievements.flatMap((game) =>
 						<div key={game.appid}>
 							{displayTitleInfo(game)}

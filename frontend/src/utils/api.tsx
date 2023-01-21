@@ -22,6 +22,7 @@ export const getUserGames = async (userId) => {
 				const totalAchievements = combine.length;
 				const totalCompletedAchievements = sumTotalCompleted(combine);
 				const percentComplete = ((totalCompletedAchievements / totalAchievements) * 100).toFixed(2);
+				const achievementDifficultyDistribution = sumDistributions(combine);
 				return { 
 					...game, 
 					lastPlayedDate,
@@ -31,6 +32,7 @@ export const getUserGames = async (userId) => {
 					totalAchievements,
 					totalCompletedAchievements,
 					percentComplete,
+					achievementDifficultyDistribution,
 				}
 			} else {
 				return { ...game, lastPlayedDate, hoursPlayed, achievements: undefined }
@@ -92,4 +94,34 @@ const sumTotalCompleted = (achievementList) => {
 		if (achievement.achieved) total += 1;
 	})
 	return total;
+}
+
+const sumDistributions = (achievementList) => {
+	let totalEasy = 0;
+	let totalMedium = 0;
+	let totalHard = 0;
+	let totalImpossible = 0;
+	achievementList.forEach((achievement) => {
+		const percent = achievement.percent;
+		switch (true) {
+			case percent >= 50:
+				totalEasy += 1;
+				break;
+			case percent >= 10:
+				totalMedium += 1;
+				break;
+			case percent >= 3:
+				totalHard += 1;
+				break;
+			default:
+				totalImpossible += 1;
+		}
+	});
+	const total = achievementList.length;
+	return {
+		easyPercent: parseFloat((totalEasy/total*100).toFixed(2)),
+		mediumPercent: parseFloat((totalMedium/total*100).toFixed(2)),
+		hardPercent: parseFloat((totalHard/total*100).toFixed(2)),
+		impossiblePercent: parseFloat((totalImpossible/total*100).toFixed(2)),
+	}
 }
