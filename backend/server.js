@@ -12,11 +12,11 @@ const corsOptions = {
 	origin: "http://localhost:3000"
 };
 
-app.get('/getData', cors(corsOptions), async (req, res) => {
+app.get('/getData/:userId', cors(corsOptions), async (req, res) => {
 	const endpoint = `
 		https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/
 		?key=${process.env.REACT_APP_STEAM_KEY}
-		&steamid=${process.env.REACT_APP_USER_ID}
+		&steamid=${req.params.userId}
 		&format=json
 		&include_appinfo=true
 		&include_played_free_games=true
@@ -31,7 +31,7 @@ app.get('/getData', cors(corsOptions), async (req, res) => {
 
 app.get('/getGameAchievements/:appId', cors(corsOptions), async (req, res) => {
 	const endpoint = `
-		http://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/
+		https://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/
 		?gameid=${req.params.appId}
 	`;
 	const fetchOptions = {
@@ -42,12 +42,12 @@ app.get('/getGameAchievements/:appId', cors(corsOptions), async (req, res) => {
 	res.json(jsonResponse);
 });
 
-app.get('/getUserAchievements/:appId', cors(corsOptions), async (req, res) => {
+app.get('/getUserAchievements/:appId/:userId', cors(corsOptions), async (req, res) => {
 	const endpoint = `
 	https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/
 		?appid=${req.params.appId}
 		&key=${process.env.REACT_APP_STEAM_KEY}
-		&steamid=${process.env.REACT_APP_USER_ID}
+		&steamid=${req.params.userId}
 	`;
 	const fetchOptions = {
 		method: 'GET'
