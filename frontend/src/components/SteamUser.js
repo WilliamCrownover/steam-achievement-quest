@@ -8,8 +8,10 @@ export const SteamUser = () => {
 	useEffect(() => {
 		const getData = async () => {
 			setLoading(true);
-			const data = await getUserGames()
-			const sorted = data.sort((a,b) => a.name.localeCompare(b.name));
+			const data = await getUserGames('76561198035409755')
+			const filtered = data.filter(game => game.achievements !== undefined);
+			// const sorted = data.sort((a,b) => a.name.localeCompare(b.name)).sort((a,b) => b.playtime_forever-a.playtime_forever);
+			const sorted = filtered.sort((a, b) => b.achievements[b.achievements.length - 1].percent - a.achievements[a.achievements.length - 1].percent).sort((a, b) => a.achievements.length - b.achievements.length);
 			setUserData(sorted);
 			setLoading(false);
 		};
@@ -25,17 +27,17 @@ export const SteamUser = () => {
 	}
 
 	const averageAchievementPercent = (list) => {
-		const sum = (prev, cur) => ({percent: prev.percent + cur.percent});
-		const avg = list.reduce(sum).percent/list.length;
+		const sum = (prev, cur) => ({ percent: prev.percent + cur.percent });
+		const avg = list.reduce(sum).percent / list.length;
 		return avg;
 	}
 
 	const setColorFill = (number) => {
-		const percent = parseInt(number)/100;
-		const redIncrease = 255*(1-percent)
-		const greenIncrease = 100+155*(1-percent)
-		const greenDecrease = 100+155*(percent)
-		const greenDecreaseMax = greenIncrease*(percent*10)
+		const percent = parseInt(number) / 100;
+		const redIncrease = 255 * (1 - percent)
+		const greenIncrease = 100 + 155 * (1 - percent)
+		const greenDecrease = 100 + 155 * (percent)
+		const greenDecreaseMax = greenIncrease * (percent * 10)
 		switch (true) {
 			case number >= 90:
 				return 'rgb(0,255,0)';
@@ -55,25 +57,25 @@ export const SteamUser = () => {
 	const totalComplete = (achievementList) => {
 		let total = 0;
 		achievementList.forEach((achievement) => {
-			if(achievement.achieved) total += 1;
+			if (achievement.achieved) total += 1;
 		})
 		return total;
 	}
 
 	const displayAchievements = (achievementList) => {
-		if(achievementList === undefined) { return <h3>No Achievements</h3>}
-		if ( achievementList.length > 0) {
+		if (achievementList === undefined) { return <h3>No Achievements</h3> }
+		if (achievementList.length > 0) {
 			const averagePercent = averageAchievementPercent(achievementList).toFixed(2);
 			const totalAchievements = achievementList.length;
 			const completedTotal = totalComplete(achievementList);
-			const percentComplete = ((completedTotal/totalAchievements)*100).toFixed(2);
+			const percentComplete = ((completedTotal / totalAchievements) * 100).toFixed(2);
 			return (
 				<>
 					<h3>{totalAchievements} Total Achievements</h3>
 					<h3>{completedTotal} Completed - {percentComplete}%</h3>
-					<h3 
+					<h3
 						className={`averagePercent ${percentComplete === '100.00' && 'achieved'}`}
-						style={{backgroundColor: setColorFill(averagePercent)}}
+						style={{ backgroundColor: setColorFill(averagePercent) }}
 					>
 						{averagePercent}
 					</h3>
@@ -83,7 +85,7 @@ export const SteamUser = () => {
 							const percent = achievement.percent.toFixed(2);
 							const colorFill = setColorFill(percent);
 							const achieved = achievement.achieved && 'achieved'
-							return <h3 key={name} title={name} style={{backgroundColor: colorFill}} className={achieved}>{percent}</h3>
+							return <h3 key={name} title={name} style={{ backgroundColor: colorFill }} className={achieved}>{percent}</h3>
 						})}
 					</div>
 				</>
@@ -97,16 +99,18 @@ export const SteamUser = () => {
 				<h1>Loading!</h1>
 			) : (
 				<>
-					{userData.map((game) => (
-						<div key={game.name}>
-							<div className='gameTitleInfo'>
-								<h2>{game.name}</h2>
-								{game.playtime_forever > 0 && <p>{`${parseFloat(game.playtime_forever / 60).toFixed(2)} Hours Played`}</p>}
-								<p>{dataFormat(game.rtime_last_played)}</p>
+					{userData.flatMap((game) => {
+						return (
+							<div key={game.appid}>
+								<div className='gameTitleInfo'>
+									<h2>{game.name}</h2>
+									{game.playtime_forever > 0 && <p>{`${parseFloat(game.playtime_forever / 60).toFixed(2)} Hours Played`}</p>}
+									<p>{dataFormat(game.rtime_last_played)}</p>
+								</div>
+								{displayAchievements(game.achievements)}
 							</div>
-							{displayAchievements(game.achievements)}
-						</div>
-					))}
+						)
+					})}
 				</>
 			)}
 		</>
