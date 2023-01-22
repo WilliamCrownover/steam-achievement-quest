@@ -9,6 +9,7 @@ body {
 }
 h2 {
 	margin-bottom: 0px;
+	margin-top: 5px;
 }
 h3 {
 	margin: 0px;
@@ -40,9 +41,17 @@ p {
 	color: white;
 }
 
+.completeGraph {
+	display: flex;
+	align-items: flex-end;
+	height: 200px;
+	width: 100%;
+}
+
 .difficultyBar {
 	display: flex;
 	width: 100%;
+	margin-top: 3px;
 }
 .segment{
 	height: 25px;
@@ -58,4 +67,10 @@ p {
 }
 .impossible {
 	background-color: rgb(255, 0, 0);
+}
+
+.bottomItem {
+	margin-bottom: 20px;
+	border-bottom: 1px solid black;
+	padding-bottom: 5px;
 }
