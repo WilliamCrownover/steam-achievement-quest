@@ -1,15 +1,35 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getUserGames } from '../utils/api'
 
 export const SteamUser = () => {
-	const [loading, setLoading] = useState(true);
+	const [userId, setUserId] = useState('76561198035409755');
+	const [userIdCheck, setUserIdCheck] = useState(true);
+	const userIdRegex = new RegExp('^(7656[0-9]{13}?)$');
+	const [loading, setLoading] = useState(false);
+	const [noDataResponse, setNoDataResponse] = useState(false);
 	const [gameWithAchievements, setGameWithAchievements] = useState([]);
 	const [gameWithoutAchievements, setGameWithoutAchievements] = useState([]);
 
-	useEffect(() => {
+	const handleChange = (e) => {
+		setNoDataResponse(false);
+		const value = e.target.value;
+		setUserId(e.target.value);
+		userIdRegex.test(value) ? setUserIdCheck(true) : setUserIdCheck(false);
+	}
+
+	const handleSubmit = (e) => {
 		const getData = async () => {
 			setLoading(true);
-			const allData = await getUserGames('76561198035409755');
+			setNoDataResponse(false);
+			setGameWithAchievements([]);
+			setGameWithoutAchievements([]);
+			const allData = await getUserGames(e.target[0].value);
+			console.log(allData);
+			if(allData === undefined) {
+				setLoading(false);
+				setNoDataResponse(true);
+				return;
+			}
 			const gamesWithAchievementsData = allData.filter(game => game.achievements !== undefined);
 			const gamesWithoutAchievementsData = allData.filter(game => game.achievements === undefined);
 			// const sorted = data.sort((a,b) => a.name.localeCompare(b.name)).sort((a,b) => b.playtime_forever-a.playtime_forever);
@@ -27,7 +47,8 @@ export const SteamUser = () => {
 		};
 
 		getData();
-	}, [])
+		e.preventDefault();
+	}
 
 	const setColorFill = (number) => {
 		const percent = parseInt(number) / 100;
@@ -91,6 +112,16 @@ export const SteamUser = () => {
 
 	return (
 		<>
+			<form onSubmit={handleSubmit}>
+				<label>
+					Steam User ID
+					<input type='text' value={userId} onChange={handleChange}/>
+				</label>
+				<input type='submit' value='Submit' disabled={!userIdCheck}/>
+				{!userIdCheck && <p>Not a valid User ID</p>}
+			</form>
+			{noDataResponse && <p>A Steam User with this ID does not exist or has a completely private profile.</p>}
+			{gameWithAchievements[0]?.privateProfile && <p>This Steam user's achievements completed data is private.</p>}
 			{loading ? (
 				<h1>Loading!</h1>
 			) : (
@@ -100,12 +131,14 @@ export const SteamUser = () => {
 						return (
 							<div key={game.appid}>
 								{displayGraph(game.achievements)}
-								<div className='difficultyBar'>
-									<div className='segment easy' style={{ width: `${distribution.easyPercent}%` }} />
-									<div className='segment medium' style={{ width: `${distribution.mediumPercent}%` }} />
-									<div className='segment hard' style={{ width: `${distribution.hardPercent}%` }} />
-									<div className='segment impossible' style={{ width: `${distribution.impossiblePercent}%` }} />
-								</div>
+								{distribution?.easyPercent !== undefined &&
+									<div className='difficultyBar'>
+										<div className='segment easy' style={{ width: `${distribution.easyPercent}%` }} />
+										<div className='segment medium' style={{ width: `${distribution.mediumPercent}%` }} />
+										<div className='segment hard' style={{ width: `${distribution.hardPercent}%` }} />
+										<div className='segment impossible' style={{ width: `${distribution.impossiblePercent}%` }} />
+									</div>
+								}
 								<h3
 									className={`${game.percentComplete === '100.00' && 'achieved'}`}
 									style={{ backgroundColor: setColorFill(game.averagePercent), margin: '3px 0px' }}

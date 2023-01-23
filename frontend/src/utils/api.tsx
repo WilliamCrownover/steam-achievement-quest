@@ -6,20 +6,35 @@ export const getUserGames = async (userId) => {
 		const res = await fetch(url);
 		const json = await res.json();
 		const data = json.response.games;
+		if(data === undefined) return;
 		//Using slice to reduce the length of the array for testing .slice(0, 50)
 		const globalAchievements = await Promise.all(data.map(async (game) => {
 			const achievements = await getGameAchievements(game.appid);
 			return { ...game, achievements: achievements };
 		}));
 		const combinedAchievements = await Promise.all(globalAchievements.map(async (game) => {
-			const userAchievements = await getUserAchievements(game.appid, userId);
+			const gameAchievements = game.achievements;
+			const userAchievements = gameAchievements && await getUserAchievements(game.appid, userId);
 			const lastPlayedDate = dataFormat(game.rtime_last_played)
 			const hoursPlayed = (game.playtime_forever / 60).toFixed(2);
-			if (userAchievements !== undefined ) {
-				const combine = combineAchievements(game.achievements, userAchievements);
+
+			if(userAchievements === 'privateProfile' && gameAchievements?.length > 0 ) {
+				const totalAchievements = gameAchievements.length;
+				gameAchievements.sort((a, b) => b.percent - a.percent);
+				return { 
+					...game, 
+					lastPlayedDate, 
+					hoursPlayed,
+					totalAchievements,
+					privateProfile: true,
+				}
+			} else if (userAchievements === undefined || gameAchievements?.length === 0) {
+				return { ...game, lastPlayedDate, hoursPlayed, achievements: undefined }
+			} else {
+				const combine = combineAchievements(gameAchievements, userAchievements);
 				combine.sort((a, b) => b.percent - a.percent);
 				const averagePercent = averageAchievementPercent(combine).toFixed(2);
-				const totalAchievements = combine.length;
+				const totalAchievements = gameAchievements.length;
 				const totalCompletedAchievements = sumTotalCompleted(combine);
 				const percentComplete = ((totalCompletedAchievements / totalAchievements) * 100).toFixed(2);
 				const achievementDifficultyDistribution = sumDistributions(combine);
@@ -34,9 +49,7 @@ export const getUserGames = async (userId) => {
 					percentComplete,
 					achievementDifficultyDistribution,
 				}
-			} else {
-				return { ...game, lastPlayedDate, hoursPlayed, achievements: undefined }
-			}
+			} 
 		}));
 		return combinedAchievements;
 	} catch (error) {
@@ -62,7 +75,7 @@ const getUserAchievements = async (appId, userId) => {
 	try {
 		const res = await fetch(url);
 		const json = await res.json();
-		return json.playerstats.achievements?.sort((a, b) => a.apiname.localeCompare(b.apiname));
+		return json.playerstats.success === true ? json.playerstats.achievements?.sort((a, b) => a.apiname.localeCompare(b.apiname)) : 'privateProfile';
 	} catch (error) {
 		console.log(error);
 	}
