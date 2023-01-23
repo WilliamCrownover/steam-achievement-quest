@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { getUserGames } from '../utils/api'
+import { dataFormat, getUserGames, getUserInfo } from '../utils/api'
 
 export const SteamUser = () => {
 	const [userId, setUserId] = useState('76561198035409755');
 	const [userIdCheck, setUserIdCheck] = useState(true);
 	const userIdRegex = new RegExp('^(7656[0-9]{13}?)$');
+	const [userData, setUserData] = useState({});
+	const [loadingUserData, setLoadingUserData] = useState(true);
 	const [loading, setLoading] = useState(false);
 	const [noDataResponse, setNoDataResponse] = useState(false);
 	const [gameWithAchievements, setGameWithAchievements] = useState([]);
@@ -18,13 +20,13 @@ export const SteamUser = () => {
 	}
 
 	const handleSubmit = (e) => {
+		const inputValue = e.target[0].value;
 		const getData = async () => {
 			setLoading(true);
 			setNoDataResponse(false);
 			setGameWithAchievements([]);
 			setGameWithoutAchievements([]);
-			const allData = await getUserGames(e.target[0].value);
-			console.log(allData);
+			const allData = await getUserGames(inputValue);
 			if(allData === undefined) {
 				setLoading(false);
 				setNoDataResponse(true);
@@ -46,8 +48,31 @@ export const SteamUser = () => {
 			setLoading(false);
 		};
 
+		const getUserData = async () => {
+			setUserData({});
+			setLoadingUserData(true);
+			const uData = await getUserInfo(inputValue);
+			setUserData(uData);
+			setLoadingUserData(false);
+			if(uData === undefined) {
+				setLoading(false);
+			}
+		}
+
 		getData();
+		getUserData();
 		e.preventDefault();
+	}
+
+	const displayUserInfo = () => {
+		return userData === undefined 
+		? <p>Steam User Profile does not exist.</p> 
+		: <>
+				<h2>Username: {userData.personaname} {userData.realname && `(${userData.realname})`}</h2>
+				<h3>Profile Link: <span><a href={userData.profileurl} target='_blank' rel='noreferrer'>{userData.profileurl}</a></span></h3>
+				{userData.lastlogoff && <h3>Last Online: {dataFormat(userData.lastlogoff)}</h3>}
+				{userData.timecreated && <h3>Profile Created: {dataFormat(userData.timecreated)}</h3>}
+		</>
 	}
 
 	const setColorFill = (number) => {
@@ -120,12 +145,13 @@ export const SteamUser = () => {
 				<input type='submit' value='Submit' disabled={!userIdCheck}/>
 				{!userIdCheck && <p>Not a valid User ID</p>}
 			</form>
-			{noDataResponse && <p>A Steam User with this ID does not exist or has a completely private profile.</p>}
+			{noDataResponse && <p>This Steam user has a completely private profile.</p>}
 			{gameWithAchievements[0]?.privateProfile && <p>This Steam user's achievements completed data is private.</p>}
 			{loading ? (
 				<h1>Loading!</h1>
 			) : (
 				<>
+					{!loadingUserData && displayUserInfo()}
 					{gameWithAchievements.flatMap((game) => {
 						const distribution = game.achievementDifficultyDistribution;
 						return (

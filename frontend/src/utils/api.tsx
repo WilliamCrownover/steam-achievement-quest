@@ -1,6 +1,6 @@
 
 export const getUserGames = async (userId) => {
-	const url = `http://localhost:5000/getData/${userId}`
+	const url = `http://localhost:5000/getOwnedGames/${userId}`
 
 	try {
 		const res = await fetch(url);
@@ -57,6 +57,18 @@ export const getUserGames = async (userId) => {
 	}
 }
 
+export const getUserInfo = async (userId) => {
+	const url = `http://localhost:5000/getUserInfo/${userId}`
+
+	try {
+		const res = await fetch(url);
+		const json = await res.json();
+		return json.response.players[0];
+	} catch (error) {
+		console.log(error);
+	}
+}
+
 const getGameAchievements = async (appId) => {
 	const url = `http://localhost:5000/getGameAchievements/${appId}`
 
@@ -81,11 +93,10 @@ const getUserAchievements = async (appId, userId) => {
 	}
 }
 
-const dataFormat = (timestamp) => {
+export const dataFormat = (timestamp) => {
 	if (timestamp <= 100000) return 'Not Played';
 	const dateObject = new Date(timestamp * 1000);
-	return dateObject.toLocaleString('en-US', {
-	})
+	return dateObject.toLocaleString('en-US', {})
 }
 
 const combineAchievements = (globalA, userA) => {
