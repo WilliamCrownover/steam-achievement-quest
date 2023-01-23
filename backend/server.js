@@ -24,9 +24,15 @@ app.get('/getData/:userId', cors(corsOptions), async (req, res) => {
 	const fetchOptions = {
 		method: 'GET'
 	}
-	const response = await fetch(endpoint, fetchOptions);
-	const jsonResponse = await response.json();
-	res.json(jsonResponse);
+
+	try {
+		const response = await fetch(endpoint, fetchOptions);
+		const jsonResponse = await response.json();
+		res.json(jsonResponse);
+	} catch (error) {
+		console.log(error);
+		return { error: 'Could not fetch. Check User ID value.', success: false };
+	}
 });
 
 app.get('/getGameAchievements/:appId', cors(corsOptions), async (req, res) => {
