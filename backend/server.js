@@ -12,7 +12,7 @@ const corsOptions = {
 	origin: "http://localhost:3000"
 };
 
-app.get('/getData/:userId', cors(corsOptions), async (req, res) => {
+app.get('/getOwnedGames/:userId', cors(corsOptions), async (req, res) => {
 	const endpoint = `
 		https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/
 		?key=${process.env.REACT_APP_STEAM_KEY}
@@ -20,6 +20,30 @@ app.get('/getData/:userId', cors(corsOptions), async (req, res) => {
 		&format=json
 		&include_appinfo=true
 		&include_played_free_games=true
+	`;
+	const fetchOptions = {
+		method: 'GET'
+	}
+
+	try {
+		const response = await fetch(endpoint, fetchOptions);
+		if(response.status !== 200) {
+			throw new Error('Could not fetch. Check User ID value.');
+		}
+		const jsonResponse = await response.json();
+		res.json(jsonResponse);
+	} catch (error) {
+		console.log(error);
+		return { error, success: false };
+	}
+});
+
+app.get('/getUserInfo/:userId', cors(corsOptions), async (req, res) => {
+	const endpoint = `
+		https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/
+		?key=${process.env.REACT_APP_STEAM_KEY}
+		&steamids=${req.params.userId}
+		&format=json
 	`;
 	const fetchOptions = {
 		method: 'GET'
