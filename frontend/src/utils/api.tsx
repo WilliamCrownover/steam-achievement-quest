@@ -15,17 +15,23 @@ export const getUserGames = async (userId) => {
 		const combinedAchievements = await Promise.all(globalAchievements.map(async (game) => {
 			const gameAchievements = game.achievements;
 			const userAchievements = gameAchievements && await getUserAchievements(game.appid, userId);
-			const lastPlayedDate = dataFormat(game.rtime_last_played)
+			const lastPlayedDate = dateFormat(game.rtime_last_played)
 			const hoursPlayed = (game.playtime_forever / 60).toFixed(2);
 
 			if(userAchievements === 'privateProfile' && gameAchievements?.length > 0 ) {
+				const averagePercent = averageAchievementPercent(gameAchievements).toFixed(2);
 				const totalAchievements = gameAchievements.length;
+				const totalCompletedAchievements = sumTotalCompleted(gameAchievements);
+				const percentComplete = ((totalCompletedAchievements / totalAchievements) * 100).toFixed(2);
 				gameAchievements.sort((a, b) => b.percent - a.percent);
 				return { 
 					...game, 
 					lastPlayedDate, 
 					hoursPlayed,
+					averagePercent,
 					totalAchievements,
+					totalCompletedAchievements,
+					percentComplete,
 					privateProfile: true,
 				}
 			} else if (userAchievements === undefined || gameAchievements?.length === 0) {
@@ -93,7 +99,7 @@ const getUserAchievements = async (appId, userId) => {
 	}
 }
 
-export const dataFormat = (timestamp) => {
+export const dateFormat = (timestamp) => {
 	if (timestamp <= 100000) return 'Not Played';
 	const dateObject = new Date(timestamp * 1000);
 	return dateObject.toLocaleString('en-US', {})
@@ -102,7 +108,8 @@ export const dataFormat = (timestamp) => {
 const combineAchievements = (globalA, userA) => {
 	return globalA.map((achievement, i) => {
 		const uAchievement = userA[i];
-		return { ...achievement, achieved: uAchievement.achieved, unlocktime: uAchievement.unlocktime }
+		const unlockDate = uAchievement.unlocktime === 0 ? 'Unachieved' : dateFormat(uAchievement.unlocktime);
+		return { ...achievement, achieved: uAchievement.achieved, unlockDate, unlocktime: uAchievement.unlocktime }
 	})
 }
 
