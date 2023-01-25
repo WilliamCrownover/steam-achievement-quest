@@ -1,82 +1,66 @@
+import { between, dateFormat, round } from './utils';
 
-export const getUserGames = async (userId) => {
-	const url = `http://localhost:5000/getOwnedGames/${userId}`
-
-	try {
-		const res = await fetch(url);
-		const json = await res.json();
-		const data = json.response.games;
-		if(data === undefined) return;
-		//Using slice to reduce the length of the array for testing .slice(0, 50)
-		const globalAchievements = await Promise.all(data.map(async (game) => {
-			const achievements = await getGameAchievements(game.appid);
-			return { ...game, achievements: achievements };
-		}));
-		const combinedAchievements = await Promise.all(globalAchievements.map(async (game) => {
-			const gameAchievements = game.achievements;
-			const userAchievements = gameAchievements && await getUserAchievements(game.appid, userId);
-			const lastPlayedDate = dateFormat(game.rtime_last_played)
-			const hoursPlayed = (game.playtime_forever / 60).toFixed(2);
-
-			if(userAchievements === 'privateProfile' && gameAchievements?.length > 0 ) {
-				const averagePercent = averageAchievementPercent(gameAchievements).toFixed(2);
-				const totalAchievements = gameAchievements.length;
-				const totalCompletedAchievements = sumTotalCompleted(gameAchievements);
-				const percentComplete = ((totalCompletedAchievements / totalAchievements) * 100).toFixed(2);
-				gameAchievements.sort((a, b) => b.percent - a.percent);
-				return { 
-					...game, 
-					lastPlayedDate, 
-					hoursPlayed,
-					averagePercent,
-					totalAchievements,
-					totalCompletedAchievements,
-					percentComplete,
-					privateProfile: true,
-				}
-			} else if (userAchievements === undefined || gameAchievements?.length === 0) {
-				return { ...game, lastPlayedDate, hoursPlayed, achievements: undefined }
-			} else {
-				const combine = combineAchievements(gameAchievements, userAchievements);
-				combine.sort((a, b) => b.percent - a.percent);
-				const averagePercent = averageAchievementPercent(combine).toFixed(2);
-				const totalAchievements = gameAchievements.length;
-				const totalCompletedAchievements = sumTotalCompleted(combine);
-				const percentComplete = ((totalCompletedAchievements / totalAchievements) * 100).toFixed(2);
-				const achievementDifficultyDistribution = sumDistributions(combine);
-				return { 
-					...game, 
-					lastPlayedDate,
-					hoursPlayed,
-					achievements: combine, 
-					averagePercent,
-					totalAchievements,
-					totalCompletedAchievements,
-					percentComplete,
-					achievementDifficultyDistribution,
-				}
-			} 
-		}));
-		return combinedAchievements;
-	} catch (error) {
-		console.log(error);
-	}
-}
-
-export const getUserInfo = async (userId) => {
-	const url = `http://localhost:5000/getUserInfo/${userId}`
+// Main API call to collect and process Steam data
+export const getUserGameData = async (userId, sampleSize = false) => {
+	const url = `http://localhost:5000/getOwnedGames/${userId}`;
 
 	try {
 		const res = await fetch(url);
 		const json = await res.json();
-		return json.response.players[0];
+		const gamesData = json.response.games;
+
+		// The profile is completely private and no game data is available.
+		if (!gamesData) return;
+
+		// Get the global achievement data for each game and add extra properties.
+		const gamesDataGlobalAchievements = await Promise.all(gamesData.slice(0, sampleSize ? 25 : gamesData.length).map(async (game) => {
+			let achievements = await getGameAchievements(game.appid);
+			if (achievements) achievements = achievements.map((achievement) => ({ ...achievement, unlockDate: 'Unachieved' }));
+			const hoursPlayed = round((game.playtime_forever / 60));
+			const lastPlayedDate = dateFormat(game.rtime_last_played);
+			return { ...game, achievements, hoursPlayed, lastPlayedDate };
+		}));
+
+		// Get the user's achievement data and combine it with global data. Add extra properties.
+		const gamesDataGlobalAndUserAchievements = await Promise.all(gamesDataGlobalAchievements.map(async (game) => {
+			let achievements = game.achievements;
+			// If there are achievements to process
+			if (achievements && achievements?.length > 0) {
+				const userAchievements = await getUserAchievements(game.appid, userId);
+				const totalAchievements = achievements.length;
+				let totalCompletedAchievements = 0;
+				let privateProfile = true;
+				// If the user's achievement data is available
+				if (userAchievements !== 'privateProfile') {
+					achievements = combineAchievements(achievements, userAchievements);
+					totalCompletedAchievements = sumTotalCompleted(achievements);
+					privateProfile = false;
+				}
+				achievements = achievements.map((achievement) => ({ ...achievement, hoverInfo: `${achievement.name} - ${achievement.unlockDate}` }));
+				const percentComplete = round((totalCompletedAchievements / totalAchievements) * 100);
+				return {
+					...game,
+					achievements,
+					averagePercent: round(averageAchievementPercent(achievements)),
+					totalAchievements,
+					totalCompletedAchievements,
+					percentComplete,
+					achievementDifficultyDistribution: sumDistributions(achievements),
+					privateProfile,
+				}
+			}
+
+			return { ...game, achievements: undefined };
+		}));
+
+		return gamesDataGlobalAndUserAchievements;
 	} catch (error) {
 		console.log(error);
 	}
 }
 
 const getGameAchievements = async (appId) => {
-	const url = `http://localhost:5000/getGameAchievements/${appId}`
+	const url = `http://localhost:5000/getGameAchievements/${appId}`;
 
 	try {
 		const res = await fetch(url);
@@ -88,71 +72,55 @@ const getGameAchievements = async (appId) => {
 }
 
 const getUserAchievements = async (appId, userId) => {
-	const url = `http://localhost:5000/getUserAchievements/${appId}/${userId}`
+	const url = `http://localhost:5000/getUserAchievements/${appId}/${userId}`;
 
 	try {
 		const res = await fetch(url);
 		const json = await res.json();
-		return json.playerstats.success === true ? json.playerstats.achievements?.sort((a, b) => a.apiname.localeCompare(b.apiname)) : 'privateProfile';
+		return json.playerstats.success ? json.playerstats.achievements?.sort((a, b) => a.apiname.localeCompare(b.apiname)) : 'privateProfile';
 	} catch (error) {
 		console.log(error);
 	}
 }
 
-export const dateFormat = (timestamp) => {
-	if (timestamp <= 100000) return 'Not Played';
-	const dateObject = new Date(timestamp * 1000);
-	return dateObject.toLocaleString('en-US', {})
+export const getUserInfo = async (userId) => {
+	const url = `http://localhost:5000/getUserInfo/${userId}`;
+
+	try {
+		const res = await fetch(url);
+		const json = await res.json();
+		return json.response.players[0];
+	} catch (error) {
+		console.log(error);
+	}
 }
 
+// API Util Functions
 const combineAchievements = (globalA, userA) => {
 	return globalA.map((achievement, i) => {
-		const uAchievement = userA[i];
-		const unlockDate = uAchievement.unlocktime === 0 ? 'Unachieved' : dateFormat(uAchievement.unlocktime);
-		return { ...achievement, achieved: uAchievement.achieved, unlockDate, unlocktime: uAchievement.unlocktime }
+		const userAchievement = userA[i];
+		const achieved = userAchievement.achieved;
+		const unlocktime = userAchievement.unlocktime;
+		const unlockDate = unlocktime === 0 ? 'Unachieved' : dateFormat(unlocktime);
+		return { ...achievement, achieved, unlockDate, unlocktime };
 	})
 }
 
-const averageAchievementPercent = (achievementList) => {
-	const sum = (prev, cur) => ({ percent: prev.percent + cur.percent });
-	const avg = achievementList.reduce(sum).percent / achievementList.length;
-	return avg;
-}
+const sumTotalCompleted = (achievementList) => achievementList.reduce((total, achievement) => total + achievement.achieved, 0);
 
-const sumTotalCompleted = (achievementList) => {
-	let total = 0;
-	achievementList.forEach((achievement) => {
-		if (achievement.achieved) total += 1;
-	})
-	return total;
-}
+const averageAchievementPercent = (achievementList) => achievementList.reduce((total, achievement) => total + achievement.percent, 0) / achievementList.length;
 
 const sumDistributions = (achievementList) => {
-	let totalEasy = 0;
-	let totalMedium = 0;
-	let totalHard = 0;
-	let totalImpossible = 0;
-	achievementList.forEach((achievement) => {
-		const percent = achievement.percent;
-		switch (true) {
-			case percent >= 50:
-				totalEasy += 1;
-				break;
-			case percent >= 10:
-				totalMedium += 1;
-				break;
-			case percent >= 3:
-				totalHard += 1;
-				break;
-			default:
-				totalImpossible += 1;
-		}
-	});
+	const totalByRange = (percentTop, percentBottom) => achievementList.reduce((total, achievement) => total + (between(achievement.percent, percentTop, percentBottom) ? 1 : 0), 0);
+	const totalEasy = totalByRange(100, 50);
+	const totalMedium = totalByRange(50, 10);
+	const totalHard = totalByRange(10, 3);
+	const totalImpossible = totalByRange(3, 0);
 	const total = achievementList.length;
 	return {
-		easyPercent: parseFloat((totalEasy/total*100).toFixed(2)),
-		mediumPercent: parseFloat((totalMedium/total*100).toFixed(2)),
-		hardPercent: parseFloat((totalHard/total*100).toFixed(2)),
-		impossiblePercent: parseFloat((totalImpossible/total*100).toFixed(2)),
+		easyPercent: round(totalEasy / total * 100),
+		mediumPercent: round(totalMedium / total * 100),
+		hardPercent: round(totalHard / total * 100),
+		impossiblePercent: round(totalImpossible / total * 100),
 	}
 }
