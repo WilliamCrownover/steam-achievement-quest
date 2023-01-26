@@ -5,7 +5,7 @@ import { AchievementSortOrder } from './AchievementSortOrder';
 
 
 export const SteamUser = () => {
-	const [sampleSize, setSampleSize]= useState(true);
+	const [sampleSize, setSampleSize] = useState(true);
 	const [userId, setUserId] = useState('76561198035409755');
 	const [userIdCheck, setUserIdCheck] = useState(true);
 	const userIdRegex = new RegExp('^(7656[0-9]{13}?)$');
@@ -35,7 +35,7 @@ export const SteamUser = () => {
 			setGamesWithoutAchievements([]);
 			const allData = await getUserGameData(inputValue, sampleSize);
 			console.log(allData);
-			if(allData === undefined) {
+			if (allData === undefined) {
 				setLoading(false);
 				setNoDataResponse(true);
 				return;
@@ -53,7 +53,7 @@ export const SteamUser = () => {
 			const uData = await getUserInfo(inputValue);
 			setUserData(uData);
 			setLoadingUserData(false);
-			if(uData === undefined) {
+			if (uData === undefined) {
 				setLoading(false);
 			}
 		}
@@ -64,9 +64,9 @@ export const SteamUser = () => {
 	}
 
 	const displayUserInfo = () => {
-		return userData === undefined 
-		? <p>Steam User Profile does not exist.</p> 
-		: <>
+		return userData === undefined
+			? <p>Steam User Profile does not exist.</p>
+			: <>
 				<h2>Username: {userData.personaname} {userData.realname && `(${userData.realname})`}</h2>
 				<h3>Profile Link: <span><a href={userData.profileurl} target='_blank' rel='noreferrer'>{userData.profileurl}</a></span></h3>
 				{userData.lastlogoff && <h3>Last Online: {dateFormat(userData.lastlogoff)}</h3>}
@@ -76,7 +76,7 @@ export const SteamUser = () => {
 				<h3>Total Without Achievements: {gamesWithoutAchievements.length}</h3>
 				<h3>Number of Achievements: {gamesWithAchievements.reduce((total, current) => total + current.totalAchievements, 0)}</h3>
 				<h3>Number of Achievements Completed: {gamesWithAchievements.reduce((total, current) => total + current.totalCompletedAchievements, 0)}</h3>
-		</>
+			</>
 	}
 
 	const changeGameOrder = (e) => {
@@ -118,13 +118,13 @@ export const SteamUser = () => {
 			<>
 				<h4>Game Sort Order</h4>
 				<div onChange={changeGameOrder}>
-					<input type='radio' value='name' name='sortGames' defaultChecked/> Alphabetical
-					<input type='radio' value='hoursPlayed' name='sortGames'/> Playtime
-					<input type='radio' value='rtime_last_played' name='sortGames'/> Last Played Date
-					<input type='radio' value='totalAchievements' name='sortGames'/> Number of Achievements
-					<input type='radio' value='percentComplete' name='sortGames'/> Percent Complete
-					<input type='radio' value='averagePercent' name='sortGames'/> Average Global Achievement Rate
-					<input type='radio' value='lowestAchievementPercent' name='sortGames'/> Lowest Achievement Percent per Game
+					<input type='radio' value='name' name='sortGames' defaultChecked /> Alphabetical
+					<input type='radio' value='hoursPlayed' name='sortGames' /> Playtime
+					<input type='radio' value='rtime_last_played' name='sortGames' /> Last Played Date
+					<input type='radio' value='totalAchievements' name='sortGames' /> Number of Achievements
+					<input type='radio' value='percentComplete' name='sortGames' /> Percent Complete
+					<input type='radio' value='averagePercent' name='sortGames' /> Average Global Achievement Rate
+					<input type='radio' value='lowestAchievementPercent' name='sortGames' /> Lowest Achievement Percent per Game
 				</div>
 			</>
 		)
@@ -169,7 +169,7 @@ export const SteamUser = () => {
 					const percent = round(achievement.percent);
 					const colorFill = setColorFill(percent);
 					return (
-						<div key={achievement.name} title={achievement.hoverInfo} style={{ width: `${1 / achievementList.length * 100}%`, height: `${achievement.percent*2}px`, backgroundColor: `${achievement.achieved ? 'lightGrey' : colorFill}` }} />
+						<div key={achievement.name} title={achievement.hoverInfo} style={{ width: `${1 / achievementList.length * 100}%`, height: `${achievement.percent * 2}px`, backgroundColor: `${achievement.achieved ? 'lightGrey' : colorFill}` }} />
 					)
 				})}
 			</div>
@@ -194,13 +194,13 @@ export const SteamUser = () => {
 			<form onSubmit={handleSubmit}>
 				<label>
 					Steam User ID
-					<input type='text' value={userId} onChange={handleChange}/>
+					<input type='text' value={userId} onChange={handleChange} />
 				</label>
-				<input type='submit' value='Submit' disabled={!userIdCheck}/>
+				<input type='submit' value='Submit' disabled={!userIdCheck} />
 				{!userIdCheck && <p>Not a valid User ID</p>}
 			</form>
 			<label>
-				<input type='checkbox' checked={sampleSize} onChange={() => setSampleSize(!sampleSize)}/>
+				<input type='checkbox' checked={sampleSize} onChange={() => setSampleSize(!sampleSize)} />
 				Use Test Data Size: 25 Games
 			</label>
 			{(noDataResponse && userData) && <p>This Steam user has a completely private profile.</p>}
@@ -209,11 +209,11 @@ export const SteamUser = () => {
 				<h1>Loading!</h1>
 			) : (
 				<>
-					{!loadingUserData && 
+					{!loadingUserData &&
 						<>
 							{displayUserInfo()}
 							{displayGameSortOptions()}
-							<AchievementSortOrder gamesWithAchievements={gamesWithAchievements} setGamesWithAchievements={setGamesWithAchievements}/>
+							<AchievementSortOrder gamesWithAchievements={gamesWithAchievements} setGamesWithAchievements={setGamesWithAchievements} />
 						</>
 					}
 					{gamesWithAchievements.flatMap((game) => {

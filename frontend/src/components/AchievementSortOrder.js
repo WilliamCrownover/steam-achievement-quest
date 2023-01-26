@@ -1,6 +1,6 @@
 import { sorter, sortAlphabet, sortNumber } from '../utils/utils';
 
-export const AchievementSortOrder = ({gamesWithAchievements, setGamesWithAchievements }) => {
+export const AchievementSortOrder = ({ gamesWithAchievements, setGamesWithAchievements }) => {
 
 	const changeAchievementOrder = (e) => {
 		const value = e.target.value;
@@ -20,7 +20,7 @@ export const AchievementSortOrder = ({gamesWithAchievements, setGamesWithAchieve
 				}
 			}
 			const achievementsSorted = sortProperty(value);
-			return {...game, achievements: achievementsSorted};
+			return { ...game, achievements: achievementsSorted };
 		}));
 	}
 
