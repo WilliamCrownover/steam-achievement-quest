@@ -1,7 +1,10 @@
 import { useState } from "react";
-import { dateFormat, getUserGames, getUserInfo } from '../utils/api'
+import { getUserGameData, getUserInfo } from '../utils/api'
+import { dateFormat, round, sorter, sortAlphabet, sortNumber } from '../utils/utils';
+
 
 export const SteamUser = () => {
+	const [sampleSize, setSampleSize]= useState(true);
 	const [userId, setUserId] = useState('76561198035409755');
 	const [userIdCheck, setUserIdCheck] = useState(true);
 	const userIdRegex = new RegExp('^(7656[0-9]{13}?)$');
@@ -9,8 +12,8 @@ export const SteamUser = () => {
 	const [loadingUserData, setLoadingUserData] = useState(true);
 	const [loading, setLoading] = useState(false);
 	const [noDataResponse, setNoDataResponse] = useState(false);
-	const [gameWithAchievements, setGameWithAchievements] = useState([]);
-	const [gameWithoutAchievements, setGameWithoutAchievements] = useState([]);
+	const [gamesWithAchievements, setGamesWithAchievements] = useState([]);
+	const [gamesWithoutAchievements, setGamesWithoutAchievements] = useState([]);
 
 	const handleChange = (e) => {
 		setNoDataResponse(false);
@@ -19,14 +22,18 @@ export const SteamUser = () => {
 		userIdRegex.test(value) ? setUserIdCheck(true) : setUserIdCheck(false);
 	}
 
+	const sortAlphabeticalThenSetState = (setFunction, array, property) => setFunction(sorter(array, sortAlphabet(property)));
+	const sortNumberThenSetState = (setFunction, array, property, descending = false) => setFunction(sorter(array, sortNumber(property, descending)));
+
 	const handleSubmit = (e) => {
 		const inputValue = e.target[0].value;
 		const getData = async () => {
 			setLoading(true);
 			setNoDataResponse(false);
-			setGameWithAchievements([]);
-			setGameWithoutAchievements([]);
-			const allData = await getUserGames(inputValue);
+			setGamesWithAchievements([]);
+			setGamesWithoutAchievements([]);
+			const allData = await getUserGameData(inputValue, sampleSize);
+			console.log(allData);
 			if(allData === undefined) {
 				setLoading(false);
 				setNoDataResponse(true);
@@ -34,10 +41,8 @@ export const SteamUser = () => {
 			}
 			const gamesWithAchievementsData = allData.filter(game => game.achievements !== undefined);
 			const gamesWithoutAchievementsData = allData.filter(game => game.achievements === undefined);
-			gamesWithAchievementsData.sort((a,b) => a.name.localeCompare(b.name));
-			gamesWithoutAchievementsData.sort((a, b) => a.name.localeCompare(b.name));
-			setGameWithAchievements(gamesWithAchievementsData);
-			setGameWithoutAchievements(gamesWithoutAchievementsData);
+			sortAlphabeticalThenSetState(setGamesWithAchievements, gamesWithAchievementsData, 'name');
+			sortAlphabeticalThenSetState(setGamesWithoutAchievements, gamesWithoutAchievementsData, 'name');
 			setLoading(false);
 		};
 
@@ -65,111 +70,82 @@ export const SteamUser = () => {
 				<h3>Profile Link: <span><a href={userData.profileurl} target='_blank' rel='noreferrer'>{userData.profileurl}</a></span></h3>
 				{userData.lastlogoff && <h3>Last Online: {dateFormat(userData.lastlogoff)}</h3>}
 				{userData.timecreated && <h3>Profile Created: {dateFormat(userData.timecreated)}</h3>}
-				<h2>Total Number of Games: {gameWithAchievements.length + gameWithoutAchievements.length}</h2>
-				<h3>Total With Achievements: {gameWithAchievements.length}</h3>
-				<h3>Total Without Achievements: {gameWithoutAchievements.length}</h3>
-				<h3>Number of Achievements: {gameWithAchievements.reduce((total, current) => total + current.totalAchievements, 0)}</h3>
-				<h3>Number of Achievements Completed: {gameWithAchievements.reduce((total, current) => total + current.totalCompletedAchievements, 0)}</h3>
+				<h2>Total Number of Games: {gamesWithAchievements.length + gamesWithoutAchievements.length}</h2>
+				<h3>Total With Achievements: {gamesWithAchievements.length}</h3>
+				<h3>Total Without Achievements: {gamesWithoutAchievements.length}</h3>
+				<h3>Number of Achievements: {gamesWithAchievements.reduce((total, current) => total + current.totalAchievements, 0)}</h3>
+				<h3>Number of Achievements Completed: {gamesWithAchievements.reduce((total, current) => total + current.totalCompletedAchievements, 0)}</h3>
 		</>
 	}
 
-	const changeGameSort = (e) => {
+	const changeGameOrder = (e) => {
 		const value = e.target.value;
+		sortAlphabeticalThenSetState(setGamesWithoutAchievements, gamesWithoutAchievements, 'name');
+		const sharedSort = (property) => {
+			sortNumberThenSetState(setGamesWithAchievements, [...gamesWithAchievements], property, true);
+			sortNumberThenSetState(setGamesWithoutAchievements, [...gamesWithoutAchievements], property, true);
+		}
 		switch (true) {
-			case value === 'Name':
-				setGameWithAchievements([...gameWithAchievements].sort((a,b) => a.name.localeCompare(b.name)));
-				setGameWithoutAchievements([...gameWithoutAchievements].sort((a,b) => a.name.localeCompare(b.name)));
+			case value === 'name':
+				sortAlphabeticalThenSetState(setGamesWithAchievements, [...gamesWithAchievements], value);
 				break;
-			case value === 'Playtime':
-				setGameWithAchievements([...gameWithAchievements].sort((a,b) => b.hoursPlayed - a.hoursPlayed));
-				setGameWithoutAchievements([...gameWithoutAchievements].sort((a,b) => b.hoursPlayed - a.hoursPlayed));
+			case value === 'hoursPlayed':
+				sharedSort(value);
 				break;
-			case value === 'LastPlayed':
-				setGameWithAchievements([...gameWithAchievements].sort((a,b) => b.rtime_last_played - a.rtime_last_played));
-				setGameWithoutAchievements([...gameWithoutAchievements].sort((a,b) => b.rtime_last_played - a.rtime_last_played));
+			case value === 'rtime_last_played':
+				sharedSort(value);
 				break;
-			case value === 'TotalAchievements':
-				setGameWithAchievements([...gameWithAchievements].sort((a, b) => a.totalAchievements - b.totalAchievements));
-				setGameWithoutAchievements([...gameWithoutAchievements].sort((a,b) => a.name.localeCompare(b.name)));
+			case value === 'totalAchievements':
+				sortNumberThenSetState(setGamesWithAchievements, [...gamesWithAchievements], value);
 				break;
-			case value === 'PercentComplete':
-				setGameWithAchievements([...gameWithAchievements].sort((a, b) => a.totalAchievements - b.totalAchievements).sort((a, b) => b.percentComplete - a.percentComplete));
-				setGameWithoutAchievements([...gameWithoutAchievements].sort((a,b) => a.name.localeCompare(b.name)));
+			case value === 'percentComplete':
+				sortNumberThenSetState(setGamesWithAchievements, [...sorter([...gamesWithAchievements], sortNumber('totalAchievements'))], value, true);
 				break;
-			case value === 'GlobalAverage':
-				setGameWithAchievements([...gameWithAchievements].sort((a, b) => b.averagePercent - a.averagePercent));
-				setGameWithoutAchievements([...gameWithoutAchievements].sort((a,b) => a.name.localeCompare(b.name)));
+			case value === 'averagePercent':
+				sortNumberThenSetState(setGamesWithAchievements, [...gamesWithAchievements], value, true);
 				break;
-			case value === 'LastAchievement':
-				setGameWithAchievements([...gameWithAchievements].sort((a, b) => b.achievements[b.achievements.length - 1].percent - a.achievements[a.achievements.length - 1].percent));
-				setGameWithoutAchievements([...gameWithoutAchievements].sort((a,b) => a.name.localeCompare(b.name)));
+			case value === 'lowestAchievementPercent':
+				sortNumberThenSetState(setGamesWithAchievements, [...gamesWithAchievements], value, true);
 				break;
 			default:
 				return;
 		}
 	}
 
-	const changeAchievementSort = (e) => {
+	const changeAchievementOrder = (e) => {
 		const value = e.target.value;
-		switch (true) {
-			case value === 'Percent':
-				const pSort = gameWithAchievements.map(
-					(game) => (
-						{ 
-							...game, 
-							achievements: game.achievements.sort(
-								(a, b) => b.percent - a.percent
-							)
-						}
-					)
-				);
-				setGameWithAchievements(pSort);
-				break;
-			case value === 'Name':
-				const nSort = gameWithAchievements.map(
-					(game) => (
-						{ 
-							...game, 
-							achievements: game.achievements.sort(
-								(a, b) => a.name.localeCompare(b.name)
-							)
-						}
-					)
-				);
-				setGameWithAchievements(nSort);
-				break;
-			case value === 'UnlockDate':
-				const udSort = gameWithAchievements.map(
-					(game) => (
-						{ 
-							...game, 
-							achievements: game.achievements.sort(
-								(a, b) => b.percent - a.percent
-							).sort(
-								(a, b) => (a.unlocktime === 0 ? 9999999999 : a.unlocktime) - (b.unlocktime === 0 ? 9999999999 : b.unlocktime)
-							)
-						}
-					)
-				);
-				setGameWithAchievements(udSort);
-				break;
-			default:
-				return;
-		}
+		setGamesWithAchievements(gamesWithAchievements.map((game) => {
+			const sortProperty = (property) => {
+				const achievements = game.achievements;
+				const achievementsSortedByPercent = sorter(achievements, sortNumber('percent', true));
+				switch (property) {
+					case 'name':
+						return sorter(achievements, sortAlphabet(property));
+					case 'percent':
+						return achievementsSortedByPercent;
+					case 'unlockTime':
+						return sorter(achievementsSortedByPercent, sortNumber(property));
+					default:
+						return [];
+				}
+			}
+			const achievementsSorted = sortProperty(value);
+			return {...game, achievements: achievementsSorted};
+		}));
 	}
 
 	const displayGameSortOptions = () => {
 		return (
 			<>
 				<h4>Game Sort Order</h4>
-				<div onChange={changeGameSort}>
-					<input type='radio' value='Name' name='sortGames' defaultChecked/> Alphabetical Order
-					<input type='radio' value='Playtime' name='sortGames'/> Playtime
-					<input type='radio' value='LastPlayed' name='sortGames'/> Last Played Date
-					<input type='radio' value='TotalAchievements' name='sortGames'/> Total Number of Achievements
-					<input type='radio' value='PercentComplete' name='sortGames'/> Percent Complete
-					<input type='radio' value='GlobalAverage' name='sortGames'/> Average Global Achievement Rate
-					<input type='radio' value='LastAchievement' name='sortGames'/> Difficulty of Last Achievement
+				<div onChange={changeGameOrder}>
+					<input type='radio' value='name' name='sortGames' defaultChecked/> Alphabetical
+					<input type='radio' value='hoursPlayed' name='sortGames'/> Playtime
+					<input type='radio' value='rtime_last_played' name='sortGames'/> Last Played Date
+					<input type='radio' value='totalAchievements' name='sortGames'/> Number of Achievements
+					<input type='radio' value='percentComplete' name='sortGames'/> Percent Complete
+					<input type='radio' value='averagePercent' name='sortGames'/> Average Global Achievement Rate
+					<input type='radio' value='lowestAchievementPercent' name='sortGames'/> Lowest Achievement Percent per Game
 				</div>
 			</>
 		)
@@ -179,10 +155,10 @@ export const SteamUser = () => {
 		return (
 			<>
 				<h4>Achievement Sort Order</h4>
-				<div onChange={changeAchievementSort}>
-					<input type='radio' value='Percent' name='sortAchievements' defaultChecked/> Global Percent Complete
-					<input type='radio' value='Name' name='sortAchievements'/> Alphabetical Name
-					<input type='radio' value='UnlockDate' name='sortAchievements'/> Date Achieved
+				<div onChange={changeAchievementOrder}>
+					<input type='radio' value='name' name='sortAchievements' defaultChecked/> Alphabetical
+					<input type='radio' value='percent' name='sortAchievements'/> Global Percent Complete
+					<input type='radio' value='unlockTime' name='sortAchievements'/> Date Achieved
 				</div>
 			</>
 		)
@@ -224,10 +200,10 @@ export const SteamUser = () => {
 		return (
 			<div className='completeGraph'>
 				{achievementList.map((achievement) => {
-					const percent = achievement.percent.toFixed(2);
+					const percent = round(achievement.percent);
 					const colorFill = setColorFill(percent);
 					return (
-						<div style={{ width: `${1 / achievementList.length * 100}%`, height: `${achievement.percent*2}px`, backgroundColor: `${achievement.achieved ? 'lightGrey' : colorFill}` }} />
+						<div key={achievement.name} title={achievement.hoverInfo} style={{ width: `${1 / achievementList.length * 100}%`, height: `${achievement.percent*2}px`, backgroundColor: `${achievement.achieved ? 'lightGrey' : colorFill}` }} />
 					)
 				})}
 			</div>
@@ -238,11 +214,10 @@ export const SteamUser = () => {
 		return (
 			<div className='achievementList'>
 				{achievementList.map((achievement) => {
-					const name = achievement.name;
-					const percent = achievement.percent.toFixed(2);
+					const percent = round(achievement.percent);
 					const colorFill = setColorFill(percent);
 					const achieved = achievement.achieved && 'achieved'
-					return <h3 key={name} title={`${name} - ${achievement.unlockDate}`} style={{ backgroundColor: colorFill }} className={achieved}>{percent}</h3>
+					return <h3 key={achievement.name} title={achievement.hoverInfo} style={{ backgroundColor: colorFill }} className={achieved}>{percent}</h3>
 				})}
 			</div>
 		)
@@ -258,8 +233,12 @@ export const SteamUser = () => {
 				<input type='submit' value='Submit' disabled={!userIdCheck}/>
 				{!userIdCheck && <p>Not a valid User ID</p>}
 			</form>
-			{noDataResponse && <p>This Steam user has a completely private profile.</p>}
-			{gameWithAchievements[0]?.privateProfile && <p>This Steam user's achievements completed data is private.</p>}
+			<label>
+				<input type='checkbox' checked={sampleSize} onChange={() => setSampleSize(!sampleSize)}/>
+				Use Test Data Size: 25 Games
+			</label>
+			{(noDataResponse && userData) && <p>This Steam user has a completely private profile.</p>}
+			{gamesWithAchievements[0]?.privateProfile && <p>This Steam user's achievements completed data is private.</p>}
 			{loading ? (
 				<h1>Loading!</h1>
 			) : (
@@ -271,7 +250,7 @@ export const SteamUser = () => {
 							{displayAchievementsSortOptions()}
 						</>
 					}
-					{gameWithAchievements.flatMap((game) => {
+					{gamesWithAchievements.flatMap((game) => {
 						const distribution = game.achievementDifficultyDistribution;
 						return (
 							<div key={game.appid}>
@@ -297,7 +276,7 @@ export const SteamUser = () => {
 							</div>
 						)
 					})}
-					{gameWithoutAchievements.flatMap((game) =>
+					{gamesWithoutAchievements.flatMap((game) =>
 						<div key={game.appid}>
 							{displayTitleInfo(game)}
 							<h3>No Achievements</h3>

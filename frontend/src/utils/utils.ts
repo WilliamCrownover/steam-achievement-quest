@@ -7,3 +7,9 @@ export const dateFormat = (timestamp) => {
 }
 
 export const round = (num: number) => num.toFixed(2);
+
+export const sorter = (array, method) => array.sort(method);
+
+export const sortAlphabet = (property) => (a, b) => a[property].localeCompare(b[property]);
+
+export const sortNumber = (property, descending = false) => (a, b) => (descending ? b[property] : a[property]) - (descending ? a[property] : b[property]);

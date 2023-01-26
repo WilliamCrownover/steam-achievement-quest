@@ -1,4 +1,4 @@
-import { between, dateFormat, round } from './utils';
+import { between, dateFormat, round, sorter, sortAlphabet } from './utils';
 
 // Main API call to collect and process Steam data
 export const getUserGameData = async (userId, sampleSize = false) => {
@@ -15,10 +15,14 @@ export const getUserGameData = async (userId, sampleSize = false) => {
 		// Get the global achievement data for each game and add extra properties.
 		const gamesDataGlobalAchievements = await Promise.all(gamesData.slice(0, sampleSize ? 25 : gamesData.length).map(async (game) => {
 			let achievements = await getGameAchievements(game.appid);
-			if (achievements) achievements = achievements.map((achievement) => ({ ...achievement, unlockDate: 'Unachieved' }));
+			let lowestAchievementPercent = '0';
+			if (achievements) {
+				lowestAchievementPercent = round(Math.min(...achievements.map((achievement) => achievement.percent)));
+				achievements = achievements.map((achievement) => ({ ...achievement, unlockDate: 'Unachieved' }));
+			}
 			const hoursPlayed = round((game.playtime_forever / 60));
 			const lastPlayedDate = dateFormat(game.rtime_last_played);
-			return { ...game, achievements, hoursPlayed, lastPlayedDate };
+			return { ...game, achievements, lowestAchievementPercent, hoursPlayed, lastPlayedDate };
 		}));
 
 		// Get the user's achievement data and combine it with global data. Add extra properties.
@@ -65,7 +69,8 @@ const getGameAchievements = async (appId) => {
 	try {
 		const res = await fetch(url);
 		const json = await res.json();
-		return json.achievementpercentages?.achievements.sort((a, b) => a.name.localeCompare(b.name));
+		const achievements = json.achievementpercentages?.achievements;
+		return achievements ? sorter(achievements, sortAlphabet('name')) : achievements;
 	} catch (error) {
 		console.log(error);
 	}
@@ -77,7 +82,7 @@ const getUserAchievements = async (appId, userId) => {
 	try {
 		const res = await fetch(url);
 		const json = await res.json();
-		return json.playerstats.success ? json.playerstats.achievements?.sort((a, b) => a.apiname.localeCompare(b.apiname)) : 'privateProfile';
+		return json.playerstats.success ? sorter(json.playerstats.achievements, sortAlphabet('apiname')) : 'privateProfile';
 	} catch (error) {
 		console.log(error);
 	}
@@ -100,9 +105,9 @@ const combineAchievements = (globalA, userA) => {
 	return globalA.map((achievement, i) => {
 		const userAchievement = userA[i];
 		const achieved = userAchievement.achieved;
-		const unlocktime = userAchievement.unlocktime;
-		const unlockDate = unlocktime === 0 ? 'Unachieved' : dateFormat(unlocktime);
-		return { ...achievement, achieved, unlockDate, unlocktime };
+		const unlockTime = userAchievement.unlocktime === 0 ? 9999999999 : userAchievement.unlocktime;
+		const unlockDate = unlockTime === 9999999999 ? 'Unachieved' : dateFormat(unlockTime);
+		return { ...achievement, achieved, unlockDate, unlockTime };
 	})
 }
 
