@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { getUserGameData, getUserInfo } from '../utils/api'
-import { round, sortAlphabeticalThenSetState } from '../utils/utils';
+import { sortAlphabeticalThenSetState } from '../utils/utils';
 import { UserInfoSection } from './UserInfoSection';
 import { GamesInfoSection } from './GamesInfoSection';
 import { GameSortOrder } from './GameSortOrder';
 import { AchievementSortOrder } from './AchievementSortOrder';
+import { GameWithAchievements } from './GameWithAchievements';
 
 
 export const SteamUser = () => {
@@ -65,61 +66,12 @@ export const SteamUser = () => {
 		e.preventDefault();
 	}
 
-	const setColorFill = (number) => {
-		const percent = parseInt(number) / 100;
-		const redIncrease = 255 * (1 - percent)
-		const greenIncrease = 100 + 155 * (1 - percent)
-		const greenDecrease = 100 + 155 * (percent)
-		const greenDecreaseMax = greenIncrease * (percent * 10)
-		switch (true) {
-			case number >= 90:
-				return 'rgb(0,255,0)';
-			case number >= 50:
-				return `rgb(${redIncrease},${greenDecrease},0)`;
-			case number >= 10:
-				return `rgb(${redIncrease},${greenIncrease},0)`;
-			case number >= 1:
-				return `rgb(${redIncrease},${greenDecreaseMax},0)`;
-			case number >= 0.11:
-				return 'rgb(200,0,0)'
-			default:
-				return 'rgb(150,0,0)'
-		}
-	}
-
 	const displayTitleInfo = (game) => {
 		return (
 			<div className='gameTitleInfo'>
 				<h2>{game.name}</h2>
 				{game.hoursPlayed > 0 && <p>{`${game.hoursPlayed} Hours Played`}</p>}
 				<p>{game.lastPlayedDate}</p>
-			</div>
-		)
-	}
-
-	const displayGraph = (achievementList) => {
-		return (
-			<div className='completeGraph'>
-				{achievementList.map((achievement) => {
-					const percent = round(achievement.percent);
-					const colorFill = setColorFill(percent);
-					return (
-						<div key={achievement.name} title={achievement.hoverInfo} style={{ width: `${1 / achievementList.length * 100}%`, height: `${achievement.percent * 2}px`, backgroundColor: `${achievement.achieved ? 'lightGrey' : colorFill}` }} />
-					)
-				})}
-			</div>
-		)
-	}
-
-	const displayAchievements = (achievementList) => {
-		return (
-			<div className='achievementList'>
-				{achievementList.map((achievement) => {
-					const percent = round(achievement.percent);
-					const colorFill = setColorFill(percent);
-					const achieved = achievement.achieved && 'achieved'
-					return <h3 key={achievement.name} title={achievement.hoverInfo} style={{ backgroundColor: colorFill }} className={achieved}>{percent}</h3>
-				})}
 			</div>
 		)
 	}
@@ -174,32 +126,9 @@ export const SteamUser = () => {
 						:
 						(!firstLoad && <p>Steam User Profile does not exist.</p>)
 					}
-					{gamesWithAchievements.flatMap((game) => {
-						const distribution = game.achievementDifficultyDistribution;
-						return (
-							<div key={game.appid}>
-								{displayGraph(game.achievements)}
-								{distribution?.easyPercent !== undefined &&
-									<div className='difficultyBar'>
-										<div className='segment easy' style={{ width: `${distribution.easyPercent}%` }} />
-										<div className='segment medium' style={{ width: `${distribution.mediumPercent}%` }} />
-										<div className='segment hard' style={{ width: `${distribution.hardPercent}%` }} />
-										<div className='segment impossible' style={{ width: `${distribution.impossiblePercent}%` }} />
-									</div>
-								}
-								<h3
-									className={`${game.percentComplete === '100.00' && 'achieved'}`}
-									style={{ backgroundColor: setColorFill(game.averagePercent), margin: '3px 0px' }}
-								>
-									{game.averagePercent}
-								</h3>
-								{displayAchievements(game.achievements)}
-								{displayTitleInfo(game)}
-								<h3>{game.totalAchievements} Total Achievements</h3>
-								<h3 className='bottomItem'>{game.totalCompletedAchievements} Completed - {game.percentComplete}%</h3>
-							</div>
-						)
-					})}
+					{gamesWithAchievements.flatMap((game) =>
+						<GameWithAchievements game={game} key={game.appid} />
+					)}
 					{gamesWithoutAchievements.flatMap((game) =>
 						<div key={game.appid}>
 							{displayTitleInfo(game)}
