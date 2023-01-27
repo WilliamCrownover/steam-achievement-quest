@@ -6,6 +6,7 @@ import { GamesInfoSection } from './GamesInfoSection';
 import { GameSortOrder } from './GameSortOrder';
 import { AchievementSortOrder } from './AchievementSortOrder';
 import { GameWithAchievements } from './GameWithAchievements';
+import { GameWithoutAchievements } from './GameWithoutAchievements';
 
 
 export const SteamUser = () => {
@@ -66,16 +67,6 @@ export const SteamUser = () => {
 		e.preventDefault();
 	}
 
-	const displayTitleInfo = (game) => {
-		return (
-			<div className='gameTitleInfo'>
-				<h2>{game.name}</h2>
-				{game.hoursPlayed > 0 && <p>{`${game.hoursPlayed} Hours Played`}</p>}
-				<p>{game.lastPlayedDate}</p>
-			</div>
-		)
-	}
-
 	return (
 		<>
 			<form onSubmit={handleSubmit}>
@@ -130,10 +121,7 @@ export const SteamUser = () => {
 						<GameWithAchievements game={game} key={game.appid} />
 					)}
 					{gamesWithoutAchievements.flatMap((game) =>
-						<div key={game.appid}>
-							{displayTitleInfo(game)}
-							<h3>No Achievements</h3>
-						</div>
+						<GameWithoutAchievements game={game} key={game.appid} />
 					)}
 				</>
 			)}
