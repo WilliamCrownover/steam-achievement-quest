@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { getUserGameData, getUserInfo } from '../utils/api'
-import { dateFormat, round, sortAlphabeticalThenSetState } from '../utils/utils';
+import { round, sortAlphabeticalThenSetState } from '../utils/utils';
+import { UserInfoSection } from './UserInfoSection';
+import { GamesInfoSection } from './GamesInfoSection';
 import { GameSortOrder } from './GameSortOrder';
 import { AchievementSortOrder } from './AchievementSortOrder';
 
@@ -11,33 +13,47 @@ export const SteamUser = () => {
 	const [userIdCheck, setUserIdCheck] = useState(true);
 	const userIdRegex = new RegExp('^(7656[0-9]{13}?)$');
 	const [userData, setUserData] = useState({});
-	const [loadingUserData, setLoadingUserData] = useState(true);
+	const [firstLoad, setFirstLoad] = useState(true);
 	const [loading, setLoading] = useState(false);
-	const [noDataResponse, setNoDataResponse] = useState(false);
+	const [hasGames, setHasGames] = useState(false);
 	const [gamesWithAchievements, setGamesWithAchievements] = useState([]);
 	const [gamesWithoutAchievements, setGamesWithoutAchievements] = useState([]);
 
 	const handleChange = (e) => {
-		setNoDataResponse(false);
 		const value = e.target.value;
-		setUserId(e.target.value);
-		userIdRegex.test(value) ? setUserIdCheck(true) : setUserIdCheck(false);
+		setUserId(value);
+		setUserIdCheck(userIdRegex.test(value));
+	}
+
+	const reset = () => {
+		setFirstLoad(false);
+		setLoading(true);
+		setUserData({});
+		setGamesWithAchievements([]);
+		setGamesWithoutAchievements([]);
+		setHasGames(false);
 	}
 
 	const handleSubmit = (e) => {
 		const inputValue = e.target[0].value;
-		const getData = async () => {
-			setLoading(true);
-			setNoDataResponse(false);
-			setGamesWithAchievements([]);
-			setGamesWithoutAchievements([]);
-			const allData = await getUserGameData(inputValue, sampleSize);
-			console.log(allData);
-			if (allData === undefined) {
+		const getUserData = async () => {
+			reset();
+			const uData = await getUserInfo(inputValue);
+			setUserData(uData);
+			if (uData === undefined) {
 				setLoading(false);
-				setNoDataResponse(true);
 				return;
 			}
+			getData();
+		}
+
+		const getData = async () => {
+			const allData = await getUserGameData(inputValue, sampleSize);
+			if (allData === undefined) {
+				setLoading(false);
+				return;
+			}
+			setHasGames(true);
 			const gamesWithAchievementsData = allData.filter(game => game.achievements !== undefined);
 			const gamesWithoutAchievementsData = allData.filter(game => game.achievements === undefined);
 			sortAlphabeticalThenSetState(setGamesWithAchievements, gamesWithAchievementsData, 'name');
@@ -45,36 +61,8 @@ export const SteamUser = () => {
 			setLoading(false);
 		};
 
-		const getUserData = async () => {
-			setUserData({});
-			setLoadingUserData(true);
-			const uData = await getUserInfo(inputValue);
-			setUserData(uData);
-			setLoadingUserData(false);
-			if (uData === undefined) {
-				setLoading(false);
-			}
-		}
-
-		getData();
 		getUserData();
 		e.preventDefault();
-	}
-
-	const displayUserInfo = () => {
-		return userData === undefined
-			? <p>Steam User Profile does not exist.</p>
-			: <>
-				<h2>Username: {userData.personaname} {userData.realname && `(${userData.realname})`}</h2>
-				<h3>Profile Link: <span><a href={userData.profileurl} target='_blank' rel='noreferrer'>{userData.profileurl}</a></span></h3>
-				{userData.lastlogoff && <h3>Last Online: {dateFormat(userData.lastlogoff)}</h3>}
-				{userData.timecreated && <h3>Profile Created: {dateFormat(userData.timecreated)}</h3>}
-				<h2>Total Number of Games: {gamesWithAchievements.length + gamesWithoutAchievements.length}</h2>
-				<h3>Total With Achievements: {gamesWithAchievements.length}</h3>
-				<h3>Total Without Achievements: {gamesWithoutAchievements.length}</h3>
-				<h3>Number of Achievements: {gamesWithAchievements.reduce((total, current) => total + current.totalAchievements, 0)}</h3>
-				<h3>Number of Achievements Completed: {gamesWithAchievements.reduce((total, current) => total + current.totalCompletedAchievements, 0)}</h3>
-			</>
 	}
 
 	const setColorFill = (number) => {
@@ -150,26 +138,41 @@ export const SteamUser = () => {
 				<input type='checkbox' checked={sampleSize} onChange={() => setSampleSize(!sampleSize)} />
 				Use Test Data Size: 25 Games
 			</label>
-			{(noDataResponse && userData) && <p>This Steam user has a completely private profile.</p>}
 			{gamesWithAchievements[0]?.privateProfile && <p>This Steam user's achievements completed data is private.</p>}
+
 			{loading ? (
 				<h1>Loading!</h1>
 			) : (
 				<>
-					{!loadingUserData &&
+					{(!firstLoad && userData) ?
 						<>
-							{displayUserInfo()}
-							<GameSortOrder 
-								gamesWithAchievements={gamesWithAchievements} 
-								setGamesWithAchievements={setGamesWithAchievements} 
-								gamesWithoutAchievements={gamesWithoutAchievements}
-								setGamesWithoutAchievements={setGamesWithoutAchievements}
+							<UserInfoSection
+								userData={userData}
 							/>
-							<AchievementSortOrder 
-								gamesWithAchievements={gamesWithAchievements} 
-								setGamesWithAchievements={setGamesWithAchievements} 
-							/>
+							{hasGames ?
+								<>
+									<GamesInfoSection
+										gamesWithAchievements={gamesWithAchievements}
+										gamesWithoutAchievements={gamesWithoutAchievements}
+									/>
+									<GameSortOrder
+										gamesWithAchievements={gamesWithAchievements}
+										setGamesWithAchievements={setGamesWithAchievements}
+										gamesWithoutAchievements={gamesWithoutAchievements}
+										setGamesWithoutAchievements={setGamesWithoutAchievements}
+									/>
+									{gamesWithAchievements.length > 0 &&
+										<AchievementSortOrder
+											gamesWithAchievements={gamesWithAchievements}
+											setGamesWithAchievements={setGamesWithAchievements}
+										/>
+									}
+								</>
+								: <p>This Steam User's game list is private.</p>
+							}
 						</>
+						:
+						(!firstLoad && <p>Steam User Profile does not exist.</p>)
 					}
 					{gamesWithAchievements.flatMap((game) => {
 						const distribution = game.achievementDifficultyDistribution;
