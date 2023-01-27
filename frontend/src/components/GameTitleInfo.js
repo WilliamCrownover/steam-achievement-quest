@@ -1,4 +1,4 @@
-export const GameTitleInfo = ({game}) => {
+export const GameTitleInfo = ({ game }) => {
 	const hoursPlayed = game.hoursPlayed;
 
 	return (

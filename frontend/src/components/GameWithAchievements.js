@@ -25,7 +25,7 @@ export const GameWithAchievements = ({ game }) => {
 			</h3>
 			<AchievementPercentages achievements={game.achievements} />
 			<GameTitleInfo game={game} />
-			<h3>{game.totalAchievements} Total Achievements</h3>
+			<a className='achievementLink' href={game.achievementsUrl} target='_blank' rel='noreferrer'>{game.totalAchievements} Total Achievements</a>
 			<h3 className='bottomItem'>{game.totalCompletedAchievements} Completed - {game.percentComplete}%</h3>
 		</>
 	)

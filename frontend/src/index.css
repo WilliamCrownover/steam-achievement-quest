@@ -46,6 +46,10 @@ p {
 .achieved {
 	color: white;
 }
+.achievementLink {
+	font-size: 1.15rem;
+	color: black;
+}
 
 .completeGraph {
 	display: flex;

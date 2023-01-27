@@ -24,7 +24,8 @@ export const getUserGameData = async (userId, sampleSize = false) => {
 			const hoursPlayed = round((game.playtime_forever / 60));
 			const lastPlayedDate = dateFormat(game.rtime_last_played);
 			const gameUrl = `https://store.steampowered.com/app/${gameId}`;
-			return { ...game, achievements, lowestAchievementPercent, hoursPlayed, lastPlayedDate, gameUrl };
+			const achievementsUrl = `https://steamcommunity.com/stats/${gameId}/achievements`;
+			return { ...game, achievements, lowestAchievementPercent, hoursPlayed, lastPlayedDate, gameUrl, achievementsUrl };
 		}));
 
 		// Get the user's achievement data and combine it with global data. Add extra properties.
