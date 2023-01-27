@@ -3,7 +3,7 @@ export const GameTitleInfo = ({game}) => {
 
 	return (
 		<div className='gameTitleInfo'>
-			<h2>{game.name}</h2>
+			<a className='gameTitleLink' href={game.gameUrl} target='_blank' rel='noreferrer'>{game.name}</a>
 			{hoursPlayed > 0 && <p>{`${hoursPlayed} Hours Played`}</p>}
 			<p>{game.lastPlayedDate}</p>
 		</div>

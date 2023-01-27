@@ -120,7 +120,7 @@ export const SteamUser = () => {
 					{gamesWithAchievements.flatMap((game) =>
 						<GameWithAchievements game={game} key={game.appid} />
 					)}
-					<h2 className={'gameWithoutAchievementsDivision'}>Games Without Achievements</h2>
+					{hasGames && <h2 className={'gameWithoutAchievementsDivision'}>Games Without Achievements</h2>}
 					{gamesWithoutAchievements.flatMap((game) =>
 						<GameWithoutAchievements game={game} key={game.appid} />
 					)}

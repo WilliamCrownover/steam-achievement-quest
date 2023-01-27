@@ -22,10 +22,16 @@ p {
 .gameTitleInfo {
 	display: flex;
 	align-items:flex-end;
+	margin-top: 10px;
 }
 .gameTitleInfo > * {
 	display: inline-block;
 	padding-right: 10px;
+}
+.gameTitleLink {
+	font-size: 1.5rem;
+	font-weight: 600;
+	color: black;
 }
 
 .achievementList {
@@ -82,5 +88,5 @@ p {
 }
 .gameWithoutAchievementsDivision,
 .gameWithoutAchievements {
-	margin-bottom: 20px;
+	margin: 20px 0px;
 }

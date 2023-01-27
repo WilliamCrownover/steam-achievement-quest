@@ -14,7 +14,8 @@ export const getUserGameData = async (userId, sampleSize = false) => {
 
 		// Get the global achievement data for each game and add extra properties.
 		const gamesDataGlobalAchievements = await Promise.all(gamesData.slice(0, sampleSize ? 25 : gamesData.length).map(async (game) => {
-			let achievements = await getGameAchievements(game.appid);
+			const gameId = game.appid;
+			let achievements = await getGameAchievements(gameId);
 			let lowestAchievementPercent = '0';
 			if (achievements) {
 				lowestAchievementPercent = round(Math.min(...achievements.map((achievement) => achievement.percent)));
@@ -22,7 +23,8 @@ export const getUserGameData = async (userId, sampleSize = false) => {
 			}
 			const hoursPlayed = round((game.playtime_forever / 60));
 			const lastPlayedDate = dateFormat(game.rtime_last_played);
-			return { ...game, achievements, lowestAchievementPercent, hoursPlayed, lastPlayedDate };
+			const gameUrl = `https://store.steampowered.com/app/${gameId}`;
+			return { ...game, achievements, lowestAchievementPercent, hoursPlayed, lastPlayedDate, gameUrl };
 		}));
 
 		// Get the user's achievement data and combine it with global data. Add extra properties.
