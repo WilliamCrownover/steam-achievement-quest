@@ -74,3 +74,13 @@ p {
 	border-bottom: 1px solid black;
 	padding-bottom: 5px;
 }
+
+.gameWithoutAchievementsDivision{
+	background-color: black;
+	color: white;
+	padding: 5px;
+}
+.gameWithoutAchievementsDivision,
+.gameWithoutAchievements {
+	margin-bottom: 20px;
+}
