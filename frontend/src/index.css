@@ -1,82 +1,82 @@
 * {
-  font-family: 'Libre Franklin', sans-serif;
-  box-sizing: border-box;
+	font-family: 'Libre Franklin', sans-serif;
+	box-sizing: border-box;
 }
 
 body {
 	margin: 30px;
 	margin-left: 60px;
 }
+
 h2 {
 	margin-bottom: 0px;
 	margin-top: 5px;
 }
+
 h3 {
 	margin: 0px;
 }
+
 p {
 	margin: 0px;
 	margin-bottom: 4px;
 }
 
+.achievementSortOrder {
+	margin-bottom: 20px;
+}
+
+.achievementGraph {
+	display: flex;
+	align-items: flex-end;
+	height: 300px;
+	width: 100%;
+}
+
+.graphVerticalBar {
+	display: flex;
+	flex-direction: column;
+}
+
 .gameTitleInfo {
 	display: flex;
-	align-items:flex-end;
+	align-items: flex-end;
 	margin-top: 10px;
 }
-.gameTitleInfo > * {
+
+.gameTitleInfo>* {
 	display: inline-block;
 	padding-right: 10px;
 }
+
 .gameTitleLink {
 	font-size: 1.5rem;
 	font-weight: 600;
 	color: black;
 }
 
+.averagePercent {
+	padding: 3px;
+}
+
 .achievementList {
 	display: flex;
 	flex-wrap: wrap;
 }
+
 .achievementList h3 {
 	display: inline-block;
 	padding: 3px;
 	min-width: 58px;
 }
+
 .achieved {
 	color: white;
 }
+
 .achievementLink {
 	font-size: 1.15rem;
 	color: black;
-}
-
-.completeGraph {
-	display: flex;
-	align-items: flex-end;
-	height: 200px;
-	width: 100%;
-}
-
-.difficultyBar {
-	display: flex;
-	width: 100%;
-	margin-top: 3px;
-}
-.segment{
-	height: 25px;
-}
-.easy {
-	background-color: rgb(0, 255, 0);
-}
-.medium {
-	background-color: rgb(255, 255, 0);
-}
-.hard {
-	background-color: rgb(255, 155, 0);
-}
-.impossible {
-	background-color: rgb(255, 0, 0);
 }
 
 .bottomItem {
@@ -85,11 +85,12 @@ p {
 	padding-bottom: 5px;
 }
 
-.gameWithoutAchievementsDivision{
+.gameWithoutAchievementsDivision {
 	background-color: black;
 	color: white;
 	padding: 5px;
 }
+
 .gameWithoutAchievementsDivision,
 .gameWithoutAchievements {
 	margin: 20px 0px;

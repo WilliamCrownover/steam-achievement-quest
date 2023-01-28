@@ -27,7 +27,7 @@ export const AchievementSortOrder = ({ gamesWithAchievements, setGamesWithAchiev
 	return (
 		<>
 			<h4>Achievement Sort Order</h4>
-			<div onChange={changeAchievementOrder}>
+			<div onChange={changeAchievementOrder} className='achievementSortOrder' >
 				<input type='radio' value='name' name='sortAchievements' defaultChecked /> Alphabetical
 				<input type='radio' value='percent' name='sortAchievements' /> Global Percent Complete
 				<input type='radio' value='unlockTime' name='sortAchievements' /> Date Achieved

@@ -1,4 +1,4 @@
-import { between, dateFormat, round, sorter, sortAlphabet } from './utils';
+import { dateFormat, round, sorter, sortAlphabet } from './utils';
 
 // Main API call to collect and process Steam data
 export const getUserGameData = async (userId, sampleSize = false) => {
@@ -52,7 +52,6 @@ export const getUserGameData = async (userId, sampleSize = false) => {
 					totalAchievements,
 					totalCompletedAchievements,
 					percentComplete,
-					achievementDifficultyDistribution: sumDistributions(achievements),
 					privateProfile,
 				}
 			}
@@ -117,18 +116,3 @@ const combineAchievements = (globalA, userA) => {
 const sumTotalCompleted = (achievementList) => achievementList.reduce((total, achievement) => total + achievement.achieved, 0);
 
 const averageAchievementPercent = (achievementList) => achievementList.reduce((total, achievement) => total + achievement.percent, 0) / achievementList.length;
-
-const sumDistributions = (achievementList) => {
-	const totalByRange = (percentTop, percentBottom) => achievementList.reduce((total, achievement) => total + (between(achievement.percent, percentTop, percentBottom) ? 1 : 0), 0);
-	const totalEasy = totalByRange(100, 50);
-	const totalMedium = totalByRange(50, 10);
-	const totalHard = totalByRange(10, 3);
-	const totalImpossible = totalByRange(3, 0);
-	const total = achievementList.length;
-	return {
-		easyPercent: round(totalEasy / total * 100),
-		mediumPercent: round(totalMedium / total * 100),
-		hardPercent: round(totalHard / total * 100),
-		impossiblePercent: round(totalImpossible / total * 100),
-	}
-}
