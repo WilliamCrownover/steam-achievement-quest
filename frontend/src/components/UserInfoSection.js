@@ -1,6 +1,9 @@
 import { dateFormat } from '../utils/utils';
 
-export const UserInfoSection = ({userData}) => {
+export const UserInfoSection = (props) => {
+	const {
+		userData,
+	} = props;
 
 	return (
 		<>

@@ -1,9 +1,16 @@
 import { sorter, sortAlphabet, sortNumber } from '../utils/utils';
 
-export const AchievementSortOrder = ({ gamesWithAchievements, setGamesWithAchievements }) => {
+export const AchievementSortOrder = (props) => {
+	const {
+		userData,
+		gamesWithAchievements,
+		setGamesWithAchievements,
+		setSortChangeOnly,
+	} = props;
 
 	const changeAchievementOrder = (e) => {
 		const value = e.target.value;
+		setSortChangeOnly(true);
 		setGamesWithAchievements(gamesWithAchievements.map((game) => {
 			const sortProperty = (property) => {
 				const achievements = game.achievements;
@@ -30,7 +37,7 @@ export const AchievementSortOrder = ({ gamesWithAchievements, setGamesWithAchiev
 			<div onChange={changeAchievementOrder} className='achievementSortOrder' >
 				<input type='radio' value='name' name='sortAchievements' defaultChecked /> Alphabetical
 				<input type='radio' value='percent' name='sortAchievements' /> Global Percent Complete
-				<input type='radio' value='unlockTime' name='sortAchievements' /> Date Achieved
+				{!userData.privateProfile && <><input type='radio' value='unlockTime' name='sortAchievements' /> <span>Date Achieved</span></>}
 			</div>
 		</>
 	)

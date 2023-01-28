@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getUserGameData, getUserInfo } from '../utils/api'
 import { sortAlphabeticalThenSetState } from '../utils/utils';
 import { UserInfoSection } from './UserInfoSection';
@@ -8,18 +8,20 @@ import { AchievementSortOrder } from './AchievementSortOrder';
 import { GameWithAchievements } from './GameWithAchievements';
 import { GameWithoutAchievements } from './GameWithoutAchievements';
 
-
 export const SteamUser = () => {
 	const [sampleSize, setSampleSize] = useState(true);
+	const [firstLoad, setFirstLoad] = useState(true);
+	const [loading, setLoading] = useState(false);
 	const [userId, setUserId] = useState('76561198035409755');
 	const [userIdCheck, setUserIdCheck] = useState(true);
 	const userIdRegex = new RegExp('^(7656[0-9]{13}?)$');
 	const [userData, setUserData] = useState({});
-	const [firstLoad, setFirstLoad] = useState(true);
-	const [loading, setLoading] = useState(false);
+	const [modifiedUserData, setModifiedUserData] = useState({});
 	const [hasGames, setHasGames] = useState(false);
 	const [gamesWithAchievements, setGamesWithAchievements] = useState([]);
 	const [gamesWithoutAchievements, setGamesWithoutAchievements] = useState([]);
+	const [sortChangeOnly, setSortChangeOnly] = useState(false);
+	const [passDownSteamData, setPassDownSteamData] = useState({});
 
 	const handleChange = (e) => {
 		const value = e.target.value;
@@ -31,9 +33,12 @@ export const SteamUser = () => {
 		setFirstLoad(false);
 		setLoading(true);
 		setUserData({});
+		setModifiedUserData({});
+		setHasGames(false);
 		setGamesWithAchievements([]);
 		setGamesWithoutAchievements([]);
-		setHasGames(false);
+		setSortChangeOnly(false);
+		setPassDownSteamData({});
 	}
 
 	const handleSubmit = (e) => {
@@ -41,16 +46,21 @@ export const SteamUser = () => {
 		const getUserData = async () => {
 			reset();
 			const uData = await getUserInfo(inputValue);
-			setUserData(uData);
+			setModifiedUserData(uData);
 			if (uData === undefined) {
 				setLoading(false);
 				return;
 			}
-			getData();
+			setUserData(uData);
 		}
 
-		const getData = async () => {
-			const allData = await getUserGameData(inputValue, sampleSize);
+		getUserData();
+		e.preventDefault();
+	}
+
+	useEffect(() => {
+		const getGamesData = async () => {
+			const allData = await getUserGameData(userData.steamid, sampleSize);
 			if (allData === undefined) {
 				setLoading(false);
 				return;
@@ -60,12 +70,37 @@ export const SteamUser = () => {
 			const gamesWithoutAchievementsData = allData.filter(game => game.achievements === undefined);
 			sortAlphabeticalThenSetState(setGamesWithAchievements, gamesWithAchievementsData, 'name');
 			sortAlphabeticalThenSetState(setGamesWithoutAchievements, gamesWithoutAchievementsData, 'name');
-			setLoading(false);
 		};
 
-		getUserData();
-		e.preventDefault();
-	}
+		userData.steamid && getGamesData();
+	}, [userData, sampleSize]);
+
+	useEffect(() => {
+		const addMoreDataToUser = () => {
+			setModifiedUserData({
+				...userData,
+				totalNumberOfGames: [...gamesWithAchievements, ...gamesWithoutAchievements].length,
+				privateProfile: gamesWithAchievements[0]?.privateProfile
+			})
+		}
+
+		(!sortChangeOnly && userData.steamid && (gamesWithAchievements.length > 0 || gamesWithoutAchievements.length > 0)) && addMoreDataToUser();
+	}, [sortChangeOnly, userData, gamesWithAchievements, gamesWithoutAchievements]);
+
+	useEffect(() => {
+		const packageData = () => {
+			setPassDownSteamData({
+				userData: modifiedUserData,
+				gamesWithAchievements: gamesWithAchievements,
+				setGamesWithAchievements: setGamesWithAchievements,
+				gamesWithoutAchievements: gamesWithoutAchievements,
+				setGamesWithoutAchievements: setGamesWithoutAchievements,
+			});
+			modifiedUserData.totalNumberOfGames && setLoading(false);
+		}
+
+		(!sortChangeOnly && modifiedUserData?.steamid) && packageData();
+	}, [sortChangeOnly, modifiedUserData, gamesWithAchievements, gamesWithoutAchievements]);
 
 	return (
 		<>
@@ -81,33 +116,28 @@ export const SteamUser = () => {
 				<input type='checkbox' checked={sampleSize} onChange={() => setSampleSize(!sampleSize)} />
 				Use Test Data Size: 25 Games
 			</label>
-			{gamesWithAchievements[0]?.privateProfile && <p>This Steam user's achievements completed data is private.</p>}
 
 			{loading ? (
 				<h1>Loading!</h1>
 			) : (
 				<>
-					{(!firstLoad && userData) ?
+					{(!firstLoad && modifiedUserData) ?
 						<>
 							<UserInfoSection
-								userData={userData}
+								{...passDownSteamData}
 							/>
 							{hasGames ?
 								<>
 									<GamesInfoSection
-										gamesWithAchievements={gamesWithAchievements}
-										gamesWithoutAchievements={gamesWithoutAchievements}
+										{...passDownSteamData}
 									/>
 									<GameSortOrder
-										gamesWithAchievements={gamesWithAchievements}
-										setGamesWithAchievements={setGamesWithAchievements}
-										gamesWithoutAchievements={gamesWithoutAchievements}
-										setGamesWithoutAchievements={setGamesWithoutAchievements}
+										{...passDownSteamData}
 									/>
 									{gamesWithAchievements.length > 0 &&
 										<AchievementSortOrder
-											gamesWithAchievements={gamesWithAchievements}
-											setGamesWithAchievements={setGamesWithAchievements}
+											{...passDownSteamData}
+											setSortChangeOnly={setSortChangeOnly}
 										/>
 									}
 								</>
@@ -120,7 +150,7 @@ export const SteamUser = () => {
 					{gamesWithAchievements.flatMap((game) =>
 						<GameWithAchievements game={game} key={game.appid} />
 					)}
-					{hasGames && <h2 className={'gameWithoutAchievementsDivision'}>Games Without Achievements</h2>}
+					{(hasGames && gamesWithoutAchievements.length > 0) && <h2 className={'gameWithoutAchievementsDivision'}>Games Without Achievements</h2>}
 					{gamesWithoutAchievements.flatMap((game) =>
 						<GameWithoutAchievements game={game} key={game.appid} />
 					)}
