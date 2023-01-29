@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getUserGameData, getUserInfo } from '../utils/api'
-import { sortAlphabeticalThenSetState } from '../utils/utils';
+import { round, sortAlphabeticalThenSetState } from '../utils/utils';
 import { UserInfoSection } from './UserInfoSection';
 import { GamesInfoSection } from './GamesInfoSection';
 import { GameSortOrder } from './GameSortOrder';
@@ -23,10 +23,11 @@ export const SteamUser = () => {
 	const [sortChangeOnly, setSortChangeOnly] = useState(false);
 	const [passDownSteamData, setPassDownSteamData] = useState({});
 
-	const handleChange = (e) => {
+	const handleIDChange = (e) => {
 		const value = e.target.value;
 		setUserId(value);
 		setUserIdCheck(userIdRegex.test(value));
+		e.preventDefault();
 	}
 
 	const reset = () => {
@@ -47,7 +48,7 @@ export const SteamUser = () => {
 			reset();
 			const uData = await getUserInfo(inputValue);
 			setModifiedUserData(uData);
-			if (uData === undefined) {
+			if (!uData) {
 				setLoading(false);
 				return;
 			}
@@ -60,14 +61,15 @@ export const SteamUser = () => {
 
 	useEffect(() => {
 		const getGamesData = async () => {
-			const allData = await getUserGameData(userData.steamid, sampleSize);
-			if (allData === undefined) {
+			setLoading(true);
+			const gameData = await getUserGameData(userData.steamid, sampleSize);
+			if (!gameData) {
 				setLoading(false);
 				return;
 			}
 			setHasGames(true);
-			const gamesWithAchievementsData = allData.filter(game => game.achievements !== undefined);
-			const gamesWithoutAchievementsData = allData.filter(game => game.achievements === undefined);
+			const gamesWithAchievementsData = gameData.filter(game => game.achievements);
+			const gamesWithoutAchievementsData = gameData.filter(game => !game.achievements);
 			sortAlphabeticalThenSetState(setGamesWithAchievements, gamesWithAchievementsData, 'name');
 			sortAlphabeticalThenSetState(setGamesWithoutAchievements, gamesWithoutAchievementsData, 'name');
 		};
@@ -77,10 +79,15 @@ export const SteamUser = () => {
 
 	useEffect(() => {
 		const addMoreDataToUser = () => {
+			const allGames = [...gamesWithAchievements, ...gamesWithoutAchievements];
 			setModifiedUserData({
 				...userData,
-				totalNumberOfGames: [...gamesWithAchievements, ...gamesWithoutAchievements].length,
-				privateProfile: gamesWithAchievements[0]?.privateProfile
+				privateProfile: gamesWithAchievements[0]?.privateProfile,
+				totalNumberOfGames: allGames.length,
+				totalAchievements: gamesWithAchievements.reduce((total, current) => total + current.totalAchievements, 0),
+				totalAchievementsCompleted: gamesWithAchievements.reduce((total, current) => total + current.totalCompletedAchievements, 0),
+				totalPlaytime: round(allGames.reduce((total, game) => total + parseFloat(game.hoursPlayed), 0)),
+				totalNeverPlayed: allGames.reduce((total, game) => total + (game.lastPlayedDate === 'Not Played' ? 1 : 0), 0),
 			})
 		}
 
@@ -96,7 +103,7 @@ export const SteamUser = () => {
 				gamesWithoutAchievements: gamesWithoutAchievements,
 				setGamesWithoutAchievements: setGamesWithoutAchievements,
 			});
-			modifiedUserData.totalNumberOfGames && setLoading(false);
+			modifiedUserData.totalPlaytime && setLoading(false);
 		}
 
 		(!sortChangeOnly && modifiedUserData?.steamid) && packageData();
@@ -107,7 +114,7 @@ export const SteamUser = () => {
 			<form onSubmit={handleSubmit}>
 				<label>
 					Steam User ID
-					<input type='text' value={userId} onChange={handleChange} />
+					<input type='text' value={userId} onChange={handleIDChange} />
 				</label>
 				<input type='submit' value='Submit' disabled={!userIdCheck} />
 				{!userIdCheck && <p>Not a valid User ID</p>}

@@ -4,6 +4,8 @@ export const dateFormat = (timestamp) => {
 	return dateObject.toLocaleString('en-US', {});
 }
 
+export const percent = (num, total) => `${round(num / total * 100)}%`;
+
 export const round = (num: number) => num.toFixed(2);
 
 export const setColorFill = (number, achieved = false) => {
