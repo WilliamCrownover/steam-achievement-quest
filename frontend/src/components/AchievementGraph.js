@@ -5,29 +5,34 @@ export const AchievementGraph = ({ achievements }) => {
 	return (
 		<div className='achievementGraph'>
 			{achievements.map((achievement) => {
+				const {
+					achieved,
+					name,
+					hoverInfo,
+				} = achievement;
 				const percent = round(achievement.percent);
 				const colorFill = setColorFill(percent);
-				const colorFillAchieved = setColorFill(percent, achievement.achieved);
+				const colorFillAchieved = setColorFill(percent, achieved);
 				return (
 					<div
-						key={achievement.name}
+						key={name}
 						className='graphVerticalBar'
 						style={{
 							width: `${1 / achievements.length * 100}%`,
 						}}
 					>
 						<div
-							title={achievement.hoverInfo}
+							title={hoverInfo}
 							style={{
-								height: `${(100 - achievement.percent) * 3}px`,
+								height: `${(100 - percent) * 3}px`,
 								backgroundColor: colorFill,
 								opacity: 0.3
 							}}
 						/>
 						<div
-							title={achievement.hoverInfo}
+							title={hoverInfo}
 							style={{
-								height: `${achievement.percent * 3}px`,
+								height: `${percent * 3}px`,
 								backgroundColor: colorFillAchieved
 							}}
 						/>

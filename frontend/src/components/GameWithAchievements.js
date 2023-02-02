@@ -4,20 +4,41 @@ import { AchievementPercentages } from './AchievementPercentages';
 import { GameTitleInfo } from './GameTitleInfo';
 
 export const GameWithAchievements = ({ game }) => {
+	const {
+		achievements,
+		averagePercent,
+		percentComplete,
+		achievementsUrl,
+		totalAchievements,
+		totalCompletedAchievements,
+	} = game;
+
+	const lineArray = [
+		{class:'ninetyPercent'},
+		{class:'fiftyPercent'},
+		{class:'tenPercent'},
+	]
 
 	return (
-		<>
-			<AchievementGraph achievements={game.achievements} />
+		<div className='gameAchievementsContainer'>
+			<AchievementGraph achievements={achievements} />
+			{lineArray.map((line) => 
+				<div key={line.class} className={`horizontalGraphLine ${line.class}`}/>
+			)}
+			<div 
+				className='horizontalGraphLine averagePercentLine'
+				style={{ top: `${(100 - averagePercent) * 3}px` }}
+			/>
 			<h3
-				className={`${game.percentComplete === '100.00' && 'achieved'} averagePercent`}
-				style={{ backgroundColor: setColorFill(game.averagePercent), margin: '3px 0px' }}
+				className={`${percentComplete === '100.00' && 'achieved'} averagePercent`}
+				style={{ backgroundColor: setColorFill(averagePercent) }}
 			>
-				{game.averagePercent}
+				{averagePercent}
 			</h3>
-			<AchievementPercentages achievements={game.achievements} />
+			<AchievementPercentages achievements={achievements} />
 			<GameTitleInfo game={game} />
-			<a className='achievementLink' href={game.achievementsUrl} target='_blank' rel='noreferrer'>{game.totalAchievements} Total Achievements</a>
-			<h3 className='bottomItem'>{game.totalCompletedAchievements} Completed - {game.percentComplete}%</h3>
-		</>
+			<a className='achievementLink' href={achievementsUrl} target='_blank' rel='noreferrer'>{totalAchievements} Total Achievements</a>
+			<h3 className='bottomItem'>{totalCompletedAchievements} Completed - {percentComplete}%</h3>
+		</div>
 	)
 }
