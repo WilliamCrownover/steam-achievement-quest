@@ -82,13 +82,29 @@ p {
 
 .gameTitleInfo>* {
 	display: inline-block;
-	padding-right: 10px;
+	margin-right: 10px;
 }
 
 .gameTitleLink {
 	font-size: 1.5rem;
 	font-weight: 600;
 	color: black;
+}
+
+.dlc,
+.notPlayed {
+	padding: 3px;
+	border-radius: 10px;
+	color: white;
+}
+
+.dlc {
+	background-color: rgb(153, 153, 241);
+}
+
+.notPlayed {
+	background-color: rgb(241, 153, 153);
+
 }
 
 .averagePercent {
