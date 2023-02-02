@@ -19,7 +19,9 @@ app.get('/getOwnedGames/:userId', cors(corsOptions), async (req, res) => {
 		&steamid=${req.params.userId}
 		&format=json
 		&include_appinfo=true
+		&include_extended_appinfo=true
 		&include_played_free_games=true
+		&skip_unvetted_apps=false
 	`;
 	const fetchOptions = {
 		method: 'GET'
@@ -63,6 +65,34 @@ app.get('/getGameAchievements/:appId', cors(corsOptions), async (req, res) => {
 	const endpoint = `
 		https://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/
 		?gameid=${req.params.appId}
+	`;
+	const fetchOptions = {
+		method: 'GET'
+	}
+	const response = await fetch(endpoint, fetchOptions);
+	const jsonResponse = await response.json();
+	res.json(jsonResponse);
+});
+
+app.get('/getSchemaForGame/:appId', cors(corsOptions), async (req, res) => {
+	const endpoint = `
+	https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/
+		?key=${process.env.REACT_APP_STEAM_KEY}
+		&appid=${req.params.appId}
+	`;
+	const fetchOptions = {
+		method: 'GET'
+	}
+	const response = await fetch(endpoint, fetchOptions);
+	const jsonResponse = await response.json();
+	res.json(jsonResponse);
+});
+
+app.get('/getCurrentPlayersForGame/:appId', cors(corsOptions), async (req, res) => {
+	const endpoint = `
+	https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/
+		?key=${process.env.REACT_APP_STEAM_KEY}
+		&appid=${req.params.appId}
 	`;
 	const fetchOptions = {
 		method: 'GET'
