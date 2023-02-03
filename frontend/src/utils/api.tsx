@@ -7,60 +7,93 @@ export const getUserGameData = async (userId, sampleSize = false) => {
 	try {
 		const res = await fetch(url);
 		const json = await res.json();
-		const gamesData = json.response.games;
+		const allGamesData = json.response.games;
 
 		// The profile is completely private and no game data is available.
-		if (!gamesData) return;
+		if (!allGamesData) return;
 
-		// Get the global achievement data for each game and add extra properties.
-		const gamesDataGlobalAchievements = await Promise.all(gamesData.slice(0, sampleSize ? 25 : gamesData.length).map(async (game) => {
+		// 440 is Team Fortress 2. Avoid excessive user achievement fetches if private profile.
+		const privacyCheckGame = await getUserAchievements(440, userId);
+		let publicProfileCheck = true;
+		if (privacyCheckGame === 'privateProfile') publicProfileCheck = false;
+
+		// Get achievement data for each game and add extra properties.
+		const allGamesDataExpanded = await Promise.all(allGamesData.slice(0, sampleSize ? 25 : allGamesData.length).map(async (game) => {
 			const gameId = game.appid;
-			const playerCount = await getGamePlayerCount(gameId);
-			let achievements = await getGameAchievements(gameId);
-			let lowestAchievementPercent = '0';
-			if (achievements) {
-				lowestAchievementPercent = round(Math.min(...achievements.map((achievement) => achievement.percent)));
-				achievements = achievements.map((achievement) => ({ ...achievement, unlockDate: 'Unachieved' }));
-			}
+			const gameIcon = `https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/${gameId}/${game.img_icon_url}.jpg`
 			const hoursPlayed = round((game.playtime_forever / 60));
 			const lastPlayedDate = dateFormat(game.rtime_last_played);
 			const gameUrl = `https://store.steampowered.com/app/${gameId}`;
 			const achievementsUrl = `https://steamcommunity.com/stats/${gameId}/achievements`;
-			return { ...game, playerCount, achievements, lowestAchievementPercent, hoursPlayed, lastPlayedDate, gameUrl, achievementsUrl };
-		}));
+			const playerCount = await getGamePlayerCount(gameId);
+			let lowestAchievementPercent = '0';
 
-		// Get the user's achievement data and combine it with global data. Add extra properties.
-		const gamesDataGlobalAndUserAchievements = await Promise.all(gamesDataGlobalAchievements.map(async (game) => {
-			let achievements = game.achievements;
-			// If there are achievements to process
-			if (achievements && achievements?.length > 0) {
-				const userAchievements = await getUserAchievements(game.appid, userId);
-				const totalAchievements = achievements.length;
-				let totalCompletedAchievements = 0;
-				let privateProfile = true;
-				// If the user's achievement data is available
-				if (userAchievements !== 'privateProfile') {
-					achievements = combineAchievements(achievements, userAchievements);
-					totalCompletedAchievements = sumTotalCompleted(achievements);
-					privateProfile = false;
-				}
-				achievements = achievements.map((achievement) => ({ ...achievement, hoverInfo: `${achievement.name} - ${achievement.unlockDate}` }));
-				const percentComplete = round((totalCompletedAchievements / totalAchievements) * 100);
-				return {
-					...game,
-					achievements,
-					averagePercent: round(averageAchievementPercent(achievements)),
-					totalAchievements,
-					totalCompletedAchievements,
-					percentComplete,
-					privateProfile,
+			// Each game will have at least these properties.
+			const gameDataExpanded = {
+				...game,
+				gameIcon,
+				hoursPlayed,
+				lastPlayedDate,
+				gameUrl,
+				achievementsUrl,
+				playerCount,
+				lowestAchievementPercent,
+				achievements: undefined,
+			}
+
+			// If the game has community data it likely has achievement data.
+			if (game.has_community_visible_stats) {
+				let achievements = await getGameAchievements(gameId);
+				
+				// If it does indeed have achievements, elaborate the data.
+				if (achievements) {
+					lowestAchievementPercent = round(Math.min(...achievements.map((achievement) => achievement.percent)));
+					const totalAchievements = achievements.length;
+					let totalCompletedAchievements = 0;
+					let privateProfile = true;
+					const achievementSchemas = await getGameAchievementSchemas(gameId);
+					achievements = achievements.map((achievement, i) => ({ ...achievement, ...achievementSchemas[i], unlockDate: 'Unachieved' }));
+					
+					// If the user's achievements are public, combine data and sum total completed achievements.
+					if (publicProfileCheck) {
+						const userAchievements = await getUserAchievements(gameId, userId);
+						achievements = combineAchievements(achievements, userAchievements);
+						totalCompletedAchievements = sumTotalCompleted(achievements);
+						privateProfile = false;
+					}
+
+					achievements = achievements.map((achievement) => ({ ...achievement, hoverInfo: concatHoverInfo(achievement) }));
+					const percentComplete = round((totalCompletedAchievements / totalAchievements) * 100);
+
+					return {
+						...gameDataExpanded,
+						achievements,
+						lowestAchievementPercent,
+						totalAchievements,
+						totalCompletedAchievements,
+						privateProfile,
+						percentComplete,
+						averagePercent: round(averageAchievementPercent(achievements)),
+					}
 				}
 			}
 
-			return { ...game, achievements: undefined };
+			return gameDataExpanded;
 		}));
 
-		return gamesDataGlobalAndUserAchievements;
+		return allGamesDataExpanded;
+	} catch (error) {
+		console.log(error);
+	}
+}
+
+const getGamePlayerCount = async (appId) => {
+	const url = `http://localhost:5000/getCurrentPlayersForGame/${appId}`;
+
+	try {
+		const res = await fetch(url);
+		const json = await res.json();
+		return json.response.player_count;
 	} catch (error) {
 		console.log(error);
 	}
@@ -79,13 +112,14 @@ const getGameAchievements = async (appId) => {
 	}
 }
 
-const getGamePlayerCount = async (appId) => {
-	const url = `http://localhost:5000/getCurrentPlayersForGame/${appId}`;
+const getGameAchievementSchemas = async (appId) => {
+	const url = `http://localhost:5000/getSchemaForGame/${appId}`;
 
 	try {
 		const res = await fetch(url);
 		const json = await res.json();
-		return json.response.player_count;
+		const schemas = json.game.availableGameStats.achievements;
+		return sorter(schemas, sortAlphabet('name'));
 	} catch (error) {
 		console.log(error);
 	}
@@ -127,5 +161,15 @@ const combineAchievements = (globalA, userA) => {
 }
 
 const sumTotalCompleted = (achievementList) => achievementList.reduce((total, achievement) => total + achievement.achieved, 0);
+
+const concatHoverInfo = (achievement) => {
+	const {
+		displayName,
+		description,
+		unlockDate,
+	} = achievement;
+
+	return `${displayName}${description ? ` - ${description}` : ''} - ${unlockDate}`;
+}
 
 const averageAchievementPercent = (achievementList) => achievementList.reduce((total, achievement) => total + achievement.percent, 0) / achievementList.length;
