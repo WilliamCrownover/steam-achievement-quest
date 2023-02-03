@@ -35,7 +35,7 @@ export const AchievementSortOrder = (props) => {
 		<>
 			<h4>Achievement Sort Order</h4>
 			<div onChange={changeAchievementOrder} className='achievementSortOrder' >
-				<input type='radio' value='name' name='sortAchievements' defaultChecked /> Alphabetical
+				<input type='radio' value='name' name='sortAchievements' defaultChecked /> ID Name
 				<input type='radio' value='percent' name='sortAchievements' /> Global Percent Complete
 				{!userData.privateProfile && <><input type='radio' value='unlockTime' name='sortAchievements' /> <span>Date Achieved</span></>}
 			</div>
