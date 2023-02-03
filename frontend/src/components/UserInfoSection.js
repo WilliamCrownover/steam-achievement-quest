@@ -5,12 +5,24 @@ export const UserInfoSection = (props) => {
 		userData,
 	} = props;
 
+	const {
+		avatar,
+		personaname,
+		realname,
+		profileurl,
+		lastlogoff,
+		timecreated,
+	} = userData;
+
 	return (
 		<>
-			<h2>Username: {userData.personaname} {userData.realname && `(${userData.realname})`}</h2>
-			<h3>Profile Link: <span><a href={userData.profileurl} target='_blank' rel='noreferrer'>{userData.profileurl}</a></span></h3>
-			{userData.lastlogoff && <h3>Last Online: {dateFormat(userData.lastlogoff)}</h3>}
-			{userData.timecreated && <h3>Profile Created: {dateFormat(userData.timecreated)}</h3>}
+			<div className='userNameImageContainer'>
+				<img src={avatar} alt={personaname} height='80' />
+				<h2>{personaname} {realname && `(${realname})`}</h2>
+			</div>
+			<h3>Profile Link: <span><a href={profileurl} target='_blank' rel='noreferrer'>{profileurl}</a></span></h3>
+			{lastlogoff && <h3>Last Online: {dateFormat(lastlogoff)}</h3>}
+			{timecreated && <h3>Profile Created: {dateFormat(timecreated)}</h3>}
 		</>
 	)
 }

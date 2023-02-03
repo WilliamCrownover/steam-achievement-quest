@@ -8,7 +8,12 @@ export const AchievementPercentages = ({ achievements }) => {
 				const percent = round(achievement.percent);
 				const colorFill = setColorFill(percent);
 				const achieved = achievement.achieved && 'achieved'
-				return <h3 key={achievement.name} title={achievement.hoverInfo} style={{ backgroundColor: colorFill }} className={achieved}>{percent}</h3>
+				return (
+					<div key={achievement.name} title={achievement.hoverInfo}>
+						<h3 style={{ backgroundColor: colorFill }} className={achieved}>{percent}</h3>
+						<img src={achievement.icon} alt={achievement.displayName} height='50'/>
+					</div>
+				)
 			})}
 		</div>
 	)

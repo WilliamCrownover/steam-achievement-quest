@@ -26,6 +26,16 @@ p {
 	margin-bottom: 4px;
 }
 
+.userNameImageContainer {
+	display: flex;
+	align-items: flex-end;
+	margin: 10px 0px;
+}
+
+.userNameImageContainer img {
+	margin-right: 10px;
+}
+
 .achievementSortOrder {
 	margin-bottom: 20px;
 }
@@ -117,10 +127,20 @@ p {
 	flex-wrap: wrap;
 }
 
+.achievementList div {
+	display: flex;
+	align-items: flex-start;
+	margin-top: 1px;
+	margin-right: 1px;
+	/* border: solid 1px rgb(255, 255, 255); */
+}
+
 .achievementList h3 {
 	display: inline-block;
 	padding: 3px;
-	min-width: 58px;
+	padding-top: 15px;
+	min-width: 65px;
+	height: 50px;
 }
 
 .achieved {
