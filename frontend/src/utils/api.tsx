@@ -15,6 +15,7 @@ export const getUserGameData = async (userId, sampleSize = false) => {
 		// Get the global achievement data for each game and add extra properties.
 		const gamesDataGlobalAchievements = await Promise.all(gamesData.slice(0, sampleSize ? 25 : gamesData.length).map(async (game) => {
 			const gameId = game.appid;
+			const playerCount = await getGamePlayerCount(gameId);
 			let achievements = await getGameAchievements(gameId);
 			let lowestAchievementPercent = '0';
 			if (achievements) {
@@ -25,7 +26,7 @@ export const getUserGameData = async (userId, sampleSize = false) => {
 			const lastPlayedDate = dateFormat(game.rtime_last_played);
 			const gameUrl = `https://store.steampowered.com/app/${gameId}`;
 			const achievementsUrl = `https://steamcommunity.com/stats/${gameId}/achievements`;
-			return { ...game, achievements, lowestAchievementPercent, hoursPlayed, lastPlayedDate, gameUrl, achievementsUrl };
+			return { ...game, playerCount, achievements, lowestAchievementPercent, hoursPlayed, lastPlayedDate, gameUrl, achievementsUrl };
 		}));
 
 		// Get the user's achievement data and combine it with global data. Add extra properties.
@@ -73,6 +74,18 @@ const getGameAchievements = async (appId) => {
 		const json = await res.json();
 		const achievements = json.achievementpercentages?.achievements;
 		return achievements ? sorter(achievements, sortAlphabet('name')) : achievements;
+	} catch (error) {
+		console.log(error);
+	}
+}
+
+const getGamePlayerCount = async (appId) => {
+	const url = `http://localhost:5000/getCurrentPlayersForGame/${appId}`;
+
+	try {
+		const res = await fetch(url);
+		const json = await res.json();
+		return json.response.player_count;
 	} catch (error) {
 		console.log(error);
 	}

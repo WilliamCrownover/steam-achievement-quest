@@ -20,6 +20,9 @@ export const GameSortOrder = (props) => {
 			case value === 'name':
 				sortAlphabeticalThenSetState(setGamesWithAchievements, [...gamesWithAchievements], value);
 				break;
+			case value === 'playerCount':
+				sharedSort(value);
+				break;
 			case value === 'hoursPlayed':
 				sharedSort(value);
 				break;
@@ -48,6 +51,7 @@ export const GameSortOrder = (props) => {
 			<h4>Game Sort Order</h4>
 			<div onChange={changeGameOrder}>
 				<input type='radio' value='name' name='sortGames' defaultChecked /> Alphabetical
+				<input type='radio' value='playerCount' name='sortGames' /> Current Player Count
 				<input type='radio' value='hoursPlayed' name='sortGames' /> Playtime
 				<input type='radio' value='rtime_last_played' name='sortGames' /> Last Played Date
 				<input type='radio' value='totalAchievements' name='sortGames' /> Number of Achievements

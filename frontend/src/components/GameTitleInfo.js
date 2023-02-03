@@ -2,6 +2,7 @@ export const GameTitleInfo = ({ game }) => {
 	const {
 		hoursPlayed,
 		lastPlayedDate,
+		playerCount,
 	} = game;
 
 	return (
@@ -10,6 +11,7 @@ export const GameTitleInfo = ({ game }) => {
 			{game.has_dlc && <p className='dlc'>+DLC</p>}
 			{hoursPlayed > 0 && <p>{`${hoursPlayed} Hours Played`}</p>}
 			<p className={`${lastPlayedDate === 'Not Played' && 'notPlayed'}`}>{lastPlayedDate}</p>
+			<p>{playerCount} Current Players</p>
 		</div>
 	)
 }
