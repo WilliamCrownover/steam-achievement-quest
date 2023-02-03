@@ -59,7 +59,6 @@ export const SteamUser = () => {
 			return;
 		}
 		getGamesData(uData);
-		return;
 	}
 
 	const getGamesData = async (user) => {
@@ -75,7 +74,6 @@ export const SteamUser = () => {
 		sortAlphabeticalThenSetState(setGamesWithAchievements, gamesWithAchievementsData, 'name');
 		sortAlphabeticalThenSetState(setGamesWithoutAchievements, gamesWithoutAchievementsData, 'name');
 		addMoreDataToUser(user, gamesWithAchievementsData, gamesWithoutAchievementsData);
-		return;
 	};
 
 	const addMoreDataToUser = (user, withAchieves, withoutAchieves) => {
