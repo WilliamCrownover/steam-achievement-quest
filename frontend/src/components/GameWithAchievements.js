@@ -3,7 +3,7 @@ import { AchievementGraph } from './AchievementGraph';
 import { AchievementPercentages } from './AchievementPercentages';
 import { GameTitleInfo } from './GameTitleInfo';
 
-export const GameWithAchievements = ({ game }) => {
+export const GameWithAchievements = ({ game, privateProfile }) => {
 	const {
 		achievements,
 		averagePercent,
@@ -13,22 +13,12 @@ export const GameWithAchievements = ({ game }) => {
 		totalCompletedAchievements,
 	} = game;
 
-	const lineArray = [
-		{class:'ninetyPercent'},
-		{class:'fiftyPercent'},
-		{class:'tenPercent'},
-	]
-
 	return (
-		<div className='gameAchievementsContainer'>
-			<AchievementGraph achievements={achievements} />
-			{lineArray.map((line) => 
-				<div key={line.class} className={`horizontalGraphLine ${line.class}`}/>
-			)}
-			<div 
-				className='horizontalGraphLine averagePercentLine'
-				style={{ top: `${(100 - averagePercent) * 3}px` }}
-			/>
+		<>
+			<GameTitleInfo game={game} />
+			<a className='achievementLink' href={achievementsUrl} target='_blank' rel='noreferrer'>{totalAchievements} Total Achievements</a>
+			{!privateProfile && <h3>{totalCompletedAchievements} Completed - {percentComplete}%</h3>}
+			<AchievementGraph game={game}/>
 			<h3
 				className={`${percentComplete === '100.00' && 'achieved'} averagePercent`}
 				style={{ backgroundColor: setColorFill(averagePercent) }}
@@ -36,9 +26,7 @@ export const GameWithAchievements = ({ game }) => {
 				{averagePercent}
 			</h3>
 			<AchievementPercentages achievements={achievements} />
-			<GameTitleInfo game={game} />
-			<a className='achievementLink' href={achievementsUrl} target='_blank' rel='noreferrer'>{totalAchievements} Total Achievements</a>
-			<h3 className='bottomItem'>{totalCompletedAchievements} Completed - {percentComplete}%</h3>
-		</div>
+			<div className='bottomItem' />
+		</>
 	)
 }

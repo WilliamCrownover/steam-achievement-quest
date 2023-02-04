@@ -1,6 +1,12 @@
 import { round, setColorFill } from '../utils/utils'
 
-export const AchievementGraph = ({ achievements }) => {
+export const AchievementGraph = ({ game }) => {
+	const achievements = game.achievements;
+	const lineArray = [
+		{ class: 'ninetyPercent' },
+		{ class: 'fiftyPercent' },
+		{ class: 'tenPercent' },
+	];
 
 	return (
 		<div className='achievementGraph'>
@@ -39,6 +45,13 @@ export const AchievementGraph = ({ achievements }) => {
 					</div>
 				)
 			})}
+			{lineArray.map((line) =>
+				<div key={line.class} className={`horizontalGraphLine ${line.class}`} />
+			)}
+			<div
+				className='horizontalGraphLine averagePercentLine'
+				style={{ top: `${(100 - game.averagePercent) * 3}px` }}
+			/>
 		</div>
 	)
 }
