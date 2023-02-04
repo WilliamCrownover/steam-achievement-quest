@@ -71,7 +71,8 @@ p {
 	font-weight: 400;
 }
 
-.textStack {
+.textStack,
+.formContainer {
 	background-color: var(--darkGray);
 	color: var(--lightGray);
 	border: solid 5px var(--lightGray);
@@ -106,11 +107,37 @@ p {
 	color: var(--alert);
 }
 
+.formContainer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin: 0px 0px 5px 0px;
+}
+
+.formContainer input {
+	margin-left: 10px;
+}
+
+input[type=text] {
+	background-color: var(--lightGray);
+}
+
+input[type=submit] {
+	background-color: var(--medGray);
+	color: var(--lightGray);
+	border: solid 1px var(--lightGray);
+	padding: 2px 5px;
+}
+
+input[type=submit]:hover {
+	background-color: var(--darkGray);
+}
+
 .achievementSortOrder {
 	margin-bottom: 20px;
 }
 
-.gameAchievementsContainer {
+.achievementGraph {
 	position: relative;
 }
 

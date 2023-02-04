@@ -115,17 +115,19 @@ export const SteamUser = () => {
 
 	return (
 		<>
-			<form onSubmit={handleSubmit}>
+			<form className='formContainer' onSubmit={handleSubmit}>
+				<div>
 				<label>
 					Steam User ID
 					<input type='text' value={userId} onChange={handleIDChange} />
 				</label>
-				<input type='submit' value='Submit' disabled={!userIdCheck} />
+				<input type='submit' value='Search' disabled={!userIdCheck} />
+				</div>
+				<label>
+					Sample Size 25 Games
+					<input type='checkbox' checked={sampleSize} onChange={() => setSampleSize(!sampleSize)} />
+				</label>
 			</form>
-			<label>
-				<input type='checkbox' checked={sampleSize} onChange={() => setSampleSize(!sampleSize)} />
-				Use Test Data Size: 25 Games
-			</label>
 			{!userIdCheck && <p className='alertTextInvert'>Not a valid User ID</p>}
 
 			{packageDataComplete ? (
@@ -157,7 +159,7 @@ export const SteamUser = () => {
 						(!firstLoad && <p className='alertText'>Steam User Profile does not exist.</p>)
 					}
 					{gamesWithAchievements.flatMap((game) =>
-						<GameWithAchievements game={game} key={game.appid} />
+						<GameWithAchievements game={game} key={game.appid} privateProfile={userData.privateProfile}/>
 					)}
 					{(hasGames && gamesWithoutAchievements.length > 0) && <h2 className={'gameWithoutAchievementsDivision'}>Games Without Achievements</h2>}
 					{gamesWithoutAchievements.flatMap((game) =>
