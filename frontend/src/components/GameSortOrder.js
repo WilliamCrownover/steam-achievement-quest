@@ -9,6 +9,8 @@ export const GameSortOrder = (props) => {
 		setGamesWithoutAchievements,
 	} = props;
 
+	const hasAchievements = gamesWithAchievements.length > 0;
+
 	const changeGameOrder = (e) => {
 		const value = e.target.value;
 		sortAlphabeticalThenSetState(setGamesWithoutAchievements, gamesWithoutAchievements, 'name');
@@ -54,10 +56,14 @@ export const GameSortOrder = (props) => {
 				<input type='radio' value='playerCount' name='sortGames' /> Current Player Count
 				<input type='radio' value='hoursPlayed' name='sortGames' /> Playtime
 				<input type='radio' value='rtime_last_played' name='sortGames' /> Last Played Date
-				<input type='radio' value='totalAchievements' name='sortGames' /> Number of Achievements
-				{!userData.privateProfile && <><input type='radio' value='percentComplete' name='sortGames' /> <span>Percent Complete</span></>}
-				<input type='radio' value='averagePercent' name='sortGames' /> Average Global Achievement Rate
-				<input type='radio' value='lowestAchievementPercent' name='sortGames' /> Lowest Achievement Percent per Game
+				{hasAchievements &&
+					<>
+						<input type='radio' value='totalAchievements' name='sortGames' /> Number of Achievements
+						{!userData.privateProfile && <><input type='radio' value='percentComplete' name='sortGames' /> <span>Percent Complete</span></>}
+						<input type='radio' value='averagePercent' name='sortGames' /> Average Global Achievement Rate
+						<input type='radio' value='lowestAchievementPercent' name='sortGames' /> Lowest Achievement Percent per Game
+					</>
+				}
 			</div>
 		</>
 	)
