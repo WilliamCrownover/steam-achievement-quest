@@ -15,14 +15,30 @@ export const UserInfoSection = (props) => {
 	} = userData;
 
 	return (
-		<>
-			<div className='userNameImageContainer'>
+		<div className='userInfoSection'>
+			<a className='userNameImageContainer' href={profileurl} target='_blank' rel='noreferrer'>
 				<img src={avatar} alt={personaname} height='80' />
-				<h2>{personaname} {realname && `(${realname})`}</h2>
-			</div>
-			<h3>Profile Link: <span><a href={profileurl} target='_blank' rel='noreferrer'>{profileurl}</a></span></h3>
-			{lastlogoff && <h3>Last Online: {dateFormat(lastlogoff)}</h3>}
-			{timecreated && <h3>Profile Created: {dateFormat(timecreated)}</h3>}
-		</>
+				<div className='nameStack'>
+					<h2 >{personaname}</h2>
+					{realname && <h2 >{realname}</h2>}
+				</div>
+			</a>
+
+			<div className='flexLineBreak' />
+
+			{timecreated &&
+				<div className='textStack'>
+					<h3>Profile Created</h3>
+					<h4>{dateFormat(timecreated)}</h4>
+				</div>
+			}
+
+			{lastlogoff &&
+				<div className='textStack'>
+					<h3>Last Online</h3>
+					<h4>{dateFormat(lastlogoff)}</h4>
+				</div>
+			}
+		</div>
 	)
 }

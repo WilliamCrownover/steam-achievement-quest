@@ -104,12 +104,12 @@ export const SteamUser = () => {
 
 		(!sortChangeOnly && (loadingUserComplete & loadingGamesComplete & loadingModifiedComplete)) && packageData();
 	}, [
-		sortChangeOnly, 
-		userData, 
-		gamesWithAchievements, 
-		gamesWithoutAchievements, 
-		loadingUserComplete, 
-		loadingGamesComplete, 
+		sortChangeOnly,
+		userData,
+		gamesWithAchievements,
+		gamesWithoutAchievements,
+		loadingUserComplete,
+		loadingGamesComplete,
 		loadingModifiedComplete
 	]);
 
@@ -121,12 +121,12 @@ export const SteamUser = () => {
 					<input type='text' value={userId} onChange={handleIDChange} />
 				</label>
 				<input type='submit' value='Submit' disabled={!userIdCheck} />
-				{!userIdCheck && <p>Not a valid User ID</p>}
 			</form>
 			<label>
 				<input type='checkbox' checked={sampleSize} onChange={() => setSampleSize(!sampleSize)} />
 				Use Test Data Size: 25 Games
 			</label>
+			{!userIdCheck && <p className='alertTextInvert'>Not a valid User ID</p>}
 
 			{packageDataComplete ? (
 				<>
@@ -150,11 +150,11 @@ export const SteamUser = () => {
 										/>
 									}
 								</>
-								: <p>This Steam User's game list is private.</p>
+								: <p className='alertText'>This Steam User's game list is private.</p>
 							}
 						</>
 						:
-						(!firstLoad && <p>Steam User Profile does not exist.</p>)
+						(!firstLoad && <p className='alertText'>Steam User Profile does not exist.</p>)
 					}
 					{gamesWithAchievements.flatMap((game) =>
 						<GameWithAchievements game={game} key={game.appid} />

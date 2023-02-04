@@ -5,6 +5,11 @@
 
 :root {
 	--graphHeight: 300px;
+	--lightGray: rgb(152, 164, 178);
+	--medGray: rgb(66, 76, 87);
+	--darkGray: rgb(37, 44, 52);
+	--alert: rgb(138, 24, 11);
+	--alertBright: rgb(247, 192, 186);
 }
 
 body {
@@ -22,18 +27,83 @@ h3 {
 }
 
 p {
+	font-size: 0.8rem;
 	margin: 0px;
 	margin-bottom: 4px;
 }
 
+.flexLineBreak {
+	width: 100%;
+}
+
+.userInfoSection {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	background-color: var(--medGray);
+	border-radius: 10px;
+	border: solid 5px var(--darkGray);
+}
+
 .userNameImageContainer {
 	display: flex;
-	align-items: flex-end;
-	margin: 10px 0px;
+	align-items: center;
+	margin: 10px auto;
+	flex-basis: auto;
+	background-color: var(--lightGray);
+	border: solid 5px var(--darkGray);
+	padding: 20px;
+	border-radius: 10px;
+	text-decoration: none;
 }
 
 .userNameImageContainer img {
 	margin-right: 10px;
+	border: solid 2px var(--darkGray);
+}
+
+.userNameImageContainer h2 {
+	font-size: 1.5rem;
+	color: black;
+}
+
+.nameStack h2:nth-child(2) {
+	font-weight: 400;
+}
+
+.textStack {
+	background-color: var(--darkGray);
+	color: var(--lightGray);
+	border: solid 5px var(--lightGray);
+	border-radius: 10px;
+	padding: 10px;
+	margin: 10px;
+	margin-bottom: 20px;
+}
+
+.textStack h4 {
+	margin: 0px;
+	margin-top: 5px;
+	font-weight: 400;
+}
+
+.alertText,
+.alertTextInvert {
+	background-color: var(--alert);
+	color: var(--alertBright);
+	padding: 10px;
+	border-radius: 10px;
+	margin: 5px 0px;
+}
+
+.alertText {
+	background-color: var(--alert);
+	color: var(--alertBright);
+}
+
+.alertTextInvert {
+	background-color: var(--alertBright);
+	color: var(--alert);
 }
 
 .achievementSortOrder {
