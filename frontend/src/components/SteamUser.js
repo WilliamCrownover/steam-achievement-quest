@@ -11,6 +11,7 @@ import { GameWithoutAchievements } from './GameWithoutAchievements';
 export const SteamUser = () => {
 	const [firstLoad, setFirstLoad] = useState(true);
 	const [sampleSize, setSampleSize] = useState(true);
+	const [gamesToLoadCount, setGamesToLoadCount] = useState('');
 	const [loadingUserComplete, setLoadingUserComplete] = useState(true);
 	const [loadingGamesComplete, setLoadingGamesComplete] = useState(true);
 	const [loadingModifiedComplete, setLoadingModifiedComplete] = useState(true);
@@ -60,7 +61,7 @@ export const SteamUser = () => {
 	}
 
 	const getGamesData = async (user) => {
-		const gameData = await getUserGameData(user.steamid, sampleSize);
+		const gameData = await getUserGameData(user.steamid, sampleSize, setGamesToLoadCount);
 		setLoadingGamesComplete(true);
 		if (!gameData) {
 			setLoadingModifiedComplete(true);
@@ -163,7 +164,7 @@ export const SteamUser = () => {
 					)}
 				</>
 			) : (
-				<h1>Loading!</h1>
+				<h1>Loading {gamesToLoadCount} Games! Please Wait...</h1>
 			)
 			}
 		</>

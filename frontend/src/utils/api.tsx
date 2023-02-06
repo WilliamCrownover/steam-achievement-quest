@@ -1,7 +1,8 @@
 import { dateFormat, round, sorter, sortAlphabet } from './utils';
 
 // Main API call to collect and process Steam data
-export const getUserGameData = async (userId, sampleSize = false) => {
+export const getUserGameData = async (userId, sampleSize = false, setterGamesToLoad) => {
+	setterGamesToLoad('');
 	const url = `http://localhost:5000/getOwnedGames/${userId}`;
 
 	try {
@@ -12,13 +13,16 @@ export const getUserGameData = async (userId, sampleSize = false) => {
 		// The profile is completely private and no game data is available.
 		if (!allGamesData) return;
 
+		const totalGameCount = sampleSize ? 25 : allGamesData.length;
+		setterGamesToLoad(totalGameCount);
+
 		// 440 is Team Fortress 2. Avoid excessive user achievement fetches if private profile.
 		const privacyCheckGame = await getUserAchievements(440, userId);
 		let publicProfileCheck = true;
 		if (privacyCheckGame === 'privateProfile') publicProfileCheck = false;
 
 		// Get achievement data for each game and add extra properties.
-		const allGamesDataExpanded = await Promise.all(allGamesData.slice(0, sampleSize ? 25 : allGamesData.length).map(async (game) => {
+		const allGamesDataExpanded = await Promise.all(allGamesData.slice(0, totalGameCount).map(async (game) => {
 			const gameId = game.appid;
 			const gameIcon = `https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/${gameId}/${game.img_icon_url}.jpg`
 			const hoursPlayed = round((game.playtime_forever / 60));
