@@ -51,20 +51,20 @@ export const GameSortOrder = (props) => {
 	return (
 		<>
 			<h4>Game Sort Order</h4>
-			<div onChange={changeGameOrder}>
-				<input type='radio' value='name' name='sortGames' defaultChecked /> Alphabetical
-				<input type='radio' value='playerCount' name='sortGames' /> Current Player Count
-				<input type='radio' value='hoursPlayed' name='sortGames' /> Playtime
-				<input type='radio' value='rtime_last_played' name='sortGames' /> Last Played Date
+			<select onChange={changeGameOrder}>
+				<option value='name' defaultValue > Alphabetical</option>
+				<option value='playerCount' > Current Player Count</option>
+				<option value='hoursPlayed' > Playtime</option>
+				<option value='rtime_last_played' > Last Played Date</option>
 				{hasAchievements &&
 					<>
-						<input type='radio' value='totalAchievements' name='sortGames' /> Number of Achievements
-						{!userData.privateProfile && <><input type='radio' value='percentComplete' name='sortGames' /> <span>Percent Complete</span></>}
-						<input type='radio' value='averagePercent' name='sortGames' /> Average Global Achievement Rate
-						<input type='radio' value='lowestAchievementPercent' name='sortGames' /> Lowest Achievement Percent per Game
+						<option value='totalAchievements' > Number of Achievements</option>
+						{!userData.privateProfile && <option value='percentComplete'>Percent Complete</option>}
+						<option value='averagePercent' > Average Global Achievement Percent</option>
+						<option value='lowestAchievementPercent' > Lowest Achievement Percent per Game</option>
 					</>
 				}
-			</div>
+			</select>
 		</>
 	)
 }

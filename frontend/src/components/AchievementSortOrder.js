@@ -5,12 +5,10 @@ export const AchievementSortOrder = (props) => {
 		userData,
 		gamesWithAchievements,
 		setGamesWithAchievements,
-		setSortChangeOnly,
 	} = props;
 
 	const changeAchievementOrder = (e) => {
 		const value = e.target.value;
-		setSortChangeOnly(true);
 		setGamesWithAchievements(gamesWithAchievements.map((game) => {
 			const sortProperty = (property) => {
 				const achievements = game.achievements;
@@ -34,11 +32,11 @@ export const AchievementSortOrder = (props) => {
 	return (
 		<>
 			<h4>Achievement Sort Order</h4>
-			<div onChange={changeAchievementOrder} className='achievementSortOrder' >
-				<input type='radio' value='name' name='sortAchievements' defaultChecked /> ID Name
-				<input type='radio' value='percent' name='sortAchievements' /> Global Percent Complete
-				{!userData.privateProfile && <><input type='radio' value='unlockTime' name='sortAchievements' /> <span>Date Achieved</span></>}
-			</div>
+			<select onChange={changeAchievementOrder} className='achievementSortOrder' >
+				<option value='name' defaultValue > Achievement ID</option>
+				<option value='percent' > Global Percent Complete</option>
+				{!userData.privateProfile && <option value='unlockTime' >Date Achieved</option>}
+			</select>
 		</>
 	)
 }

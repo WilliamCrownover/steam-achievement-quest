@@ -22,7 +22,6 @@ export const SteamUser = () => {
 	const [hasGames, setHasGames] = useState(false);
 	const [gamesWithAchievements, setGamesWithAchievements] = useState([]);
 	const [gamesWithoutAchievements, setGamesWithoutAchievements] = useState([]);
-	const [sortChangeOnly, setSortChangeOnly] = useState(false);
 	const [passDownSteamData, setPassDownSteamData] = useState({});
 
 	const handleIDChange = (e) => {
@@ -42,7 +41,6 @@ export const SteamUser = () => {
 		setHasGames(false);
 		setGamesWithAchievements([]);
 		setGamesWithoutAchievements([]);
-		setSortChangeOnly(false);
 		setPassDownSteamData({});
 	}
 
@@ -102,9 +100,8 @@ export const SteamUser = () => {
 			setPackageDataComplete(true);
 		}
 
-		(!sortChangeOnly && (loadingUserComplete & loadingGamesComplete & loadingModifiedComplete)) && packageData();
+		(loadingUserComplete & loadingGamesComplete & loadingModifiedComplete) && packageData();
 	}, [
-		sortChangeOnly,
 		userData,
 		gamesWithAchievements,
 		gamesWithoutAchievements,
@@ -148,7 +145,6 @@ export const SteamUser = () => {
 									{gamesWithAchievements.length > 0 &&
 										<AchievementSortOrder
 											{...passDownSteamData}
-											setSortChangeOnly={setSortChangeOnly}
 										/>
 									}
 								</>
