@@ -1,4 +1,5 @@
-import { round, percent } from '../utils/utils';
+import { round } from '../utils/utils';
+import { GameDataPoint } from './GameDataPoint';
 
 export const GamesInfoSection = (props) => {
 	const {
@@ -18,23 +19,85 @@ export const GamesInfoSection = (props) => {
 
 	const hasAchievements = gamesWithAchievements.length > 0;
 
+	const GameDataPoints = [
+		{
+			dataName: 'Total Number of Games',
+			dataArray: totalNumberOfGames,
+			total: totalNumberOfGames,
+		},
+		{
+			dataName: 'With Achievements',
+			dataArray: gamesWithAchievements,
+			showPercent: true,
+			total: totalNumberOfGames,
+		},
+		{
+			dataName: 'Without Achievements',
+			dataArray: gamesWithoutAchievements,
+			showPercent: true,
+			total: totalNumberOfGames,
+		},
+		{
+			dataName: 'Never Played',
+			dataArray: totalNeverPlayed,
+			showPercent: true,
+			total: totalNumberOfGames,
+		},
+		{
+			dataName: 'Number of Achievements',
+			dataArray: totalAchievements,
+			total: totalAchievements,
+		},
+		{
+			dataName: 'Achievements Completed',
+			dataArray: totalAchievementsCompleted,
+			showPercent: true,
+			total: totalAchievements,
+		},
+		{
+			dataName: 'Achievements Completed',
+			dataArray: totalAchievementsCompleted,
+			showPercent: true,
+			total: totalAchievements,
+			privateProfile: privateProfile,
+		},
+	]
+
 	return (
-		<>
-			<h2>Total Number of Games: {totalNumberOfGames}</h2>
+		<div className='gamesInfoSection'>
+			<GameDataPoint {...GameDataPoints[0]} />
 			{hasAchievements &&
 				<>
-					<h3>Total With Achievements: {gamesWithAchievements.length} - {percent(gamesWithAchievements.length, totalNumberOfGames)}</h3>
-					<h3>Total Without Achievements: {gamesWithoutAchievements.length} - {percent(gamesWithoutAchievements.length, totalNumberOfGames)}</h3>
-					<h3>Number of Achievements: {totalAchievements}</h3>
+					<GameDataPoint {...GameDataPoints[1]} />
+					<GameDataPoint {...GameDataPoints[2]} />
+				</>
+			}
+			<GameDataPoint {...GameDataPoints[3]} />
+
+			<div className='flexLineBreak' />
+
+			{hasAchievements &&
+				<>
+					<GameDataPoint {...GameDataPoints[4]} />
 					{privateProfile ?
-						<p>This Steam user's achievements completed data is private.</p>
+						<GameDataPoint {...GameDataPoints[6]} />
 						:
-						<h3>Number of Achievements Completed: {totalAchievementsCompleted} - {percent(totalAchievementsCompleted, totalAchievements)}</h3>
+						<GameDataPoint {...GameDataPoints[5]} />
 					}
 				</>
 			}
-			<h3>Total Time Played: {totalPlaytime} Hours - {round(totalPlaytime / 24)} Days - {round(totalPlaytime / 24 / 7)} Weeks - {round(totalPlaytime / 24 / 7 / 52)} Years</h3>
-			<h3>Total Games Never Played: {totalNeverPlayed} - {percent(totalNeverPlayed, totalNumberOfGames)}</h3>
-		</>
+
+			<div className='flexLineBreak' />
+
+			<div className='gameDataPoint'>
+				<h3>Total Time Played</h3>
+				<div className='timePlayedContainer'>
+					<h3>{totalPlaytime} Hours</h3>
+					<h3>{round(totalPlaytime / 24)} Days</h3>
+					<h3>{round(totalPlaytime / 24 / 7)} Weeks</h3>
+					<h3>{round(totalPlaytime / 24 / 7 / 52)} Years</h3>
+				</div>
+			</div>
+		</div >
 	)
 }
