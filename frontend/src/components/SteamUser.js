@@ -160,13 +160,13 @@ export const SteamUser = () => {
 					{gamesWithAchievements.flatMap((game) =>
 						<GameWithAchievements game={game} key={game.appid} privateProfile={userData.privateProfile} />
 					)}
-					{(hasGames && gamesWithoutAchievements.length > 0) && <h2 className={'gameWithoutAchievementsDivision'}>Games Without Achievements</h2>}
+					{(hasGames && gamesWithoutAchievements.length > 0) && <h2 className='gameWithoutAchievementsDivision'>Games Without Achievements</h2>}
 					{gamesWithoutAchievements.flatMap((game) =>
 						<GameWithoutAchievements game={game} key={game.appid} />
 					)}
 				</>
 			) : (
-				<h1>Loading {gamesToLoadCount} Games! Please Wait...</h1>
+				<h1 className='loadingText'>Loading {gamesToLoadCount} Games! Please Wait...</h1>
 			)
 			}
 		</>

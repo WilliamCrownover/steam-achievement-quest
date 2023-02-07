@@ -4,17 +4,23 @@
 }
 
 :root {
-	--graphHeight: 300px;
+	--graphHeight: 150px;
+	--graphBackground: rgb(255, 255, 255);
 	--lightGray: rgb(152, 164, 178);
 	--medGray: rgb(66, 76, 87);
 	--darkGray: rgb(37, 44, 52);
+	--background: rgb(14, 18, 24);
 	--alert: rgb(138, 24, 11);
 	--alertBright: rgb(247, 192, 186);
+	--dlc: rgb(57, 62, 137);
+	--notPlayed: rgb(137, 62, 57);
+	--transitionSpeed: 0.4s;
 }
 
 body {
 	margin: 30px;
 	margin-left: 60px;
+	background-color: var(--background);
 }
 
 h2 {
@@ -33,6 +39,12 @@ p {
 	margin-bottom: 4px;
 }
 
+.loadingText {
+	color: var(--lightGray);
+	margin: 20px auto;
+	text-align: center;
+}
+
 .flexLineBreak {
 	width: 100%;
 }
@@ -46,26 +58,41 @@ p {
 	border: solid 5px var(--darkGray);
 }
 
-.userNameImageContainer {
+.userNameImageContainer,
+.gameTitleLink,
+.achievementLink {
 	display: flex;
 	align-items: center;
-	margin: 10px auto;
 	flex-basis: auto;
-	background-color: var(--lightGray);
-	border: solid 5px var(--darkGray);
-	padding: 20px;
 	border-radius: 10px;
 	text-decoration: none;
+	padding: 5px;
 }
 
-.userNameImageContainer img {
+.userNameImageContainer {
+	margin: 10px auto;
+	padding: 20px;
+	background-color: var(--lightGray);
+	border: solid 5px var(--darkGray);
+	color: var(--darkGray);
+	transition: all var(--transitionSpeed);
+}
+
+.userNameImageContainer:hover {
+	background-color: var(--darkGray);
+	color: var(--lightGray);
+	border: solid 5px var(--lightGray);
+	transition: all var(--transitionSpeed);
+}
+
+.userNameImageContainer img,
+.gameTitleLink img {
 	margin-right: 10px;
 	border: solid 2px var(--darkGray);
 }
 
 .userNameImageContainer h2 {
 	font-size: 1.5rem;
-	color: black;
 }
 
 .nameStack h2:nth-child(2) {
@@ -194,8 +221,97 @@ input[type=submit]:hover {
 	margin-right: 10px;
 }
 
+.gameWithAchievementsContainer {
+	background-color: var(--lightGray);
+	padding: 10px;
+	border-radius: 10px;
+	margin-bottom: 5px;
+}
+
+.gameWithAchievementsContainer a {
+	font-size: 1rem;
+}
+
+.gameWithAchievementsContainer h3,
+.gameWithoutAchievements h3,
+.gameWithAchievementsContainer h4,
+.gameWithoutAchievements h4 {
+	font-size: 0.9rem;
+}
+
+.gameTitleInfo {
+	display: flex;
+	align-items: center;
+}
+
+.gameTitleInfo>* {
+	display: inline-block;
+	margin-right: 10px;
+}
+
+.gameTitleLink,
+.achievementLink {
+	display: flex;
+	font-size: 1.2rem;
+	font-weight: 600;
+	color: black;
+	background-color: var(--darkGray);
+	border: solid 5px var(--medGray);
+	color: var(--lightGray);
+	padding-right: 10px;
+	transition: all var(--transitionSpeed);
+}
+
+.gameTitleLink:hover,
+.achievementLink:hover {
+	background-color: var(--lightGray);
+	color: var(--darkGray);
+	transition: all var(--transitionSpeed);
+}
+
+.specificGameDataPoint {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background-color: var(--medGray);
+	border: solid 5px var(--darkGray);
+	color: var(--lightGray);
+	border-radius: 10px;
+	padding: 5px;
+}
+
+.specificGameDataPoint h4 {
+	margin: 0px;
+}
+
+.specificGameDataPoint p {
+	margin: 0px;
+	margin-top: 3px;
+	font-weight: 600;
+	font-size: 1rem;
+}
+
+.dlc,
+.notPlayed {
+	padding: 3px;
+	padding-right: 4px;
+	border-radius: 10px;
+	color: var(--lightGray);
+	display: inline-block;
+}
+
+.dlc {
+	background-color: var(--dlc);
+}
+
+.notPlayed {
+	background-color: var(--notPlayed);
+	font-weight: 400;
+}
+
 .achievementGraph {
 	position: relative;
+	background-color: var(--graphBackground);
 }
 
 .achievementGraph {
@@ -214,7 +330,7 @@ input[type=submit]:hover {
 	width: 100%;
 	height: 1px;
 	position: absolute;
-	opacity: 0.3;
+	opacity: 1;
 }
 
 .ninetyPercent {
@@ -234,41 +350,8 @@ input[type=submit]:hover {
 
 .averagePercentLine {
 	background-color: white;
-	height: 3px;
+	height: 2px;
 	opacity: 0.8;
-}
-
-.gameTitleInfo {
-	display: flex;
-	align-items: flex-end;
-	margin-top: 10px;
-}
-
-.gameTitleInfo>* {
-	display: inline-block;
-	margin-right: 10px;
-}
-
-.gameTitleLink {
-	font-size: 1.5rem;
-	font-weight: 600;
-	color: black;
-}
-
-.dlc,
-.notPlayed {
-	padding: 3px;
-	border-radius: 10px;
-	color: white;
-}
-
-.dlc {
-	background-color: rgb(153, 153, 241);
-}
-
-.notPlayed {
-	background-color: rgb(241, 153, 153);
-
 }
 
 .averagePercent {
@@ -286,15 +369,16 @@ input[type=submit]:hover {
 	align-items: flex-start;
 	margin-top: 1px;
 	margin-right: 1px;
-	/* border: solid 1px rgb(255, 255, 255); */
 }
 
 .achievementList h3 {
+	border-top-left-radius: 10px;
+	border-bottom-left-radius: 10px;
 	display: inline-block;
 	padding: 3px;
-	padding-top: 15px;
-	min-width: 65px;
-	height: 50px;
+	padding-top: 12px;
+	min-width: 51px;
+	height: 40px;
 }
 
 .achieved {
@@ -302,23 +386,25 @@ input[type=submit]:hover {
 }
 
 .achievementLink {
+	display: flex;
+	margin: 5px 0px;
 	font-size: 1.15rem;
-	color: black;
 }
 
-.bottomItem {
-	margin-bottom: 20px;
-	border-bottom: 1px solid black;
-	padding-bottom: 5px;
+.achievementLink h3 {
+	margin-right: 20px;
 }
 
 .gameWithoutAchievementsDivision {
-	background-color: black;
-	color: white;
+	background-color: var(--darkGray);
+	color: var(--lightGray);
+	border: solid 5px var(--lightGray);
+	border-radius: 10px;
 	padding: 5px;
+	text-align: center;
+	margin: 30px 0px;
 }
 
-.gameWithoutAchievementsDivision,
 .gameWithoutAchievements {
-	margin: 20px 0px;
+	margin: 10px 0px;
 }

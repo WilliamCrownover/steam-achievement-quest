@@ -7,6 +7,7 @@ export const AchievementGraph = ({ game }) => {
 		{ class: 'fiftyPercent' },
 		{ class: 'tenPercent' },
 	];
+	const heightFactor = 1.5;
 
 	return (
 		<div className='achievementGraph'>
@@ -30,15 +31,15 @@ export const AchievementGraph = ({ game }) => {
 						<div
 							title={hoverInfo}
 							style={{
-								height: `${(100 - percent) * 3}px`,
+								height: `${(100 - percent) * heightFactor}px`,
 								backgroundColor: colorFill,
-								opacity: 0.3
+								opacity: 0.4
 							}}
 						/>
 						<div
 							title={hoverInfo}
 							style={{
-								height: `${percent * 3}px`,
+								height: `${percent * heightFactor}px`,
 								backgroundColor: colorFillAchieved
 							}}
 						/>
@@ -50,7 +51,7 @@ export const AchievementGraph = ({ game }) => {
 			)}
 			<div
 				className='horizontalGraphLine averagePercentLine'
-				style={{ top: `${(100 - game.averagePercent) * 3}px` }}
+				style={{ top: `${(100 - game.averagePercent) * heightFactor}px` }}
 			/>
 		</div>
 	)

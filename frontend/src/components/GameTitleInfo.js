@@ -8,12 +8,27 @@ export const GameTitleInfo = ({ game }) => {
 
 	return (
 		<div className='gameTitleInfo'>
-			<img src={gameIcon} alt={game.name} height='50'/>
-			<a className='gameTitleLink' href={game.gameUrl} target='_blank' rel='noreferrer'>{game.name}</a>
-			{game.has_dlc && <p className='dlc'>+DLC</p>}
-			{hoursPlayed > 0 && <p>{`${hoursPlayed} Hours Played`}</p>}
-			<p className={`${lastPlayedDate === 'Not Played' && 'notPlayed'}`}>{lastPlayedDate}</p>
-			<p>{playerCount} Current Players</p>
+			<a className='gameTitleLink' href={game.gameUrl} target='_blank' rel='noreferrer'>
+				<img src={gameIcon} alt={game.name} height='50' />
+				<div className='gameNameContainer'>
+					<h3>{game.name}</h3>
+					{game.has_dlc && <p className='dlc'>+DLC</p>}
+				</div>
+			</a>
+			{hoursPlayed > 0 &&
+				<div className='specificGameDataPoint'>
+					<h4>Hours Played</h4>
+					<p>{hoursPlayed}</p>
+				</div>
+			}
+			<div className='specificGameDataPoint'>
+				<h4>Last Played</h4>
+				<p className={`${lastPlayedDate === 'Not Played' && 'notPlayed'}`}>{lastPlayedDate}</p>
+			</div>
+			<div className='specificGameDataPoint'>
+				<h4>Current Players</h4>
+				<p>{playerCount}</p>
+			</div>
 		</div>
 	)
 }

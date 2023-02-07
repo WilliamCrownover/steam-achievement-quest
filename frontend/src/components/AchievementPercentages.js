@@ -11,7 +11,7 @@ export const AchievementPercentages = ({ achievements }) => {
 				return (
 					<div key={achievement.name} title={achievement.hoverInfo}>
 						<h3 style={{ backgroundColor: colorFill }} className={achieved}>{percent}</h3>
-						<img src={achievement.icon} alt={achievement.displayName} height='50'/>
+						<img src={achievement.icon} alt={achievement.displayName} height='40' />
 					</div>
 				)
 			})}

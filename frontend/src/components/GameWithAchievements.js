@@ -14,11 +14,13 @@ export const GameWithAchievements = ({ game, privateProfile }) => {
 	} = game;
 
 	return (
-		<>
+		<div className='gameWithAchievementsContainer'>
 			<GameTitleInfo game={game} />
-			<a className='achievementLink' href={achievementsUrl} target='_blank' rel='noreferrer'>{totalAchievements} Total Achievements</a>
-			{!privateProfile && <h3>{totalCompletedAchievements} Completed - {percentComplete}%</h3>}
-			<AchievementGraph game={game}/>
+			<a className='achievementLink' href={achievementsUrl} target='_blank' rel='noreferrer'>
+				<h3>{totalAchievements} Total Achievements</h3>
+				{!privateProfile && <h3>{totalCompletedAchievements} Completed - {percentComplete}%</h3>}
+			</a>
+			<AchievementGraph game={game} />
 			<h3
 				className={`${percentComplete === '100.00' && 'achieved'} averagePercent`}
 				style={{ backgroundColor: setColorFill(averagePercent) }}
@@ -26,7 +28,6 @@ export const GameWithAchievements = ({ game, privateProfile }) => {
 				{averagePercent}
 			</h3>
 			<AchievementPercentages achievements={achievements} />
-			<div className='bottomItem' />
-		</>
+		</div>
 	)
 }
