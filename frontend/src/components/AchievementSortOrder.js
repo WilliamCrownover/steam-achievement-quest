@@ -30,13 +30,13 @@ export const AchievementSortOrder = (props) => {
 	}
 
 	return (
-		<>
+		<div className='sortOption'>
 			<h4>Achievement Sort Order</h4>
-			<select onChange={changeAchievementOrder} className='achievementSortOrder' >
+			<select onChange={changeAchievementOrder} >
 				<option value='name' defaultValue > Achievement ID</option>
 				<option value='percent' > Global Percent Complete</option>
 				{!userData.privateProfile && <option value='unlockTime' >Date Achieved</option>}
 			</select>
-		</>
+		</div>
 	)
 }

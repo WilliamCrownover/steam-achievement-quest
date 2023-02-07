@@ -74,7 +74,8 @@ p {
 
 .textStack,
 .formContainer,
-.gameDataPoint {
+.gameDataPoint,
+.sortOptionContainer {
 	background-color: var(--darkGray);
 	color: var(--lightGray);
 	border: solid 5px var(--lightGray);
@@ -177,8 +178,20 @@ input[type=submit]:hover {
 	font-weight: 400;
 }
 
-.achievementSortOrder {
-	margin-bottom: 20px;
+.sortOptionContainer {
+	display: flex;
+	align-items: center;
+	margin: 5px 0px;
+	justify-content: space-around;
+}
+
+.sortOption select {
+	background-color: var(--lightGray);
+}
+
+.sortOptionContainer h4 {
+	margin: 0px;
+	margin-right: 10px;
 }
 
 .achievementGraph {

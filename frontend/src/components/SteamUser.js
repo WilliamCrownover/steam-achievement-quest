@@ -115,11 +115,11 @@ export const SteamUser = () => {
 		<>
 			<form className='formContainer' onSubmit={handleSubmit}>
 				<div>
-				<label>
-					Steam User ID
-					<input type='text' value={userId} onChange={handleIDChange} />
-				</label>
-				<input type='submit' value='Search' disabled={!userIdCheck} />
+					<label>
+						Steam User ID
+						<input type='text' value={userId} onChange={handleIDChange} />
+					</label>
+					<input type='submit' value='Search' disabled={!userIdCheck} />
 				</div>
 				<label>
 					Sample Size 25 Games
@@ -140,14 +140,16 @@ export const SteamUser = () => {
 									<GamesInfoSection
 										{...passDownSteamData}
 									/>
-									<GameSortOrder
-										{...passDownSteamData}
-									/>
-									{gamesWithAchievements.length > 0 &&
-										<AchievementSortOrder
+									<div className='sortOptionContainer'>
+										<GameSortOrder
 											{...passDownSteamData}
 										/>
-									}
+										{gamesWithAchievements.length > 0 &&
+											<AchievementSortOrder
+												{...passDownSteamData}
+											/>
+										}
+									</div>
 								</>
 								: <p className='alertText'>This Steam User's game list is private.</p>
 							}
@@ -156,7 +158,7 @@ export const SteamUser = () => {
 						(!firstLoad && <p className='alertText'>Steam User Profile does not exist.</p>)
 					}
 					{gamesWithAchievements.flatMap((game) =>
-						<GameWithAchievements game={game} key={game.appid} privateProfile={userData.privateProfile}/>
+						<GameWithAchievements game={game} key={game.appid} privateProfile={userData.privateProfile} />
 					)}
 					{(hasGames && gamesWithoutAchievements.length > 0) && <h2 className={'gameWithoutAchievementsDivision'}>Games Without Achievements</h2>}
 					{gamesWithoutAchievements.flatMap((game) =>

@@ -49,7 +49,7 @@ export const GameSortOrder = (props) => {
 	}
 
 	return (
-		<>
+		<div className='sortOption'>
 			<h4>Game Sort Order</h4>
 			<select onChange={changeGameOrder}>
 				<option value='name' defaultValue > Alphabetical</option>
@@ -65,6 +65,6 @@ export const GameSortOrder = (props) => {
 					</>
 				}
 			</select>
-		</>
+		</div>
 	)
 }
