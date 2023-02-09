@@ -3,7 +3,15 @@ import { AchievementGraph } from './AchievementGraph';
 import { AchievementPercentages } from './AchievementPercentages';
 import { GameTitleInfo } from './GameTitleInfo';
 
-export const GameWithAchievements = ({ game, privateProfile }) => {
+export const GameWithAchievements = (props) => {
+	const {
+		game,
+		privateProfile,
+		showGraph,
+		showList,
+		showIcons,
+	} = props
+
 	const {
 		achievements,
 		averagePercent,
@@ -20,14 +28,18 @@ export const GameWithAchievements = ({ game, privateProfile }) => {
 				<h3>{totalAchievements} Total Achievements</h3>
 				{!privateProfile && <h3>{totalCompletedAchievements} Completed - {percentComplete}%</h3>}
 			</a>
-			<AchievementGraph game={game} />
-			<h3
-				className={`${percentComplete === '100.00' && 'achieved'} averagePercent`}
-				style={{ backgroundColor: setColorFill(averagePercent) }}
-			>
-				{averagePercent}
-			</h3>
-			<AchievementPercentages achievements={achievements} />
+			{showGraph &&
+				<>
+					<AchievementGraph game={game} />
+					<h3
+						className={`${percentComplete === '100.00' && 'achieved'} averagePercent`}
+						style={{ backgroundColor: setColorFill(averagePercent) }}
+					>
+						{averagePercent}
+					</h3>
+				</>
+			}
+			{showList && <AchievementPercentages achievements={achievements} showIcons={showIcons} />}
 		</div>
 	)
 }

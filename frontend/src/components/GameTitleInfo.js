@@ -9,7 +9,7 @@ export const GameTitleInfo = ({ game }) => {
 	return (
 		<div className='gameTitleInfo'>
 			<a className='gameTitleLink' href={game.gameUrl} target='_blank' rel='noreferrer'>
-				<img src={gameIcon} alt={game.name} height='50' />
+				<img src={gameIcon} alt={game.name} height='50' width='50' loading='lazy' />
 				<div className='gameNameContainer'>
 					<h3>{game.name}</h3>
 					{game.has_dlc && <p className='dlc'>+DLC</p>}

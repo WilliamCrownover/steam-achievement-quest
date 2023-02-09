@@ -48,16 +48,16 @@ export const getUserGameData = async (userId, sampleSize = false, setterGamesToL
 			// If the game has community data it likely has achievement data.
 			if (game.has_community_visible_stats) {
 				let achievements = await getGameAchievements(gameId);
-				
+
 				// If it does indeed have achievements, elaborate the data.
-				if (achievements) {
+				if (achievements?.length > 0) {
 					lowestAchievementPercent = round(Math.min(...achievements.map((achievement) => achievement.percent)));
 					const totalAchievements = achievements.length;
 					let totalCompletedAchievements = 0;
 					let privateProfile = true;
 					const achievementSchemas = await getGameAchievementSchemas(gameId);
 					achievements = achievements.map((achievement, i) => ({ ...achievement, ...achievementSchemas[i], unlockDate: 'Unachieved' }));
-					
+
 					// If the user's achievements are public, combine data and sum total completed achievements.
 					if (publicProfileCheck) {
 						const userAchievements = await getUserAchievements(gameId, userId);

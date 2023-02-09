@@ -1,6 +1,6 @@
 import { round, setColorFill } from '../utils/utils'
 
-export const AchievementPercentages = ({ achievements }) => {
+export const AchievementPercentages = ({ achievements, showIcons }) => {
 
 	return (
 		<div className='achievementList'>
@@ -10,8 +10,8 @@ export const AchievementPercentages = ({ achievements }) => {
 				const achieved = achievement.achieved && 'achieved'
 				return (
 					<div key={achievement.name} title={achievement.hoverInfo}>
-						<h3 style={{ backgroundColor: colorFill }} className={achieved}>{percent}</h3>
-						<img src={achievement.icon} alt={achievement.displayName} height='40' />
+						<h3 style={{ backgroundColor: colorFill }} className={`${achieved} ${showIcons ? 'withIcons' : 'noIcons'}`}>{percent}</h3>
+						{showIcons && <img src={achievement.icon} alt={achievement.displayName} height='40' width='40' loading='lazy' />}
 					</div>
 				)
 			})}

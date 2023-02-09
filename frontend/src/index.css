@@ -144,7 +144,7 @@ p {
 	margin: 0px 0px 5px 0px;
 }
 
-.formContainer input {
+input {
 	margin-left: 10px;
 }
 
@@ -207,9 +207,14 @@ input[type=submit]:hover {
 
 .sortOptionContainer {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	margin: 5px 0px;
 	justify-content: space-around;
+	position: -webkit-sticky;
+	position: sticky;
+	top: 0;
+	z-index: 2;
 }
 
 .sortOption select {
@@ -219,6 +224,10 @@ input[type=submit]:hover {
 .sortOptionContainer h4 {
 	margin: 0px;
 	margin-right: 10px;
+}
+
+.sortOptionContainer label {
+	margin-top: 10px;
 }
 
 .gameWithAchievementsContainer {
@@ -371,7 +380,7 @@ input[type=submit]:hover {
 	margin-right: 1px;
 }
 
-.achievementList h3 {
+.withIcons {
 	border-top-left-radius: 10px;
 	border-bottom-left-radius: 10px;
 	display: inline-block;
@@ -379,6 +388,13 @@ input[type=submit]:hover {
 	padding-top: 12px;
 	min-width: 51px;
 	height: 40px;
+}
+
+.noIcons {
+	border-radius: 0px;
+	height: auto;
+	padding: 3px;
+	min-width: 51px;
 }
 
 .achieved {

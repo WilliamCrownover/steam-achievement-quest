@@ -24,6 +24,9 @@ export const SteamUser = () => {
 	const [gamesWithAchievements, setGamesWithAchievements] = useState([]);
 	const [gamesWithoutAchievements, setGamesWithoutAchievements] = useState([]);
 	const [passDownSteamData, setPassDownSteamData] = useState({});
+	const [showGraph, setShowGraph] = useState(true);
+	const [showList, setShowList] = useState(true);
+	const [showIcons, setShowIcons] = useState(true);
 
 	const handleIDChange = (e) => {
 		const value = e.target.value;
@@ -149,6 +152,23 @@ export const SteamUser = () => {
 												{...passDownSteamData}
 											/>
 										}
+										<div className='flexLineBreak' />
+										{gamesWithAchievements.length > 0 &&
+											<>
+												<label>
+													Show Achievement Graph
+													<input type='checkbox' checked={showGraph} onChange={() => setShowGraph(!showGraph)} />
+												</label>
+												<label>
+													Show Achievement List
+													<input type='checkbox' checked={showList} onChange={() => setShowList(!showList)} />
+												</label>
+												<label>
+													Show Achievement Icons
+													<input type='checkbox' checked={showIcons} onChange={() => setShowIcons(!showIcons)} />
+												</label>
+											</>
+										}
 									</div>
 								</>
 								: <p className='alertText'>This Steam User's game list is private.</p>
@@ -158,7 +178,14 @@ export const SteamUser = () => {
 						(!firstLoad && <p className='alertText'>Steam User Profile does not exist.</p>)
 					}
 					{gamesWithAchievements.flatMap((game) =>
-						<GameWithAchievements game={game} key={game.appid} privateProfile={userData.privateProfile} />
+						<GameWithAchievements
+							key={game.appid}
+							game={game}
+							privateProfile={userData.privateProfile}
+							showGraph={showGraph}
+							showList={showList}
+							showIcons={showIcons}
+						/>
 					)}
 					{(hasGames && gamesWithoutAchievements.length > 0) && <h2 className='gameWithoutAchievementsDivision'>Games Without Achievements</h2>}
 					{gamesWithoutAchievements.flatMap((game) =>
