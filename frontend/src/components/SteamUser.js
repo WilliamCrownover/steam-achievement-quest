@@ -80,12 +80,15 @@ export const SteamUser = () => {
 
 	const addMoreDataToUser = (user, withAchieves, withoutAchieves) => {
 		const allGames = [...withAchieves, ...withoutAchieves];
+		const totalAchievements = withAchieves.reduce((total, current) => total + current.totalAchievements, 0);
+		const totalAchievementsCompleted = withAchieves.reduce((total, current) => total + current.totalCompletedAchievements, 0);
 		setUserData({
 			...user,
 			privateProfile: withAchieves[0]?.privateProfile,
 			totalNumberOfGames: allGames.length,
-			totalAchievements: withAchieves.reduce((total, current) => total + current.totalAchievements, 0),
-			totalAchievementsCompleted: withAchieves.reduce((total, current) => total + current.totalCompletedAchievements, 0),
+			totalAchievements,
+			totalAchievementsCompleted,
+			totalAchievementsIncomplete: totalAchievements - totalAchievementsCompleted,
 			totalPlaytime: round(allGames.reduce((total, game) => total + parseFloat(game.hoursPlayed), 0)),
 			totalNeverPlayed: allGames.reduce((total, game) => total + (game.lastPlayedDate === 'Not Played' ? 1 : 0), 0),
 			totalOneHundredPercentComplete: allGames.reduce((total, game) => total + (game.percentComplete === '100.00' ? 1 : 0), 0),

@@ -54,6 +54,7 @@ export const getUserGameData = async (userId, sampleSize = false, setterGamesToL
 					lowestAchievementPercent = round(Math.min(...achievements.map((achievement) => achievement.percent)));
 					const totalAchievements = achievements.length;
 					let totalCompletedAchievements = 0;
+					let totalIncompleteAchievements = totalAchievements;
 					let privateProfile = true;
 					const achievementSchemas = await getGameAchievementSchemas(gameId);
 					achievements = achievements.map((achievement, i) => ({ ...achievement, ...achievementSchemas[i], unlockDate: 'Unachieved' }));
@@ -63,6 +64,7 @@ export const getUserGameData = async (userId, sampleSize = false, setterGamesToL
 						const userAchievements = await getUserAchievements(gameId, userId);
 						achievements = combineAchievements(achievements, userAchievements);
 						totalCompletedAchievements = sumTotalCompleted(achievements);
+						totalIncompleteAchievements -= totalCompletedAchievements;
 						privateProfile = false;
 					}
 
@@ -75,6 +77,7 @@ export const getUserGameData = async (userId, sampleSize = false, setterGamesToL
 						lowestAchievementPercent,
 						totalAchievements,
 						totalCompletedAchievements,
+						totalIncompleteAchievements,
 						privateProfile,
 						percentComplete,
 						averagePercent: round(averageAchievementPercent(achievements)),
