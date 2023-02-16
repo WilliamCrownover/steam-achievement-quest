@@ -193,6 +193,10 @@ input[type=submit]:hover {
 	font-weight: 400;
 }
 
+.gameDataPoint p {
+	text-align: center;
+}
+
 .timePlayedContainer {
 	display: flex;
 	justify-content: space-around;

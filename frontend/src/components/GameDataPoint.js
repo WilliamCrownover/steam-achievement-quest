@@ -15,7 +15,7 @@ export const GameDataPoint = (props) => {
 		<div className='gameDataPoint'>
 			<h3>{dataName}</h3>
 			{privateProfile ?
-				<p>This Steam user's achievements completed data is private.</p>
+				<p>This Steam user's achievements data is private.</p>
 				:
 				<h3>{dataArrayValue}{showPercent && (` - ${percent(dataArrayValue, total)}`)}</h3>
 			}

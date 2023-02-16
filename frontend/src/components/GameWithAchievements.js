@@ -1,4 +1,4 @@
-import { setColorFill } from '../utils/utils'
+import { round, setColorFill } from '../utils/utils'
 import { AchievementGraph } from './AchievementGraph';
 import { AchievementPercentages } from './AchievementPercentages';
 import { GameTitleInfo } from './GameTitleInfo';
@@ -19,6 +19,7 @@ export const GameWithAchievements = (props) => {
 		achievementsUrl,
 		totalAchievements,
 		totalCompletedAchievements,
+		totalIncompleteAchievements,
 	} = game;
 
 	const oneHundredPercent = percentComplete === '100.00' ? 'oneHundredPercent' : '';
@@ -28,7 +29,12 @@ export const GameWithAchievements = (props) => {
 			<GameTitleInfo game={game} />
 			<a className={`achievementLink ${oneHundredPercent}`} href={achievementsUrl} target='_blank' rel='noreferrer'>
 				<h3>{totalAchievements} Total Achievements</h3>
-				{!privateProfile && <h3>{totalCompletedAchievements} Completed - {percentComplete}%</h3>}
+				{!privateProfile &&
+					<>
+						<h3>{totalIncompleteAchievements} Not Completed - {round(100 - percentComplete)}%</h3>
+						<h3>{totalCompletedAchievements} Completed - {percentComplete}%</h3>
+					</>
+				}
 			</a>
 			{showGraph &&
 				<>
