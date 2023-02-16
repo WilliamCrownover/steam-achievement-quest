@@ -15,6 +15,7 @@
 	--dlc: rgb(57, 62, 137);
 	--notPlayed: rgb(137, 62, 57);
 	--transitionSpeed: 0.4s;
+	--oneHundredPercent: rgb(52, 233, 49);
 }
 
 body {
@@ -185,6 +186,7 @@ input[type=submit]:hover {
 .gameDataPoint h3 {
 	display: inline-block;
 	width: auto;
+	text-align: center;
 }
 
 .gameDataPoint h3:nth-child(1) {
@@ -409,6 +411,10 @@ input[type=submit]:hover {
 
 .achievementLink h3 {
 	margin-right: 20px;
+}
+
+.oneHundredPercent {
+	border: solid 5px var(--oneHundredPercent);
 }
 
 .gameWithoutAchievementsDivision {

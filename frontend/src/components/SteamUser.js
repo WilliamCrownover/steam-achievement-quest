@@ -88,6 +88,7 @@ export const SteamUser = () => {
 			totalAchievementsCompleted: withAchieves.reduce((total, current) => total + current.totalCompletedAchievements, 0),
 			totalPlaytime: round(allGames.reduce((total, game) => total + parseFloat(game.hoursPlayed), 0)),
 			totalNeverPlayed: allGames.reduce((total, game) => total + (game.lastPlayedDate === 'Not Played' ? 1 : 0), 0),
+			totalOneHundredPercentComplete: allGames.reduce((total, game) => total + (game.percentComplete === '100.00' ? 1 : 0), 0),
 		});
 		setLoadingModifiedComplete(true);
 	}

@@ -21,10 +21,12 @@ export const GameWithAchievements = (props) => {
 		totalCompletedAchievements,
 	} = game;
 
+	const oneHundredPercent = percentComplete === '100.00' ? 'oneHundredPercent' : '';
+
 	return (
 		<div className='gameWithAchievementsContainer'>
 			<GameTitleInfo game={game} />
-			<a className='achievementLink' href={achievementsUrl} target='_blank' rel='noreferrer'>
+			<a className={`achievementLink ${oneHundredPercent}`} href={achievementsUrl} target='_blank' rel='noreferrer'>
 				<h3>{totalAchievements} Total Achievements</h3>
 				{!privateProfile && <h3>{totalCompletedAchievements} Completed - {percentComplete}%</h3>}
 			</a>

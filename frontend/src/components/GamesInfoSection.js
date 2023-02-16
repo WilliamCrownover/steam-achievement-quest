@@ -15,6 +15,7 @@ export const GamesInfoSection = (props) => {
 		totalAchievementsCompleted,
 		totalPlaytime,
 		totalNeverPlayed,
+		totalOneHundredPercentComplete,
 	} = userData;
 
 	const hasAchievements = gamesWithAchievements.length > 0;
@@ -34,6 +35,12 @@ export const GamesInfoSection = (props) => {
 		{
 			dataName: 'Without Achievements',
 			dataArray: gamesWithoutAchievements,
+			showPercent: true,
+			total: totalNumberOfGames,
+		},
+		{
+			dataName: '100% Complete',
+			dataArray: totalOneHundredPercentComplete,
 			showPercent: true,
 			total: totalNumberOfGames,
 		},
@@ -70,19 +77,20 @@ export const GamesInfoSection = (props) => {
 				<>
 					<GameDataPoint {...GameDataPoints[1]} />
 					<GameDataPoint {...GameDataPoints[2]} />
+					<GameDataPoint {...GameDataPoints[3]} />
 				</>
 			}
-			<GameDataPoint {...GameDataPoints[3]} />
+			<GameDataPoint {...GameDataPoints[4]} />
 
 			<div className='flexLineBreak' />
 
 			{hasAchievements &&
 				<>
-					<GameDataPoint {...GameDataPoints[4]} />
+					<GameDataPoint {...GameDataPoints[5]} />
 					{privateProfile ?
-						<GameDataPoint {...GameDataPoints[6]} />
+						<GameDataPoint {...GameDataPoints[7]} />
 						:
-						<GameDataPoint {...GameDataPoints[5]} />
+						<GameDataPoint {...GameDataPoints[6]} />
 					}
 				</>
 			}
