@@ -34,6 +34,12 @@ export const GameSortOrder = (props) => {
 			case value === 'totalAchievements':
 				sortNumberThenSetState(setGamesWithAchievements, [...gamesWithAchievements], value);
 				break;
+			case value === 'totalCompletedAchievements':
+				sortNumberThenSetState(setGamesWithAchievements, [...sorter([...gamesWithAchievements], sortNumber('totalIncompleteAchievements'))], value, true);
+				break;
+			case value === 'totalIncompleteAchievements':
+				sortNumberThenSetState(setGamesWithAchievements, [...gamesWithAchievements], value);
+				break;
 			case value === 'percentComplete':
 				sortNumberThenSetState(setGamesWithAchievements, [...sorter([...gamesWithAchievements], sortNumber('totalAchievements'))], value, true);
 				break;
@@ -58,8 +64,14 @@ export const GameSortOrder = (props) => {
 				<option value='rtime_last_played' > Last Played Date</option>
 				{hasAchievements &&
 					<>
-						<option value='totalAchievements' > Number of Achievements</option>
-						{!userData.privateProfile && <option value='percentComplete'>Percent Complete</option>}
+						<option value='totalAchievements' > Total Achievements</option>
+						{!userData.privateProfile &&
+							<>
+								<option value='totalCompletedAchievements'>Total Achievements Complete</option>
+								<option value='totalIncompleteAchievements'>Total Achievements Incomplete</option>
+								<option value='percentComplete'>Percent Complete</option>
+							</>
+						}
 						<option value='averagePercent' > Average Global Achievement Percent</option>
 						<option value='lowestAchievementPercent' > Lowest Achievement Percent per Game</option>
 					</>
