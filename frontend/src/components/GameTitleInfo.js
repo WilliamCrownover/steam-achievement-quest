@@ -21,15 +21,17 @@ export const GameTitleInfo = ({ game }) => {
 					{game.has_dlc && <p className='dlc'>+DLC</p>}
 				</div>
 			</a>
-			{hoursPlayed > 0 &&
+			<div className='playtimeDataContainer'>
 				<div className='specificGameDataPoint'>
-					<h4>Hours Played</h4>
-					<p>{hoursPlayed}</p>
+					<h4>Last Played</h4>
+					<p className={`${lastPlayedDate === 'Not Played' && 'notPlayed'}`}>{lastPlayedDate}</p>
 				</div>
-			}
-			<div className='specificGameDataPoint'>
-				<h4>Last Played</h4>
-				<p className={`${lastPlayedDate === 'Not Played' && 'notPlayed'}`}>{lastPlayedDate}</p>
+				{hoursPlayed > 0 &&
+					<div className='specificGameDataPoint'>
+						<h4>Hours Played</h4>
+						<p>{hoursPlayed}</p>
+					</div>
+				}
 			</div>
 			<div className='specificGameDataPoint'>
 				<h4>Current Players</h4>

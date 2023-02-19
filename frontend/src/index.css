@@ -262,6 +262,16 @@ input[type=submit]:hover {
 .gameTitleInfo>* {
 	display: inline-block;
 	margin-right: 10px;
+	width: 25%;
+}
+
+.gameTitleInfo a {
+	flex: 0 0 30%;
+}
+
+.gameTitleInfo .specificGameDataPoint:last-child {
+	flex: 0 0 12%;
+	margin-right: 0px;
 }
 
 .gameTitleLink,
@@ -282,6 +292,16 @@ input[type=submit]:hover {
 	background-color: var(--lightGray);
 	color: var(--darkGray);
 	transition: all var(--transitionSpeed);
+}
+
+.playtimeDataContainer {
+	display: flex;
+	width: 50%;
+}
+
+.playtimeDataContainer .specificGameDataPoint,
+.playtimeDataContainer .specificGameDataPoint:last-child {
+	flex: 1 0 50%;
 }
 
 .specificGameDataPoint {
