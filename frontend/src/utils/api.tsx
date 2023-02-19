@@ -1,9 +1,11 @@
 import { dateFormat, round, sorter, sortAlphabet } from './utils';
 
+const serverString = 'http://localhost:5000/';
+
 // Main API call to collect and process Steam data
 export const getUserGameData = async (userId, sampleSize = false, setterGamesToLoad) => {
 	setterGamesToLoad('');
-	const url = `http://localhost:5000/getOwnedGames/${userId}`;
+	const url = `${serverString}getOwnedGames/${userId}`;
 
 	try {
 		const res = await fetch(url);
@@ -30,6 +32,14 @@ export const getUserGameData = async (userId, sampleSize = false, setterGamesToL
 			const gameUrl = `https://store.steampowered.com/app/${gameId}`;
 			const achievementsUrl = `https://steamcommunity.com/stats/${gameId}/achievements`;
 			const playerCount = await getGamePlayerCount(gameId);
+			const reviewData = await getGameReviewData(gameId);
+			const reviewTotals = reviewData.total_reviews;
+			let reviewPercentPositive = '0';
+			let reviewPercentNegative = '0';
+			if (reviewTotals !== 0) {
+				reviewPercentPositive = round(reviewData.total_positive / reviewTotals * 100);
+				reviewPercentNegative = round(reviewData.total_negative / reviewTotals * 100);	
+			}
 			let lowestAchievementPercent = '0';
 
 			// Each game will have at least these properties.
@@ -41,6 +51,9 @@ export const getUserGameData = async (userId, sampleSize = false, setterGamesToL
 				gameUrl,
 				achievementsUrl,
 				playerCount,
+				...reviewData,
+				reviewPercentPositive,
+				reviewPercentNegative,
 				lowestAchievementPercent,
 				achievements: undefined,
 			}
@@ -95,7 +108,7 @@ export const getUserGameData = async (userId, sampleSize = false, setterGamesToL
 }
 
 const getGamePlayerCount = async (appId) => {
-	const url = `http://localhost:5000/getCurrentPlayersForGame/${appId}`;
+	const url = `${serverString}getCurrentPlayersForGame/${appId}`;
 
 	try {
 		const res = await fetch(url);
@@ -106,8 +119,20 @@ const getGamePlayerCount = async (appId) => {
 	}
 }
 
+const getGameReviewData = async (appId) => {
+	const url = `${serverString}getReviewsForGame/${appId}`;
+
+	try {
+		const res = await fetch(url);
+		const json = await res.json();
+		return json.query_summary;
+	} catch (error) {
+		console.log(error);
+	}
+}
+
 const getGameAchievements = async (appId) => {
-	const url = `http://localhost:5000/getGameAchievements/${appId}`;
+	const url = `${serverString}getGameAchievements/${appId}`;
 
 	try {
 		const res = await fetch(url);
@@ -120,7 +145,7 @@ const getGameAchievements = async (appId) => {
 }
 
 const getGameAchievementSchemas = async (appId) => {
-	const url = `http://localhost:5000/getSchemaForGame/${appId}`;
+	const url = `${serverString}getSchemaForGame/${appId}`;
 
 	try {
 		const res = await fetch(url);
@@ -133,7 +158,7 @@ const getGameAchievementSchemas = async (appId) => {
 }
 
 const getUserAchievements = async (appId, userId) => {
-	const url = `http://localhost:5000/getUserAchievements/${appId}/${userId}`;
+	const url = `${serverString}getUserAchievements/${appId}/${userId}`;
 
 	try {
 		const res = await fetch(url);
@@ -145,7 +170,7 @@ const getUserAchievements = async (appId, userId) => {
 }
 
 export const getUserInfo = async (userId) => {
-	const url = `http://localhost:5000/getUserInfo/${userId}`;
+	const url = `${serverString}getUserInfo/${userId}`;
 
 	try {
 		const res = await fetch(url);

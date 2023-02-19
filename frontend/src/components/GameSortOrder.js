@@ -22,13 +22,19 @@ export const GameSortOrder = (props) => {
 			case value === 'name':
 				sortAlphabeticalThenSetState(setGamesWithAchievements, [...gamesWithAchievements], value);
 				break;
-			case value === 'playerCount':
-				sharedSort(value);
-				break;
 			case value === 'hoursPlayed':
 				sharedSort(value);
 				break;
 			case value === 'rtime_last_played':
+				sharedSort(value);
+				break;
+			case value === 'playerCount':
+				sharedSort(value);
+				break;
+			case value === 'total_reviews':
+				sharedSort(value);
+				break;
+			case value === 'reviewPercentPositive':
 				sharedSort(value);
 				break;
 			case value === 'totalAchievements':
@@ -59,9 +65,11 @@ export const GameSortOrder = (props) => {
 			<h4>Game Sort Order</h4>
 			<select onChange={changeGameOrder}>
 				<option value='name' defaultValue > Alphabetical</option>
-				<option value='playerCount' > Current Player Count</option>
 				<option value='hoursPlayed' > Playtime</option>
 				<option value='rtime_last_played' > Last Played Date</option>
+				<option value='playerCount' > Current Player Count</option>
+				<option value='total_reviews' > Total Reviews</option>
+				<option value='reviewPercentPositive' > Positive Review Percent</option>
 				{hasAchievements &&
 					<>
 						<option value='totalAchievements' > Total Achievements</option>

@@ -1,10 +1,16 @@
+import { setColorFill } from '../utils/utils'
+
 export const GameTitleInfo = ({ game }) => {
 	const {
 		gameIcon,
 		hoursPlayed,
 		lastPlayedDate,
 		playerCount,
+		total_reviews,
+		reviewPercentPositive,
 	} = game;
+
+	const colorFill = setColorFill((reviewPercentPositive * (100 + 90) / 100 - 90));
 
 	return (
 		<div className='gameTitleInfo'>
@@ -28,6 +34,14 @@ export const GameTitleInfo = ({ game }) => {
 			<div className='specificGameDataPoint'>
 				<h4>Current Players</h4>
 				<p>{playerCount}</p>
+			</div>
+			<div className='specificGameDataPoint'>
+				<h4>Total Reviews</h4>
+				<p>{total_reviews}</p>
+			</div>
+			<div className='specificGameDataPoint' style={{ backgroundColor: colorFill, color: 'black' }}>
+				<h4>Positive Reviews</h4>
+				<p>{reviewPercentPositive}%</p>
 			</div>
 		</div>
 	)
