@@ -102,6 +102,20 @@ app.get('/getCurrentPlayersForGame/:appId', cors(corsOptions), async (req, res) 
 	res.json(jsonResponse);
 });
 
+app.get('/getReviewsForGame/:appId', cors(corsOptions), async (req, res) => {
+	const endpoint = `
+	https://store.steampowered.com/appreviews/
+		${req.params.appId}
+		?num_per_page=0&json=1
+	`;
+	const fetchOptions = {
+		method: 'GET'
+	}
+	const response = await fetch(endpoint, fetchOptions);
+	const jsonResponse = await response.json();
+	res.json(jsonResponse);
+});
+
 app.get('/getUserAchievements/:appId/:userId', cors(corsOptions), async (req, res) => {
 	const endpoint = `
 	https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/
