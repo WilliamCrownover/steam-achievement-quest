@@ -1,7 +1,7 @@
 export const dateFormat = (timestamp) => {
 	if (timestamp <= 100000) return 'Not Played';
 	const dateObject = new Date(timestamp * 1000);
-	return dateObject.toLocaleString('en-US', {});
+	return dateObject.toLocaleString('en-US', {dateStyle:'medium'});
 }
 
 export const percent = (num, total) => `${round(num / total * 100)}%`;
