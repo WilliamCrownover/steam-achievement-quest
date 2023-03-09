@@ -64,7 +64,7 @@ export const SteamUser = () => {
 	}
 
 	const getGamesData = async (user) => {
-		const gameData = await getUserGameData(user.steamid, sampleSize, setGamesToLoadCount);
+		const gameData = await getUserGameData(user.steamid, [], sampleSize, setGamesToLoadCount);
 		setLoadingGamesComplete(true);
 		if (!gameData) {
 			setLoadingModifiedComplete(true);

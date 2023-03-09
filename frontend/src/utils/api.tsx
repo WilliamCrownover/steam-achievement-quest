@@ -3,19 +3,22 @@ import { dateFormat, round, sorter, sortAlphabet } from './utils';
 const serverString = 'http://localhost:5000/';
 
 // Main API call to collect and process Steam data
-export const getUserGameData = async (userId, sampleSize = false, setterGamesToLoad) => {
+export const getUserGameData = async (userId, gameList, sampleSize = false, setterGamesToLoad) => {
 	setterGamesToLoad('');
 	const url = `${serverString}getOwnedGames/${userId}`;
 
 	try {
 		const res = await fetch(url);
 		const json = await res.json();
-		const allGamesData = json.response.games;
+		let allGamesData = json.response.games;
 
 		// The profile is completely private and no game data is available.
 		if (!allGamesData) return;
 
-		const totalGameCount = sampleSize ? 25 : allGamesData.length;
+		if (gameList.length > 0) allGamesData = allGamesData.filter((game) => gameList.includes(game.appid));
+
+		const gamesLength = allGamesData.length
+		const totalGameCount = (sampleSize && gamesLength > 25) ? 25 : gamesLength;
 		setterGamesToLoad(totalGameCount);
 
 		// 440 is Team Fortress 2. Avoid excessive user achievement fetches if private profile.
