@@ -2,6 +2,7 @@ import { setColorFill } from '../utils/utils'
 
 export const GameTitleInfo = ({ game }) => {
 	const {
+		name,
 		gameIcon,
 		hoursPlayed,
 		lastPlayedDate,
@@ -15,9 +16,9 @@ export const GameTitleInfo = ({ game }) => {
 	return (
 		<div className='gameTitleInfo'>
 			<a className='gameTitleLink' href={game.gameUrl} target='_blank' rel='noreferrer'>
-				<img src={gameIcon} alt={game.name} height='50' width='50' loading='lazy' />
+				<img src={gameIcon} alt={name} height='50' width='50' loading='lazy' />
 				<div className='gameNameContainer'>
-					<h3>{game.name}</h3>
+					<h3>{name}</h3>
 					{game.has_dlc && <p className='dlc'>+DLC</p>}
 				</div>
 			</a>
