@@ -42,12 +42,17 @@ export const setColorFill = (number, achieved = false) => {
 	}
 }
 
-export const sorter = (array, method) => array.sort(method);
+export const sorter = (array, method) => 
+	array.sort(method);
 
-export const sortAlphabet = (property) => (a, b) => a[property].localeCompare(b[property]);
+export const sortAlphabet = (property) => 
+	(a, b) => a[property].localeCompare(b[property]);
 
-export const sortNumber = (property, descending = false) => (a, b) => (descending ? b[property] : a[property]) - (descending ? a[property] : b[property]);
+export const sortNumber = (property, descending = false) => 
+	(a, b) => (descending ? b[property] : a[property]) - (descending ? a[property] : b[property]);
 
-export const sortAlphabeticalThenSetState = (setFunction, array, property) => setFunction(sorter(array, sortAlphabet(property)));
+export const sortAlphabeticalThenSetState = (setFunction, array, property) => 
+	setFunction(sorter(array, sortAlphabet(property)));
 
-export const sortNumberThenSetState = (setFunction, array, property, descending = false) => setFunction(sorter(array, sortNumber(property, descending)));
+export const sortNumberThenSetState = (setFunction, array, property, descending = false) => 
+	setFunction(sorter(array, sortNumber(property, descending)));

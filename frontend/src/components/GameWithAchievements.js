@@ -27,7 +27,12 @@ export const GameWithAchievements = (props) => {
 	return (
 		<div className='gameWithAchievementsContainer'>
 			<GameTitleInfo game={game} />
-			<a className={`achievementLink ${oneHundredPercent}`} href={achievementsUrl} target='_blank' rel='noreferrer'>
+			<a 
+				className={`achievementLink ${oneHundredPercent}`} 
+				href={achievementsUrl} 
+				target='_blank' 
+				rel='noreferrer'
+			>
 				<h3>{totalAchievements} Total Achievements</h3>
 				{!privateProfile &&
 					<>

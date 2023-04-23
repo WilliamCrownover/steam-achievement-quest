@@ -22,40 +22,47 @@ export const GamesInfoSection = (props) => {
 	const hasAchievements = gamesWithAchievements.length > 0;
 
 	const GameDataPoints = [
+		// 1
 		{
 			dataName: 'Total Number of Games',
 			dataArray: totalNumberOfGames,
 			total: totalNumberOfGames,
 		},
+		// 2
 		{
 			dataName: 'With Achievements',
 			dataArray: gamesWithAchievements,
 			showPercent: true,
 			total: totalNumberOfGames,
 		},
+		// 3
 		{
 			dataName: 'Without Achievements',
 			dataArray: gamesWithoutAchievements,
 			showPercent: true,
 			total: totalNumberOfGames,
 		},
+		// 4
 		{
 			dataName: '100% Complete',
 			dataArray: totalOneHundredPercentComplete,
 			showPercent: true,
-			total: totalNumberOfGames,
+			total: gamesWithAchievements.length,
 		},
+		// 5
 		{
 			dataName: 'Never Played',
 			dataArray: totalNeverPlayed,
 			showPercent: true,
 			total: totalNumberOfGames,
 		},
+		// 6
 		{
 			dataName: 'Number of Achievements',
 			dataArray: totalAchievements,
 			total: totalAchievements,
 		},
+		// 7
 		{
 			dataName: 'Not Achieved',
 			dataArray: totalAchievementsIncomplete,
@@ -63,6 +70,7 @@ export const GamesInfoSection = (props) => {
 			total: totalAchievements,
 			privateProfile: privateProfile,
 		},
+		// 8
 		{
 			dataName: 'Achieved',
 			dataArray: totalAchievementsCompleted,

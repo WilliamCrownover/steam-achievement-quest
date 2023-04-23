@@ -29,7 +29,7 @@ app.get('/getOwnedGames/:userId', cors(corsOptions), async (req, res) => {
 
 	try {
 		const response = await fetch(endpoint, fetchOptions);
-		if(response.status !== 200) {
+		if (response.status !== 200) {
 			throw new Error('Could not fetch. Check User ID value.');
 		}
 		const jsonResponse = await response.json();
@@ -111,9 +111,15 @@ app.get('/getReviewsForGame/:appId', cors(corsOptions), async (req, res) => {
 	const fetchOptions = {
 		method: 'GET'
 	}
-	const response = await fetch(endpoint, fetchOptions);
-	const jsonResponse = await response.json();
-	res.json(jsonResponse);
+	try {
+		const response = await fetch(endpoint, fetchOptions);
+		const jsonResponse = await response.json();
+		res.json(jsonResponse);
+	} catch (error) {
+		console.log(error);
+		return { error: 'Could not fetch app reviews.', success: false };
+	}
+
 });
 
 app.get('/getUserAchievements/:appId/:userId', cors(corsOptions), async (req, res) => {

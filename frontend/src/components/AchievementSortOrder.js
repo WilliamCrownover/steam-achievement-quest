@@ -1,4 +1,8 @@
-import { sorter, sortAlphabet, sortNumber } from '../utils/utils';
+import { 
+	sorter, 
+	sortAlphabet, 
+	sortNumber 
+} from '../utils/utils';
 
 export const AchievementSortOrder = (props) => {
 	const {

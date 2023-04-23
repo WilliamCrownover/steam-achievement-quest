@@ -80,8 +80,12 @@ export const SteamUser = () => {
 
 	const addMoreDataToUser = (user, withAchieves, withoutAchieves) => {
 		const allGames = [...withAchieves, ...withoutAchieves];
-		const totalAchievements = withAchieves.reduce((total, current) => total + current.totalAchievements, 0);
-		const totalAchievementsCompleted = withAchieves.reduce((total, current) => total + current.totalCompletedAchievements, 0);
+		const totalAchievements = withAchieves.reduce(
+			(total, current) => total + current.totalAchievements, 0
+		);
+		const totalAchievementsCompleted = withAchieves.reduce(
+			(total, current) => total + current.totalCompletedAchievements, 0
+		);
 		setUserData({
 			...user,
 			privateProfile: withAchieves[0]?.privateProfile,
@@ -89,9 +93,15 @@ export const SteamUser = () => {
 			totalAchievements,
 			totalAchievementsCompleted,
 			totalAchievementsIncomplete: totalAchievements - totalAchievementsCompleted,
-			totalPlaytime: round(allGames.reduce((total, game) => total + parseFloat(game.hoursPlayed), 0)),
-			totalNeverPlayed: allGames.reduce((total, game) => total + (game.lastPlayedDate === 'Not Played' ? 1 : 0), 0),
-			totalOneHundredPercentComplete: allGames.reduce((total, game) => total + (game.percentComplete === '100.00' ? 1 : 0), 0),
+			totalPlaytime: round(allGames.reduce(
+				(total, game) => total + parseFloat(game.hoursPlayed), 0
+			)),
+			totalNeverPlayed: allGames.reduce(
+				(total, game) => total + (game.lastPlayedDate === 'Not Played' ? 1 : 0), 0
+			),
+			totalOneHundredPercentComplete: allGames.reduce(
+				(total, game) => total + (game.percentComplete === '100.00' ? 1 : 0), 0
+			),
 		});
 		setLoadingModifiedComplete(true);
 	}
@@ -161,15 +171,27 @@ export const SteamUser = () => {
 											<>
 												<label>
 													Show Achievement Graph
-													<input type='checkbox' checked={showGraph} onChange={() => setShowGraph(!showGraph)} />
+													<input 
+														type='checkbox' 
+														checked={showGraph} 
+														onChange={() => setShowGraph(!showGraph)} 
+													/>
 												</label>
 												<label>
 													Show Achievement List
-													<input type='checkbox' checked={showList} onChange={() => setShowList(!showList)} />
+													<input 
+														type='checkbox' 
+														checked={showList} 
+														onChange={() => setShowList(!showList)} 
+													/>
 												</label>
 												<label>
 													Show Achievement Icons
-													<input type='checkbox' checked={showIcons} onChange={() => setShowIcons(!showIcons)} />
+													<input 
+														type='checkbox' 
+														checked={showIcons} 
+														onChange={() => setShowIcons(!showIcons)} 
+													/>
 												</label>
 											</>
 										}
@@ -191,7 +213,9 @@ export const SteamUser = () => {
 							showIcons={showIcons}
 						/>
 					)}
-					{(hasGames && gamesWithoutAchievements.length > 0) && <h2 className='gameWithoutAchievementsDivision'>Games Without Achievements</h2>}
+					{(hasGames && gamesWithoutAchievements.length > 0) && 
+						<h2 className='gameWithoutAchievementsDivision'>Games Without Achievements</h2>
+					}
 					{gamesWithoutAchievements.flatMap((game) =>
 						<GameWithoutAchievements game={game} key={game.appid} />
 					)}

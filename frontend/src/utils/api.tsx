@@ -1,9 +1,19 @@
-import { dateFormat, round, sorter, sortAlphabet } from './utils';
+import { 
+	dateFormat, 
+	round, 
+	sorter, 
+	sortAlphabet 
+} from './utils';
 
 const serverString = 'http://localhost:5000/';
 
 // Main API call to collect and process Steam data
-export const getUserGameData = async (userId, gameList, sampleSize = false, setterGamesToLoad) => {
+export const getUserGameData = async (
+	userId, 
+	gameList, 
+	sampleSize = false, 
+	setterGamesToLoad
+) => {
 	setterGamesToLoad('');
 	const url = `${serverString}getOwnedGames/${userId}`;
 
@@ -15,7 +25,12 @@ export const getUserGameData = async (userId, gameList, sampleSize = false, sett
 		// The profile is completely private and no game data is available.
 		if (!allGamesData) return;
 
-		if (gameList.length > 0) allGamesData = allGamesData.filter((game) => gameList.includes(game.appid));
+		// If a filter list is provided return games matching appids
+		if (gameList.length > 0) {
+			allGamesData = allGamesData.filter(
+				(game) => gameList.includes(game.appid)
+			);
+		}
 
 		const gamesLength = allGamesData.length
 		const totalGameCount = (sampleSize && gamesLength > 25) ? 25 : gamesLength;
@@ -67,13 +82,25 @@ export const getUserGameData = async (userId, gameList, sampleSize = false, sett
 
 				// If it does indeed have achievements, elaborate the data.
 				if (achievements?.length > 0) {
-					lowestAchievementPercent = round(Math.min(...achievements.map((achievement) => achievement.percent)));
+					lowestAchievementPercent = round(
+						Math.min(...achievements.map(
+							(achievement) => achievement.percent)
+						)
+					);
 					const totalAchievements = achievements.length;
 					let totalCompletedAchievements = 0;
 					let totalIncompleteAchievements = totalAchievements;
 					let privateProfile = true;
 					const achievementSchemas = await getGameAchievementSchemas(gameId);
-					achievements = achievements.map((achievement, i) => ({ ...achievement, ...achievementSchemas[i], unlockDate: 'Unachieved' }));
+					achievements = achievements.map(
+						(achievement, i) => (
+							{ 
+								...achievement, 
+								...achievementSchemas[i], 
+								unlockDate: 'Unachieved' 
+							}
+						)
+					);
 
 					// If the user's achievements are public, combine data and sum total completed achievements.
 					if (publicProfileCheck) {
@@ -84,7 +111,14 @@ export const getUserGameData = async (userId, gameList, sampleSize = false, sett
 						privateProfile = false;
 					}
 
-					achievements = achievements.map((achievement) => ({ ...achievement, hoverInfo: concatHoverInfo(achievement) }));
+					achievements = achievements.map(
+						(achievement) => (
+							{ 
+								...achievement, 
+								hoverInfo: concatHoverInfo(achievement) 
+							}
+						)
+					);
 					const percentComplete = round((totalCompletedAchievements / totalAchievements) * 100);
 
 					return {
@@ -166,7 +200,9 @@ const getUserAchievements = async (appId, userId) => {
 	try {
 		const res = await fetch(url);
 		const json = await res.json();
-		return json.playerstats.success ? sorter(json.playerstats.achievements, sortAlphabet('apiname')) : 'privateProfile';
+		return json.playerstats.success ? 
+			sorter(json.playerstats.achievements, sortAlphabet('apiname')) 
+			: 'privateProfile';
 	} catch (error) {
 		console.log(error);
 	}
@@ -195,7 +231,10 @@ const combineAchievements = (globalA, userA) => {
 	})
 }
 
-const sumTotalCompleted = (achievementList) => achievementList.reduce((total, achievement) => total + achievement.achieved, 0);
+const sumTotalCompleted = (achievementList) => 
+	achievementList.reduce(
+		(total, achievement) => total + achievement.achieved, 0
+	);
 
 const concatHoverInfo = (achievement) => {
 	const {
@@ -207,4 +246,7 @@ const concatHoverInfo = (achievement) => {
 	return `${displayName}${description ? ` - ${description}` : ''} - ${unlockDate}`;
 }
 
-const averageAchievementPercent = (achievementList) => achievementList.reduce((total, achievement) => total + achievement.percent, 0) / achievementList.length;
+const averageAchievementPercent = (achievementList) => 
+	achievementList.reduce(
+		(total, achievement) => total + achievement.percent, 0
+	) / achievementList.length;

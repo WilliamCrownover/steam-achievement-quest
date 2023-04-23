@@ -1,4 +1,7 @@
-import { round, setColorFill } from '../utils/utils'
+import { 
+	round, 
+	setColorFill 
+} from '../utils/utils'
 
 export const AchievementGraph = ({ game }) => {
 	const achievements = game.achievements;
