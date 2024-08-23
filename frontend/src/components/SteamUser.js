@@ -102,6 +102,24 @@ export const SteamUser = () => {
 			totalOneHundredPercentComplete: allGames.reduce(
 				(total, game) => total + (game.percentComplete === '100.00' ? 1 : 0), 0
 			),
+			totalCosts: parseFloat(allGames.reduce(
+				(total, game) => {
+					const cost = !isNaN(parseFloat(game.cost)) ? parseFloat(game.cost) : 0
+					return total + cost
+				}, 0
+			).toFixed(2)),
+			totalPayed: parseFloat(allGames.reduce(
+				(total, game) => {
+					const price = !isNaN(parseFloat(game.pricePaid)) ? parseFloat(game.pricePaid) : 0
+					return total + price
+				}, 0
+			).toFixed(2)),
+			totalTimeToBeat: parseFloat(allGames.reduce(
+				(total, game) => {
+					const time = !isNaN(parseFloat(game.timeToBeat)) ? parseFloat(game.timeToBeat) : 0
+					return total + time
+				}, 0
+			).toFixed(2)),
 		});
 		setLoadingModifiedComplete(true);
 	}
