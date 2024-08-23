@@ -60,6 +60,15 @@ export const GameSortOrder = (props) => {
 			case value === 'reviewPercentPositive':
 				sharedSort(value);
 				break;
+			case value === 'cost':
+				sharedSort(value);
+				break;
+			case value === 'pricePaid':
+				sharedSort(value);
+				break;
+			case value === 'timeToBeat':
+				sharedSort(value);
+				break;
 			case value === 'totalAchievements':
 				sortNumberThenSetState(
 					setGamesWithAchievements, 
@@ -127,6 +136,9 @@ export const GameSortOrder = (props) => {
 				<option value='playerCount' > Current Player Count</option>
 				<option value='total_reviews' > Total Reviews</option>
 				<option value='reviewPercentPositive' > Positive Review Percent</option>
+				<option value='cost' > Game Cost</option>
+				<option value='pricePaid' > Price Paid</option>
+				<option value='timeToBeat' > Time to Beat</option>
 				{hasAchievements &&
 					<>
 						<option value='totalAchievements' > Total Achievements</option>
