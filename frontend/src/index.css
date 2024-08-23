@@ -145,12 +145,31 @@ p {
 	margin: 0px 0px 5px 0px;
 }
 
+.formContainerTwo {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin: 5px 0px;
+	padding: 5px;
+}
+
+.multipleForms {
+	display: flex;
+	justify-content: left;
+	align-items: center;
+}
+
 input {
 	margin-left: 10px;
 }
 
-input[type=text] {
+input[type=text],
+input[type=number] {
 	background-color: var(--lightGray);
+}
+
+input[type=number] {
+	width: 70px;
 }
 
 input[type=submit] {
@@ -236,7 +255,8 @@ input[type=submit]:hover {
 	margin-top: 10px;
 }
 
-.gameWithAchievementsContainer {
+.gameWithAchievementsContainer,
+.gameWithoutAchievements {
 	background-color: var(--lightGray);
 	padding: 10px;
 	border-radius: 10px;
@@ -449,8 +469,4 @@ input[type=submit]:hover {
 	padding: 5px;
 	text-align: center;
 	margin: 30px 0px;
-}
-
-.gameWithoutAchievements {
-	margin: 10px 0px;
 }
