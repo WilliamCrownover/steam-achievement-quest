@@ -41,6 +41,11 @@ export const getUserGameData = async (
 		let publicProfileCheck = true;
 		if (privacyCheckGame === 'privateProfile') publicProfileCheck = false;
 
+		// Get the localStorage for game prices
+		const gameCosts = JSON.parse(localStorage.getItem('gameCosts') || '');
+		const gamePrices = JSON.parse(localStorage.getItem('gamePrices') || '');
+		const gameTimesToBeat = JSON.parse(localStorage.getItem('gameTimesToBeat') || '');
+
 		// Get achievement data for each game and add extra properties.
 		const allGamesDataExpanded = await Promise.all(allGamesData.slice(0, totalGameCount).map(async (game) => {
 			const gameId = game.appid;
@@ -59,6 +64,9 @@ export const getUserGameData = async (
 				reviewPercentNegative = round(reviewData.total_negative / reviewTotals * 100);	
 			}
 			let lowestAchievementPercent = '0';
+			let cost = parseFloat(gameCosts[gameId] ?? 0);
+			let pricePaid = parseFloat(gamePrices[gameId] ?? 0);
+			let timeToBeat = parseFloat(gameTimesToBeat[gameId] ?? 0);
 
 			// Each game will have at least these properties.
 			const gameDataExpanded = {
@@ -74,6 +82,9 @@ export const getUserGameData = async (
 				reviewPercentNegative,
 				lowestAchievementPercent,
 				achievements: undefined,
+				cost: isNaN(cost) ? 0 : cost.toFixed(2),
+				pricePaid: isNaN(pricePaid) ? 0 : pricePaid.toFixed(2),
+				timeToBeat: isNaN(timeToBeat) ? 0 : timeToBeat.toFixed(1)
 			}
 
 			// If the game has community data it likely has achievement data.
@@ -101,6 +112,7 @@ export const getUserGameData = async (
 							}
 						)
 					);
+					achievements = achievements.filter(achievement => achievement.defaultvalue !== undefined);
 
 					// If the user's achievements are public, combine data and sum total completed achievements.
 					if (publicProfileCheck) {
