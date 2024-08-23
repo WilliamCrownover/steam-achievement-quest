@@ -2,6 +2,7 @@ import { round, setColorFill } from '../utils/utils'
 import { AchievementGraph } from './AchievementGraph';
 import { AchievementPercentages } from './AchievementPercentages';
 import { GameTitleInfo } from './GameTitleInfo';
+import { GamePriceInput } from './GamePriceInput';
 
 export const GameWithAchievements = (props) => {
 	const {
@@ -27,20 +28,23 @@ export const GameWithAchievements = (props) => {
 	return (
 		<div className='gameWithAchievementsContainer'>
 			<GameTitleInfo game={game} />
-			<a 
-				className={`achievementLink ${oneHundredPercent}`} 
-				href={achievementsUrl} 
-				target='_blank' 
-				rel='noreferrer'
-			>
-				<h3>{totalAchievements} Total Achievements</h3>
-				{!privateProfile &&
-					<>
-						<h3>{totalIncompleteAchievements} Not Completed - {round(100 - percentComplete)}%</h3>
-						<h3>{totalCompletedAchievements} Completed - {percentComplete}%</h3>
-					</>
-				}
-			</a>
+			<div className='multipleForms'>
+				<a 
+					className={`achievementLink ${oneHundredPercent}`} 
+					href={achievementsUrl} 
+					target='_blank' 
+					rel='noreferrer'
+				>
+					<h3>{totalAchievements} Total Achievements</h3>
+					{!privateProfile &&
+						<>
+							<h3>{totalIncompleteAchievements} Not Completed - {round(100 - percentComplete)}%</h3>
+							<h3>{totalCompletedAchievements} Completed - {percentComplete}%</h3>
+						</>
+					}
+				</a>
+				<GamePriceInput game={game} />
+			</div>
 			{showGraph &&
 				<>
 					<AchievementGraph game={game} />
