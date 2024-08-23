@@ -17,6 +17,9 @@ export const GamesInfoSection = (props) => {
 		totalPlaytime,
 		totalNeverPlayed,
 		totalOneHundredPercentComplete,
+		totalCosts,
+		totalPayed,
+		totalTimeToBeat,
 	} = userData;
 
 	const hasAchievements = gamesWithAchievements.length > 0;
@@ -58,11 +61,23 @@ export const GamesInfoSection = (props) => {
 		},
 		// 6
 		{
+			dataName: 'Total Cost',
+			dataArray: totalCosts,
+			total: totalCosts,
+		},
+		// 7
+		{
+			dataName: 'Total Paid',
+			dataArray: totalPayed,
+			total: totalPayed,
+		},
+		// 8
+		{
 			dataName: 'Number of Achievements',
 			dataArray: totalAchievements,
 			total: totalAchievements,
 		},
-		// 7
+		// 9
 		{
 			dataName: 'Not Achieved',
 			dataArray: totalAchievementsIncomplete,
@@ -70,7 +85,7 @@ export const GamesInfoSection = (props) => {
 			total: totalAchievements,
 			privateProfile: privateProfile,
 		},
-		// 8
+		// 10
 		{
 			dataName: 'Achieved',
 			dataArray: totalAchievementsCompleted,
@@ -99,6 +114,8 @@ export const GamesInfoSection = (props) => {
 					<GameDataPoint {...GameDataPoints[5]} />
 					<GameDataPoint {...GameDataPoints[6]} />
 					<GameDataPoint {...GameDataPoints[7]} />
+					<GameDataPoint {...GameDataPoints[8]} />
+					<GameDataPoint {...GameDataPoints[9]} />
 				</>
 			}
 
@@ -111,6 +128,7 @@ export const GamesInfoSection = (props) => {
 					<h3>{round(totalPlaytime / 24)} Days</h3>
 					<h3>{round(totalPlaytime / 24 / 7)} Weeks</h3>
 					<h3>{round(totalPlaytime / 24 / 7 / 52)} Years</h3>
+					<h3>{totalTimeToBeat} Hours to Beat</h3>
 				</div>
 			</div>
 		</div >
