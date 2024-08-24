@@ -1,4 +1,4 @@
-import { SteamUser } from './components/SteamUser.js';
+import { SteamUser } from './components/SteamUser';
 
 export const App = () => {
   return (

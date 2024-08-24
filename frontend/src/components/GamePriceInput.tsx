@@ -1,32 +1,38 @@
 import { useState } from "react";
+import { GameDataExpanded } from "../models";
 
-export const GamePriceInput = ({ game }) => {
+type GamePriceInputProps = {
+	game: GameDataExpanded
+}
+
+export const GamePriceInput = ({ game }: GamePriceInputProps) => {
 	const [cost, setCost] = useState(game.cost);
 	const [price, setPrice] = useState(game.pricePaid);
 	const [timeToBeat, setTimeToBeat] = useState(game.timeToBeat);
 
-	const handleCostChange = (e) => {
+	const handleCostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setCost(value);
 		e.preventDefault();
 	}
 
-	const handlePriceChange = (e) => {
+	const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setPrice(value);
 		e.preventDefault();
 	}
 
-	const handleTimeToBeatChange = (e) => {
+	const handleTimeToBeatChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setTimeToBeat(value);
 		e.preventDefault();
 	}
 
-	const handleSubmitCost = async (e) => {
+	const handleSubmitCost = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		const inputValue = e.target[0].value;
-		let gameCosts = JSON.parse(localStorage.getItem('gameCosts'));
+		const form = e.target as HTMLFormElement;
+		const inputValue = (form.elements[0] as HTMLInputElement).value;
+		let gameCosts = JSON.parse(localStorage.getItem('gameCosts') ?? '');
 		const gameId = game.appid;
 		gameCosts = {
 			...gameCosts,
@@ -36,10 +42,11 @@ export const GamePriceInput = ({ game }) => {
 		setCost(inputValue);
 	}
 
-	const handleSubmit = async (e) => {
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		const inputValue = e.target[0].value;
-		let gamePrices = JSON.parse(localStorage.getItem('gamePrices'));
+		const form = e.target as HTMLFormElement;
+		const inputValue = (form.elements[0] as HTMLInputElement).value;
+		let gamePrices = JSON.parse(localStorage.getItem('gamePrices') ?? '');
 		const gameId = game.appid;
 		gamePrices = {
 			...gamePrices,
@@ -49,10 +56,11 @@ export const GamePriceInput = ({ game }) => {
 		setPrice(inputValue);
 	}
 
-	const handleSubmitTimeToBeat = async (e) => {
+	const handleSubmitTimeToBeat = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		const inputValue = e.target[0].value;
-		let gameTimesToBeat = JSON.parse(localStorage.getItem('gameTimesToBeat'));
+		const form = e.target as HTMLFormElement;
+		const inputValue = (form.elements[0] as HTMLInputElement).value;
+		let gameTimesToBeat = JSON.parse(localStorage.getItem('gameTimesToBeat') ?? '');
 		const gameId = game.appid;
 		gameTimesToBeat = {
 			...gameTimesToBeat,

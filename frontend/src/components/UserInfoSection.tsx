@@ -1,6 +1,7 @@
+import { PassDownSteamData } from '../models';
 import { dateFormat } from '../utils/utils';
 
-export const UserInfoSection = (props) => {
+export const UserInfoSection = (props: PassDownSteamData) => {
 	const {
 		userData,
 	} = props;

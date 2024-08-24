@@ -3,8 +3,18 @@ import { AchievementGraph } from './AchievementGraph';
 import { AchievementPercentages } from './AchievementPercentages';
 import { GameTitleInfo } from './GameTitleInfo';
 import { GamePriceInput } from './GamePriceInput';
+import { GameDataExpanded } from '../models';
 
-export const GameWithAchievements = (props) => {
+type GameWithAchievementsProps = {
+	key: number
+	game: GameDataExpanded
+	privateProfile?: boolean
+	showGraph: boolean
+	showList: boolean
+	showIcons: boolean
+}
+
+export const GameWithAchievements = (props: GameWithAchievementsProps) => {
 	const {
 		game,
 		privateProfile,

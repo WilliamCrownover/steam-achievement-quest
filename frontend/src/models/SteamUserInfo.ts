@@ -1,0 +1,29 @@
+export interface SteamUserInfo {
+	steamid: string;
+	communityvisibilitystate: number;
+	privateProfile: boolean;
+	profilestate: number;
+	personaname: string;
+	realname: string;
+	profileurl: string;
+	avatar: string;
+	avatarmedium: string;
+	avatarfull: string;
+	avatarhash: string;
+	lastlogoff: number;
+	personastate: number;
+	primaryclanid: string;
+	timecreated: number;
+	personastateflags: number;
+	loccountrycode: string;
+	totalNumberOfGames: number;
+	totalAchievements: number;
+	totalAchievementsCompleted: number;
+	totalAchievementsIncomplete: number;
+	totalPlaytime: number;
+	totalNeverPlayed: number;
+	totalOneHundredPercentComplete: number;
+	totalCosts: number;
+	totalPayed: number;
+	totalTimeToBeat: number;
+}

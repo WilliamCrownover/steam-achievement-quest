@@ -1,6 +1,11 @@
+import { GameDataExpanded } from '../models';
 import { setColorFill } from '../utils/utils'
 
-export const GameTitleInfo = ({ game }) => {
+type GameTitleInfoProps = {
+	game: GameDataExpanded
+}
+
+export const GameTitleInfo = ({ game }: GameTitleInfoProps) => {
 	const {
 		name,
 		gameIcon,
@@ -9,17 +14,19 @@ export const GameTitleInfo = ({ game }) => {
 		playerCount,
 		total_reviews,
 		reviewPercentPositive,
+		gameUrl,
+		has_dlc
 	} = game;
 
 	const colorFill = setColorFill((reviewPercentPositive * (100 + 90) / 100 - 90));
 
 	return (
 		<div className='gameTitleInfo'>
-			<a className='gameTitleLink' href={game.gameUrl} target='_blank' rel='noreferrer'>
+			<a className='gameTitleLink' href={gameUrl} target='_blank' rel='noreferrer'>
 				<img src={gameIcon} alt={name} height='50' width='50' loading='lazy' />
 				<div className='gameNameContainer'>
 					<h3>{name}</h3>
-					{game.has_dlc && <p className='dlc'>+DLC</p>}
+					{has_dlc && <p className='dlc'>+DLC</p>}
 				</div>
 			</a>
 			<div className='playtimeDataContainer'>

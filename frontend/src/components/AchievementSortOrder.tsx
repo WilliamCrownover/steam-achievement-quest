@@ -1,22 +1,24 @@
+import { ChangeEvent } from 'react';
+import { CombinedAchievementsWithSchema, PassDownSteamData } from '../models';
 import { 
 	sorter, 
 	sortAlphabet, 
 	sortNumber 
 } from '../utils/utils';
 
-export const AchievementSortOrder = (props) => {
+export const AchievementSortOrder = (props: PassDownSteamData) => {
 	const {
 		userData,
 		gamesWithAchievements,
 		setGamesWithAchievements,
 	} = props;
 
-	const changeAchievementOrder = (e) => {
+	const changeAchievementOrder = (e: ChangeEvent<HTMLSelectElement>) => {
 		const value = e.target.value;
 		setGamesWithAchievements(gamesWithAchievements.map((game) => {
-			const sortProperty = (property) => {
+			const sortProperty = (property: string) => {
 				const achievements = game.achievements;
-				const achievementsSortedByPercent = sorter(achievements, sortNumber('percent', true));
+				const achievementsSortedByPercent: CombinedAchievementsWithSchema[] = sorter(achievements, sortNumber('percent', true));
 				switch (property) {
 					case 'name':
 						return sorter(achievements, sortAlphabet(property));
@@ -36,8 +38,8 @@ export const AchievementSortOrder = (props) => {
 	return (
 		<div className='sortOption'>
 			<h4>Achievement Sort Order</h4>
-			<select onChange={changeAchievementOrder} >
-				<option value='name' defaultValue > Achievement ID</option>
+			<select defaultValue='name' onChange={changeAchievementOrder} >
+				<option value='name' > Achievement ID</option>
 				<option value='percent' > Global Percent Complete</option>
 				{!userData.privateProfile && <option value='unlockTime' >Date Achieved</option>}
 			</select>

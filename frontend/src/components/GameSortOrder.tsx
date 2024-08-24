@@ -1,3 +1,5 @@
+import { ChangeEvent } from 'react';
+import { PassDownSteamData } from '../models';
 import { 
 	sorter, 
 	sortNumber, 
@@ -5,7 +7,7 @@ import {
 	sortNumberThenSetState 
 } from '../utils/utils';
 
-export const GameSortOrder = (props) => {
+export const GameSortOrder = (props: PassDownSteamData) => {
 	const {
 		userData,
 		gamesWithAchievements,
@@ -16,14 +18,14 @@ export const GameSortOrder = (props) => {
 
 	const hasAchievements = gamesWithAchievements.length > 0;
 
-	const changeGameOrder = (e) => {
+	const changeGameOrder = (e: ChangeEvent<HTMLSelectElement>) => {
 		const value = e.target.value;
 		sortAlphabeticalThenSetState(
 			setGamesWithoutAchievements, 
 			gamesWithoutAchievements, 
 			'name'
 		);
-		const sharedSort = (property) => {
+		const sharedSort = (property: string) => {
 			sortNumberThenSetState(
 				setGamesWithAchievements, 
 				[...gamesWithAchievements], 
@@ -129,8 +131,8 @@ export const GameSortOrder = (props) => {
 	return (
 		<div className='sortOption'>
 			<h4>Game Sort Order</h4>
-			<select onChange={changeGameOrder}>
-				<option value='name' defaultValue > Alphabetical</option>
+			<select defaultValue='name' onChange={changeGameOrder}>
+				<option value='name' > Alphabetical</option>
 				<option value='hoursPlayed' > Playtime</option>
 				<option value='rtime_last_played' > Last Played Date</option>
 				<option value='playerCount' > Current Player Count</option>

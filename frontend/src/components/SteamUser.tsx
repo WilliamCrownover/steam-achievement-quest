@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { getUserGameData, getUserInfo } from '../utils/api'
 import { round, sortAlphabeticalThenSetState } from '../utils/utils';
 import { UserInfoSection } from './UserInfoSection';
@@ -7,6 +7,7 @@ import { GameSortOrder } from './GameSortOrder';
 import { AchievementSortOrder } from './AchievementSortOrder';
 import { GameWithAchievements } from './GameWithAchievements';
 import { GameWithoutAchievements } from './GameWithoutAchievements';
+import { GameDataExpanded, PassDownSteamData, SteamUserInfo } from "../models";
 
 export const SteamUser = () => {
 	const [firstLoad, setFirstLoad] = useState(true);
@@ -19,16 +20,16 @@ export const SteamUser = () => {
 	const [userId, setUserId] = useState('76561198035409755');
 	const [userIdCheck, setUserIdCheck] = useState(true);
 	const userIdRegex = new RegExp('^(7656[0-9]{13}?)$');
-	const [userData, setUserData] = useState({});
+	const [userData, setUserData] = useState<SteamUserInfo>();
 	const [hasGames, setHasGames] = useState(false);
-	const [gamesWithAchievements, setGamesWithAchievements] = useState([]);
-	const [gamesWithoutAchievements, setGamesWithoutAchievements] = useState([]);
-	const [passDownSteamData, setPassDownSteamData] = useState({});
+	const [gamesWithAchievements, setGamesWithAchievements] = useState<GameDataExpanded[]>([]);
+	const [gamesWithoutAchievements, setGamesWithoutAchievements] = useState<GameDataExpanded[]>([]);
+	const [passDownSteamData, setPassDownSteamData] = useState<PassDownSteamData>();
 	const [showGraph, setShowGraph] = useState(true);
 	const [showList, setShowList] = useState(true);
 	const [showIcons, setShowIcons] = useState(true);
 
-	const handleIDChange = (e) => {
+	const handleIDChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setUserId(value);
 		setUserIdCheck(userIdRegex.test(value));
@@ -41,16 +42,17 @@ export const SteamUser = () => {
 		setLoadingGamesComplete(false);
 		setLoadingModifiedComplete(false);
 		setPackageDataComplete(false);
-		setUserData({});
+		setUserData(undefined);
 		setHasGames(false);
 		setGamesWithAchievements([]);
 		setGamesWithoutAchievements([]);
-		setPassDownSteamData({});
+		setPassDownSteamData(undefined);
 	}
 
-	const handleSubmit = async (e) => {
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		const inputValue = e.target[0].value;
+		const form = e.target as HTMLFormElement;
+		const inputValue = (form.elements[0] as HTMLInputElement).value;
 		reset();
 		const uData = await getUserInfo(inputValue);
 		setUserData(uData);
@@ -63,7 +65,7 @@ export const SteamUser = () => {
 		getGamesData(uData);
 	}
 
-	const getGamesData = async (user) => {
+	const getGamesData = async (user: SteamUserInfo) => {
 		const gameData = await getUserGameData(user.steamid, [], sampleSize, setGamesToLoadCount);
 		setLoadingGamesComplete(true);
 		if (!gameData) {
@@ -78,7 +80,7 @@ export const SteamUser = () => {
 		addMoreDataToUser(user, gamesWithAchievementsData, gamesWithoutAchievementsData);
 	};
 
-	const addMoreDataToUser = (user, withAchieves, withoutAchieves) => {
+	const addMoreDataToUser = (user: SteamUserInfo, withAchieves: GameDataExpanded[], withoutAchieves: GameDataExpanded[]) => {
 		const allGames = [...withAchieves, ...withoutAchieves];
 		const totalAchievements = withAchieves.reduce(
 			(total, current) => total + current.totalAchievements, 0
@@ -126,6 +128,9 @@ export const SteamUser = () => {
 
 	useEffect(() => {
 		const packageData = () => {
+			if (!userData) {
+				return;
+			}
 			setPassDownSteamData({
 				userData: userData,
 				gamesWithAchievements: gamesWithAchievements,
@@ -136,7 +141,7 @@ export const SteamUser = () => {
 			setPackageDataComplete(true);
 		}
 
-		(loadingUserComplete & loadingGamesComplete & loadingModifiedComplete) && packageData();
+		(loadingUserComplete && loadingGamesComplete && loadingModifiedComplete) && packageData();
 	}, [
 		userData,
 		gamesWithAchievements,
@@ -165,7 +170,7 @@ export const SteamUser = () => {
 
 			{packageDataComplete ? (
 				<>
-					{(!firstLoad && userData) ?
+					{(!firstLoad && userData && passDownSteamData) ?
 						<>
 							<UserInfoSection
 								{...passDownSteamData}
@@ -225,7 +230,7 @@ export const SteamUser = () => {
 						<GameWithAchievements
 							key={game.appid}
 							game={game}
-							privateProfile={userData.privateProfile}
+							privateProfile={userData?.privateProfile}
 							showGraph={showGraph}
 							showList={showList}
 							showIcons={showIcons}

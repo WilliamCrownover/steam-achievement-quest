@@ -1,7 +1,12 @@
 import { GameTitleInfo } from './GameTitleInfo';
 import { GamePriceInput } from './GamePriceInput';
+import { GameDataExpanded } from '../models';
 
-export const GameWithoutAchievements = ({ game }) => {
+type GameWithoutAchievementsProps = {
+	game: GameDataExpanded
+}
+
+export const GameWithoutAchievements = ({ game }: GameWithoutAchievementsProps) => {
 
 	return (
 		<div className={'gameWithoutAchievements'}>

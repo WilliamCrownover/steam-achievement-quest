@@ -1,6 +1,15 @@
+import { GameDataExpanded } from '../models';
 import { percent } from '../utils/utils';
 
-export const GameDataPoint = (props) => {
+type GameDataPointProps = {
+	dataName: string
+	dataArray: GameDataExpanded[] | number
+	showPercent?: boolean
+	total: number
+	privateProfile?: boolean
+}
+
+export const GameDataPoint = (props: GameDataPointProps) => {
 	const {
 		dataName,
 		dataArray,
@@ -9,7 +18,7 @@ export const GameDataPoint = (props) => {
 		privateProfile = false,
 	} = props;
 
-	const dataArrayValue = dataArray.length ? dataArray.length : dataArray;
+	const dataArrayValue = Array.isArray(dataArray) ? dataArray.length : dataArray;
 
 	return (
 		<div className='gameDataPoint'>

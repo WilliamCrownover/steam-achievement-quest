@@ -1,9 +1,15 @@
+import { CombinedAchievementsWithSchema } from '../models'
 import { 
 	round, 
 	setColorFill 
 } from '../utils/utils'
 
-export const AchievementPercentages = ({ achievements, showIcons }) => {
+type AchievementPercentagesProps = {
+	achievements: CombinedAchievementsWithSchema[]
+	showIcons: boolean
+}
+
+export const AchievementPercentages = ({ achievements, showIcons }: AchievementPercentagesProps) => {
 
 	return (
 		<div className='achievementList'>
