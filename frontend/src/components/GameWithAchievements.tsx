@@ -1,9 +1,10 @@
-import { round, setColorFill } from '../utils/utils'
+import { getEnumKeyByValue, round, setColorFill } from '../utils/utils'
 import { AchievementGraph } from './AchievementGraph';
 import { AchievementPercentages } from './AchievementPercentages';
 import { GameTitleInfo } from './GameTitleInfo';
 import { GamePriceInput } from './GamePriceInput';
-import { GameDataExpanded } from '../models';
+import { GameDataExpanded, ReviewEnum } from '../models';
+import { SpecificGameDataPoint } from './SpecificGameDataPoint';
 
 type GameWithAchievementsProps = {
 	key: number
@@ -31,12 +32,22 @@ export const GameWithAchievements = (props: GameWithAchievementsProps) => {
 		totalAchievements,
 		totalCompletedAchievements,
 		totalIncompleteAchievements,
+		pricePerHour,
+		costPerTimeToBeat,
+		discountPercent,
+		review
 	} = game;
 
-	const oneHundredPercent = percentComplete === '100.00' ? 'oneHundredPercent' : '';
+	const oneHundredPercent = percentComplete === 100.00 ? 'oneHundredPercent' : '';
+	const goodPricePerHour = pricePerHour !== 0 && pricePerHour <= 0.5;
+	const goodCostPerTimeToBeat = costPerTimeToBeat !== 0 && costPerTimeToBeat <= 0.5;
+	const goodDiscount = discountPercent >= 75;
+	const badPricePerHour = pricePerHour !== 0 && pricePerHour >= 1.5;
+	const badCostPerTimeToBeat = costPerTimeToBeat !== 0 && costPerTimeToBeat >= 1.5;
+	const badDiscount = discountPercent < 0;
 
 	return (
-		<div className='gameWithAchievementsContainer'>
+		<div className={`gameWithAchievementsContainer ${getEnumKeyByValue(ReviewEnum, review)}`}>
 			<GameTitleInfo game={game} />
 			<div className='multipleForms'>
 				<a 
@@ -55,11 +66,32 @@ export const GameWithAchievements = (props: GameWithAchievementsProps) => {
 				</a>
 				<GamePriceInput game={game} />
 			</div>
+			<div className='gameSpecificDataPoints'>
+				<SpecificGameDataPoint 
+					title='Price/Hour Played $' 
+					data={pricePerHour}
+					isGoodValue={goodPricePerHour}
+					isBadValue={badPricePerHour}
+				/>
+				<SpecificGameDataPoint 
+					title='Cost/Hour Time to Beat $' 
+					data={costPerTimeToBeat}
+					isGoodValue={goodCostPerTimeToBeat}
+					isBadValue={badCostPerTimeToBeat}
+				/>	
+				<SpecificGameDataPoint 
+					title='Discount' 
+					data={discountPercent} 
+					isGoodValue={goodDiscount}
+					isPercent={true} 
+					isBadValue={badDiscount}
+				/>
+			</div>
 			{showGraph &&
 				<>
 					<AchievementGraph game={game} />
 					<h3
-						className={`${percentComplete === '100.00' && 'achieved'} averagePercent`}
+						className={`${percentComplete === 100.00 && 'achieved'} averagePercent`}
 						style={{ backgroundColor: setColorFill(averagePercent) }}
 					>
 						{averagePercent}

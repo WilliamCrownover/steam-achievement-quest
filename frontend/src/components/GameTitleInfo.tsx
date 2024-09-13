@@ -1,5 +1,6 @@
 import { GameDataExpanded } from '../models';
 import { setColorFill } from '../utils/utils'
+import { SpecificGameDataPoint } from './SpecificGameDataPoint';
 
 type GameTitleInfoProps = {
 	game: GameDataExpanded
@@ -30,25 +31,16 @@ export const GameTitleInfo = ({ game }: GameTitleInfoProps) => {
 				</div>
 			</a>
 			<div className='playtimeDataContainer'>
-				<div className='specificGameDataPoint'>
+				<div className='specificGameDataPoint playtimeDataContainerFirst'>
 					<h4>Last Played</h4>
 					<p className={`${lastPlayedDate === 'Not Played' && 'notPlayed'}`}>{lastPlayedDate}</p>
 				</div>
 				{hoursPlayed > 0 &&
-					<div className='specificGameDataPoint'>
-						<h4>Hours Played</h4>
-						<p>{hoursPlayed}</p>
-					</div>
+					<SpecificGameDataPoint title='Hours Played' data={hoursPlayed}/>
 				}
 			</div>
-			<div className='specificGameDataPoint'>
-				<h4>Current Players</h4>
-				<p>{playerCount}</p>
-			</div>
-			<div className='specificGameDataPoint'>
-				<h4>Total Reviews</h4>
-				<p>{total_reviews}</p>
-			</div>
+			<SpecificGameDataPoint title='Current Players' data={playerCount}/>
+			<SpecificGameDataPoint title='Total Reviews' data={total_reviews}/>
 			<div className='specificGameDataPoint' style={{ backgroundColor: colorFill, color: 'black' }}>
 				<h4>Positive Reviews</h4>
 				<p>{reviewPercentPositive}%</p>
