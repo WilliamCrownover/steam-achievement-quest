@@ -102,7 +102,7 @@ export const SteamUser = () => {
 				(total, game) => total + (game.lastPlayedDate === 'Not Played' ? 1 : 0), 0
 			),
 			totalOneHundredPercentComplete: allGames.reduce(
-				(total, game) => total + (game.percentComplete === '100.00' ? 1 : 0), 0
+				(total, game) => total + (game.percentComplete === 100.00 ? 1 : 0), 0
 			),
 			totalCosts: parseFloat(allGames.reduce(
 				(total, game) => {

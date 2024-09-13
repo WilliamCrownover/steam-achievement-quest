@@ -50,10 +50,11 @@ export const getUserGameData = async (
 		let publicProfileCheck = true;
 		if (privacyCheckGame === 'privateProfile') publicProfileCheck = false;
 
-		// Get the localStorage for game prices
+		// Get the localStorage for game data
 		const gameCosts = JSON.parse(localStorage.getItem('gameCosts') || '');
 		const gamePrices = JSON.parse(localStorage.getItem('gamePrices') || '');
 		const gameTimesToBeat = JSON.parse(localStorage.getItem('gameTimesToBeat') || '');
+		const myReviews = JSON.parse(localStorage.getItem('myReviews') || '');
 
 		// Get achievement data for each game and add extra properties.
 		const allGamesDataExpanded: GameDataExpanded[] = await Promise.all(allGamesData.slice(0, totalGameCount).map(async (game: SteamOwnedGame) => {
@@ -76,6 +77,10 @@ export const getUserGameData = async (
 			let cost = parseFloat(gameCosts[gameId] ?? 0);
 			let pricePaid = parseFloat(gamePrices[gameId] ?? 0);
 			let timeToBeat = parseFloat(gameTimesToBeat[gameId] ?? 0);
+			const pricePerHour = calcPricePerHour(pricePaid, hoursPlayed);
+			const costPerTimeToBeat = calcPricePerHour(cost, timeToBeat);
+			const discountPercent = round((cost - pricePaid) / cost * 100);
+			const review = myReviews[gameId];
 
 			// Each game will have at least these properties.
 			const gameDataExpanded: GameDataExpanded = {
@@ -93,7 +98,11 @@ export const getUserGameData = async (
 				achievements: undefined,
 				cost: isNaN(cost) ? 0 : cost.toFixed(2),
 				pricePaid: isNaN(pricePaid) ? 0 : pricePaid.toFixed(2),
-				timeToBeat: isNaN(timeToBeat) ? 0 : timeToBeat.toFixed(1)
+				timeToBeat: isNaN(timeToBeat) ? 0 : timeToBeat.toFixed(1),
+				pricePerHour,
+				costPerTimeToBeat,
+				discountPercent: isNaN(discountPercent) ? 0 : discountPercent,
+				review
 			}
 
 			// If the game has community data it likely has achievement data.
@@ -276,3 +285,8 @@ const averageAchievementPercent = (achievementList: SteamAchievement[]) =>
 	achievementList.reduce(
 		(total, achievement) => total + achievement.percent, 0
 	) / achievementList.length;
+
+const calcPricePerHour = (price: number, hoursPlayed: number) => {
+	if (price < 0 || hoursPlayed < 1) return 0;
+	return round(price / hoursPlayed);
+}

@@ -6,6 +6,8 @@ export const dateFormat = (timestamp: number) => {
 
 export const percent = (num: number, total: number) => `${round(num / total * 100)}%`;
 
+export const discount = (price: number, cost: number) => `${round((cost - price) / cost * 100)}%`;
+
 export const round = (num: number) => Number(num.toFixed(2));
 
 export const setColorFill = (number: number, achieved = false) => {
@@ -72,3 +74,7 @@ export const sortAlphabeticalThenSetState = <T>(setFunction: React.Dispatch<Reac
 
 export const sortNumberThenSetState = <T>(setFunction: React.Dispatch<React.SetStateAction<T[]>>, array: T[], property: keyof T, descending = false) => 
 	setFunction(sorter(array, sortNumber(property, descending)));
+
+export const getEnumKeyByValue = <T extends Object>(enumObj: T, value: string): keyof T | undefined => {
+	return (Object.keys(enumObj) as Array<keyof T>).find(key => enumObj[key] === value);
+}

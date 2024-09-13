@@ -71,6 +71,15 @@ export const GameSortOrder = (props: PassDownSteamData) => {
 			case value === 'timeToBeat':
 				sharedSort(value);
 				break;
+			case value === 'pricePerHour':
+				sharedSort(value);
+				break;
+			case value === 'costPerTimeToBeat':
+				sharedSort(value);
+				break;
+			case value === 'discountPercent':
+				sharedSort(value);
+				break;
 			case value === 'totalAchievements':
 				sortNumberThenSetState(
 					setGamesWithAchievements, 
@@ -141,6 +150,9 @@ export const GameSortOrder = (props: PassDownSteamData) => {
 				<option value='cost' > Game Cost</option>
 				<option value='pricePaid' > Price Paid</option>
 				<option value='timeToBeat' > Time to Beat</option>
+				<option value='pricePerHour' > Price per Hour</option>
+				<option value='costPerTimeToBeat' > Cost per Time to Beat</option>
+				<option value='discountPercent' > Discount Percent</option>
 				{hasAchievements &&
 					<>
 						<option value='totalAchievements' > Total Achievements</option>
