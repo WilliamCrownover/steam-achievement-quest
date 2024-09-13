@@ -16,6 +16,9 @@
 	--notPlayed: rgb(137, 62, 57);
 	--transitionSpeed: 0.4s;
 	--oneHundredPercent: rgb(52, 233, 49);
+	--badValueHighlight: rgb(233, 49, 49);
+	--thumbsUp: rgb(141, 179, 139);
+	--thumbsDown: rgb(179, 139, 139);
 }
 
 body {
@@ -151,6 +154,9 @@ p {
 	align-items: center;
 	margin: 5px 0px;
 	padding: 5px;
+	border: none;
+	border-radius: 5px;
+	margin-left: 5px;
 }
 
 .multipleForms {
@@ -242,6 +248,14 @@ input[type=submit]:hover {
 	z-index: 2;
 }
 
+.sortOptionContainer2 {
+	border: none;
+	margin-left: 5px;
+	border-radius: 5px;
+	padding: 7px;
+	z-index: 1;
+}
+
 .sortOption select {
 	background-color: var(--lightGray);
 }
@@ -253,6 +267,11 @@ input[type=submit]:hover {
 
 .sortOptionContainer label {
 	margin-top: 10px;
+}
+
+.sortOption2 {
+	display: flex;
+	align-items: center;
 }
 
 .gameWithAchievementsContainer,
@@ -274,12 +293,22 @@ input[type=submit]:hover {
 	font-size: 0.9rem;
 }
 
-.gameTitleInfo {
+.thumbsUp {
+	background-color: var(--thumbsUp);
+}
+
+.thumbsDown {
+	background-color: var(--thumbsDown);
+}
+
+.gameTitleInfo,
+.gameSpecificDataPoints {
 	display: flex;
 	align-items: center;
 }
 
-.gameTitleInfo>* {
+.gameTitleInfo>*,
+.gameSpecificDataPoints>* {
 	display: inline-block;
 	margin-right: 10px;
 	width: 25%;
@@ -319,9 +348,13 @@ input[type=submit]:hover {
 	width: 50%;
 }
 
+.playtimeDataContainerFirst {
+	margin-right: 10px;
+}
+
 .playtimeDataContainer .specificGameDataPoint,
 .playtimeDataContainer .specificGameDataPoint:last-child {
-	flex: 1 0 50%;
+	flex: 1 0 0%;
 }
 
 .specificGameDataPoint {
@@ -374,6 +407,7 @@ input[type=submit]:hover {
 	align-items: flex-end;
 	height: var(--graphHeight);
 	width: 100%;
+	margin-top: 10px;
 }
 
 .graphVerticalBar {
@@ -457,8 +491,13 @@ input[type=submit]:hover {
 	margin-right: 20px;
 }
 
-.oneHundredPercent {
+.oneHundredPercent,
+.goodValueHighlight {
 	border: solid 5px var(--oneHundredPercent);
+}
+
+.badValueHighlight {
+	border: solid 5px var(--badValueHighlight);
 }
 
 .gameWithoutAchievementsDivision {

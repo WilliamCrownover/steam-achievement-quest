@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { GameDataExpanded } from "../models";
+import { ReviewSelectDropdown } from "./ReviewSelectDropdown";
 
 type GamePriceInputProps = {
 	game: GameDataExpanded
@@ -99,6 +100,7 @@ export const GamePriceInput = ({ game }: GamePriceInputProps) => {
 					<input type='submit' value='S' />
 				</div>
 			</form>
+			<ReviewSelectDropdown game={game}/>
 		</div>
 	)
 }
