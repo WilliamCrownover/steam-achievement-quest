@@ -2,7 +2,8 @@ import {
 	dateFormat, 
 	round, 
 	sorter, 
-	sortAlphabet 
+	sortAlphabet, 
+	getOrSetLocalStorage
 } from './utils';
 import { 
 	CombinedAchievements,
@@ -13,6 +14,12 @@ import {
 	SteamUserInfo
 } from '../models'
 import { SteamAchievementSchema } from '../models/SteamAchievementSchema';
+import { 
+	defaultGameCosts, 
+	defaultGamePrices, 
+	defaultGameTimesToBeat, 
+	defaultMyReviews
+} from './variables';
 
 const serverString = 'http://localhost:5000/';
 
@@ -51,10 +58,10 @@ export const getUserGameData = async (
 		if (privacyCheckGame === 'privateProfile') publicProfileCheck = false;
 
 		// Get the localStorage for game data
-		const gameCosts = JSON.parse(localStorage.getItem('gameCosts') || '');
-		const gamePrices = JSON.parse(localStorage.getItem('gamePrices') || '');
-		const gameTimesToBeat = JSON.parse(localStorage.getItem('gameTimesToBeat') || '');
-		const myReviews = JSON.parse(localStorage.getItem('myReviews') || '');
+		const gameCosts = JSON.parse(getOrSetLocalStorage('gameCosts', defaultGameCosts));
+		const gamePrices = JSON.parse(getOrSetLocalStorage('gamePrices', defaultGamePrices));
+		const gameTimesToBeat = JSON.parse(getOrSetLocalStorage('gameTimesToBeat', defaultGameTimesToBeat));
+		const myReviews = JSON.parse(getOrSetLocalStorage('myReviews', defaultMyReviews));
 
 		// Get achievement data for each game and add extra properties.
 		const allGamesDataExpanded: GameDataExpanded[] = await Promise.all(allGamesData.slice(0, totalGameCount).map(async (game: SteamOwnedGame) => {
