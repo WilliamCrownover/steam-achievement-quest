@@ -236,10 +236,21 @@ input[type=submit]:hover {
 	font-weight: 400;
 }
 
-.sortOptionContainer {
+.sortOptionContainer,
+.sortOptionContainer2,
+.sortOption2 {
 	display: flex;
-	flex-wrap: wrap;
 	align-items: center;
+}
+
+.sortOptionContainer,
+.sortOptionContainer2 {
+	border-radius: 5px;
+	padding: 7px;
+}
+
+.sortOptionContainer {
+	flex-wrap: wrap;
 	margin: 5px 0px;
 	justify-content: space-around;
 	position: -webkit-sticky;
@@ -251,8 +262,6 @@ input[type=submit]:hover {
 .sortOptionContainer2 {
 	border: none;
 	margin-left: 5px;
-	border-radius: 5px;
-	padding: 7px;
 	z-index: 1;
 }
 
@@ -267,11 +276,6 @@ input[type=submit]:hover {
 
 .sortOptionContainer label {
 	margin-top: 10px;
-}
-
-.sortOption2 {
-	display: flex;
-	align-items: center;
 }
 
 .gameWithAchievementsContainer,
@@ -307,8 +311,8 @@ input[type=submit]:hover {
 	align-items: center;
 }
 
-.gameTitleInfo>*,
-.gameSpecificDataPoints>* {
+.gameTitleInfo > *,
+.gameSpecificDataPoints > * {
 	display: inline-block;
 	margin-right: 10px;
 	width: 25%;
