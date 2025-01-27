@@ -119,7 +119,6 @@ app.get('/getReviewsForGame/:appId', cors(corsOptions), async (req, res) => {
 		console.log(error);
 		return { error: 'Could not fetch app reviews.', success: false };
 	}
-
 });
 
 app.get('/getUserAchievements/:appId/:userId', cors(corsOptions), async (req, res) => {
@@ -135,6 +134,25 @@ app.get('/getUserAchievements/:appId/:userId', cors(corsOptions), async (req, re
 	const response = await fetch(endpoint, fetchOptions);
 	const jsonResponse = await response.json();
 	res.json(jsonResponse);
+});
+
+app.get('/getSteamSpyAppDetails/:appId', cors(corsOptions), async (req, res) => {
+	const endpoint = `
+	https://steamspy.com/api.php
+		?request=appdetails
+		&appid=${req.params.appId}
+	`;
+	const fetchOptions = {
+		method: 'GET'
+	}
+	try {
+		const response = await fetch(endpoint, fetchOptions);
+		const jsonResponse = await response.json();
+		res.json(jsonResponse);
+	} catch (error) {
+		console.log(error);
+		return { error: 'Could not fetch steamspy app details.', success: false };
+	}
 });
 
 app.listen(PORT, () => {
