@@ -1,5 +1,11 @@
-import { ChangeEvent, useState } from "react"
-import { GameDataExpanded, ReviewEnum } from "../models"
+import { 
+	ChangeEvent, 
+	useState 
+} from "react"
+import { 
+	GameDataExpanded, 
+	ReviewEnum 
+} from "../models"
 import { getEnumKeyByValue } from "../utils/utils"
 
 type ReviewSelectDropdownProps = {

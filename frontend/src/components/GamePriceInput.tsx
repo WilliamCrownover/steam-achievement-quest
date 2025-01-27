@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { GameDataExpanded } from "../models";
-import { ReviewSelectDropdown } from "./ReviewSelectDropdown";
+import { ReviewSelectDropdown } from ".";
 
 type GamePriceInputProps = {
 	game: GameDataExpanded

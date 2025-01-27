@@ -1,13 +1,30 @@
-import { ChangeEvent, useEffect, useState } from "react";
-import { getUserGameData, getUserInfo } from '../utils/api'
-import { round, sortAlphabeticalThenSetState } from '../utils/utils';
-import { UserInfoSection } from './UserInfoSection';
-import { GamesInfoSection } from './GamesInfoSection';
-import { GameSortOrder } from './GameSortOrder';
-import { AchievementSortOrder } from './AchievementSortOrder';
-import { GameWithAchievements } from './GameWithAchievements';
-import { GameWithoutAchievements } from './GameWithoutAchievements';
-import { GameDataExpanded, PassDownSteamData, SteamUserInfo } from "../models";
+import { 
+	ChangeEvent, 
+	useEffect, 
+	useState 
+} from "react";
+import { 
+	getSteamSpyData, 
+	getUserGameData, 
+	getUserInfo 
+} from '../utils/api'
+import { 
+	round, 
+	sortAlphabeticalThenSetState 
+} from '../utils/utils';
+import { 
+	GameDataExpanded, 
+	PassDownSteamData, 
+	SteamUserInfo 
+} from "../models";
+import { 
+	AchievementSortOrder, 
+	GamesInfoSection, 
+	GameSortOrder, 
+	GameWithAchievements, 
+	GameWithoutAchievements, 
+	UserInfoSection 
+} from ".";
 
 export const SteamUser = () => {
 	const [firstLoad, setFirstLoad] = useState(true);

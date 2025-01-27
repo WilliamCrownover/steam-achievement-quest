@@ -1,7 +1,13 @@
-import { GameTitleInfo } from './GameTitleInfo';
-import { GamePriceInput } from './GamePriceInput';
-import { GameDataExpanded, ReviewEnum } from '../models';
-import { SpecificGameDataPoint } from './SpecificGameDataPoint';
+import { 
+	GamePriceInput, 
+	GameTitleInfo, 
+	SpecificGameDataPoint, 
+	SteamSpyAppDetails 
+} from '.';
+import { 
+	GameDataExpanded, 
+	ReviewEnum 
+} from '../models';
 import { getEnumKeyByValue } from '../utils/utils';
 
 type GameWithoutAchievementsProps = {

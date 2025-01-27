@@ -1,10 +1,20 @@
-import { getEnumKeyByValue, round, setColorFill } from '../utils/utils'
-import { AchievementGraph } from './AchievementGraph';
-import { AchievementPercentages } from './AchievementPercentages';
-import { GameTitleInfo } from './GameTitleInfo';
-import { GamePriceInput } from './GamePriceInput';
-import { GameDataExpanded, ReviewEnum } from '../models';
-import { SpecificGameDataPoint } from './SpecificGameDataPoint';
+import { 
+	getEnumKeyByValue, 
+	round, 
+	setColorFill 
+} from '../utils/utils'
+import { 
+	GameDataExpanded, 
+	ReviewEnum 
+} from '../models';
+import { 
+	AchievementGraph, 
+	AchievementPercentages, 
+	GamePriceInput, 
+	GameTitleInfo, 
+	SpecificGameDataPoint, 
+	SteamSpyAppDetails 
+} from '.';
 
 type GameWithAchievementsProps = {
 	key: number

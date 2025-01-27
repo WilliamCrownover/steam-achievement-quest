@@ -1,5 +1,8 @@
 import { ChangeEvent } from 'react';
-import { CombinedAchievementsWithSchema, PassDownSteamData } from '../models';
+import { 
+	CombinedAchievementsWithSchema, 
+	PassDownSteamData 
+} from '../models';
 import { 
 	sorter, 
 	sortAlphabet, 

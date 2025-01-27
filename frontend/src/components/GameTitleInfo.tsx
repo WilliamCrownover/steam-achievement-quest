@@ -1,6 +1,6 @@
+import { SpecificGameDataPoint } from '.';
 import { GameDataExpanded } from '../models';
 import { setColorFill } from '../utils/utils'
-import { SpecificGameDataPoint } from './SpecificGameDataPoint';
 
 type GameTitleInfoProps = {
 	game: GameDataExpanded

@@ -1,6 +1,6 @@
+import { GameDataPoint } from '.';
 import { PassDownSteamData } from '../models';
 import { round } from '../utils/utils';
-import { GameDataPoint } from './GameDataPoint';
 
 export const GamesInfoSection = (props: PassDownSteamData) => {
 	const {
