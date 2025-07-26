@@ -231,12 +231,14 @@ const getGameAchievements = async (appId: number) => {
 		const res = await fetch(url);
 		const json = await res.json();
 		const achievements: SteamAchievement[] = json.achievementpercentages?.achievements;
+		if (!achievements) return [];
 		const achievementsConverted: SteamAchievementConverted[] = achievements.map(achievement => {
 			return {...achievement, percent: parseFloat(achievement.percent)};
 		})
 		return achievementsConverted ? sorter(achievementsConverted, sortAlphabet('name')) : achievementsConverted;
 	} catch (error) {
 		console.log(error);
+		console.log(`No achievements found for appId: ${appId}`);
 	}
 }
 
