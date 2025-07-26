@@ -1,10 +1,10 @@
-import { 
-	ChangeEvent, 
-	useState 
+import {
+	ChangeEvent,
+	useState
 } from "react"
-import { 
-	GameDataExpanded, 
-	ReviewEnum 
+import {
+	GameDataExpanded,
+	ReviewEnum
 } from "../models"
 import { getEnumKeyByValue } from "../utils/utils"
 

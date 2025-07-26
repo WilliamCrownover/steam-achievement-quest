@@ -1,10 +1,10 @@
 import { ChangeEvent } from 'react';
 import { PassDownSteamData } from '../models';
-import { 
-	sorter, 
-	sortNumber, 
-	sortAlphabeticalThenSetState, 
-	sortNumberThenSetState 
+import {
+	sorter,
+	sortNumber,
+	sortAlphabeticalThenSetState,
+	sortNumberThenSetState
 } from '../utils/utils';
 
 export const GameSortOrder = (props: PassDownSteamData) => {
@@ -21,29 +21,29 @@ export const GameSortOrder = (props: PassDownSteamData) => {
 	const changeGameOrder = (e: ChangeEvent<HTMLSelectElement>) => {
 		const value = e.target.value;
 		sortAlphabeticalThenSetState(
-			setGamesWithoutAchievements, 
-			gamesWithoutAchievements, 
+			setGamesWithoutAchievements,
+			gamesWithoutAchievements,
 			'name'
 		);
 		const sharedSort = (property: string) => {
 			sortNumberThenSetState(
-				setGamesWithAchievements, 
-				[...gamesWithAchievements], 
-				property, 
+				setGamesWithAchievements,
+				[...gamesWithAchievements],
+				property,
 				true
 			);
 			sortNumberThenSetState(
-				setGamesWithoutAchievements, 
-				[...gamesWithoutAchievements], 
-				property, 
+				setGamesWithoutAchievements,
+				[...gamesWithoutAchievements],
+				property,
 				true
 			);
 		}
 		switch (true) {
 			case value === 'name':
 				sortAlphabeticalThenSetState(
-					setGamesWithAchievements, 
-					[...gamesWithAchievements], 
+					setGamesWithAchievements,
+					[...gamesWithAchievements],
 					value
 				);
 				break;
@@ -82,53 +82,53 @@ export const GameSortOrder = (props: PassDownSteamData) => {
 				break;
 			case value === 'totalAchievements':
 				sortNumberThenSetState(
-					setGamesWithAchievements, 
-					[...gamesWithAchievements], 
+					setGamesWithAchievements,
+					[...gamesWithAchievements],
 					value
 				);
 				break;
 			case value === 'totalCompletedAchievements':
 				sortNumberThenSetState(
-					setGamesWithAchievements, 
+					setGamesWithAchievements,
 					[...sorter(
-						[...gamesWithAchievements], 
+						[...gamesWithAchievements],
 						sortNumber('totalIncompleteAchievements')
-					)], 
-					value, 
+					)],
+					value,
 					true
 				);
 				break;
 			case value === 'totalIncompleteAchievements':
 				sortNumberThenSetState(
-					setGamesWithAchievements, 
-					[...gamesWithAchievements], 
+					setGamesWithAchievements,
+					[...gamesWithAchievements],
 					value
 				);
 				break;
 			case value === 'percentComplete':
 				sortNumberThenSetState(
-					setGamesWithAchievements, 
+					setGamesWithAchievements,
 					[...sorter(
-						[...gamesWithAchievements], 
+						[...gamesWithAchievements],
 						sortNumber('totalAchievements')
-					)], 
-					value, 
+					)],
+					value,
 					true
 				);
 				break;
 			case value === 'averagePercent':
 				sortNumberThenSetState(
-					setGamesWithAchievements, 
-					[...gamesWithAchievements], 
-					value, 
+					setGamesWithAchievements,
+					[...gamesWithAchievements],
+					value,
 					true
 				);
 				break;
 			case value === 'lowestAchievementPercent':
 				sortNumberThenSetState(
-					setGamesWithAchievements, 
-					[...gamesWithAchievements], 
-					value, 
+					setGamesWithAchievements,
+					[...gamesWithAchievements],
+					value,
 					true
 				);
 				break;

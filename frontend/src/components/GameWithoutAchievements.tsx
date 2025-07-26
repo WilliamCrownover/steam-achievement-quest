@@ -1,6 +1,6 @@
-import { 
-	GameDataExpanded, 
-	ReviewEnum 
+import {
+	GameDataExpanded,
+	ReviewEnum
 } from '../models';
 import { getEnumKeyByValue } from '../utils/utils';
 import { GamePriceInput } from './GamePriceInput';
@@ -34,28 +34,28 @@ export const GameWithoutAchievements = ({ game, showSteamSpyAppDetails }: GameWi
 			<GameTitleInfo game={game} />
 			<GamePriceInput game={game} />
 			<div className='gameSpecificDataPoints'>
-				<SpecificGameDataPoint 
-					title='Price/Hour Played $' 
+				<SpecificGameDataPoint
+					title='Price/Hour Played $'
 					data={pricePerHour}
 					isGoodValue={goodPricePerHour}
 					isBadValue={badPricePerHour}
 				/>
-				<SpecificGameDataPoint 
-					title='Cost/Hour Time to Beat $' 
+				<SpecificGameDataPoint
+					title='Cost/Hour Time to Beat $'
 					data={costPerTimeToBeat}
 					isGoodValue={goodCostPerTimeToBeat}
 					isBadValue={badCostPerTimeToBeat}
-				/>	
-				<SpecificGameDataPoint 
-					title='Discount' 
-					data={discountPercent} 
+				/>
+				<SpecificGameDataPoint
+					title='Discount'
+					data={discountPercent}
 					isGoodValue={goodDiscount}
-					isPercent={true} 
+					isPercent={true}
 					isBadValue={badDiscount}
 				/>
 			</div>
 			{(ssAppDetails && showSteamSpyAppDetails) &&
-				<SteamSpyAppDetails ssAppDetails={ssAppDetails}/>
+				<SteamSpyAppDetails ssAppDetails={ssAppDetails} />
 			}
 		</div>
 	)

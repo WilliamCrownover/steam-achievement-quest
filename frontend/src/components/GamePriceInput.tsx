@@ -100,7 +100,7 @@ export const GamePriceInput = ({ game }: GamePriceInputProps) => {
 					<input type='submit' value='S' />
 				</div>
 			</form>
-			<ReviewSelectDropdown game={game}/>
+			<ReviewSelectDropdown game={game} />
 		</div>
 	)
 }

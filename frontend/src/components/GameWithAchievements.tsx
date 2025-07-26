@@ -1,11 +1,11 @@
-import { 
-	getEnumKeyByValue, 
-	round, 
-	setColorFill 
+import {
+	getEnumKeyByValue,
+	round,
+	setColorFill
 } from '../utils/utils'
-import { 
-	GameDataExpanded, 
-	ReviewEnum 
+import {
+	GameDataExpanded,
+	ReviewEnum
 } from '../models';
 import { SteamSpyAppDetails } from './SteamSpyAppDetails';
 import { SpecificGameDataPoint } from './SpecificGameDataPoint';
@@ -61,10 +61,10 @@ export const GameWithAchievements = (props: GameWithAchievementsProps) => {
 		<div className={`gameWithAchievementsContainer ${getEnumKeyByValue(ReviewEnum, review)}`}>
 			<GameTitleInfo game={game} />
 			<div className='multipleForms'>
-				<a 
-					className={`achievementLink ${oneHundredPercent}`} 
-					href={achievementsUrl} 
-					target='_blank' 
+				<a
+					className={`achievementLink ${oneHundredPercent}`}
+					href={achievementsUrl}
+					target='_blank'
 					rel='noreferrer'
 				>
 					<h3>{totalAchievements} Total Achievements</h3>
@@ -78,28 +78,28 @@ export const GameWithAchievements = (props: GameWithAchievementsProps) => {
 			</div>
 			<GamePriceInput game={game} />
 			<div className='gameSpecificDataPoints'>
-				<SpecificGameDataPoint 
-					title='Price/Hour Played $' 
+				<SpecificGameDataPoint
+					title='Price/Hour Played $'
 					data={pricePerHour}
 					isGoodValue={goodPricePerHour}
 					isBadValue={badPricePerHour}
 				/>
-				<SpecificGameDataPoint 
-					title='Cost/Hour Time to Beat $' 
+				<SpecificGameDataPoint
+					title='Cost/Hour Time to Beat $'
 					data={costPerTimeToBeat}
 					isGoodValue={goodCostPerTimeToBeat}
 					isBadValue={badCostPerTimeToBeat}
-				/>	
-				<SpecificGameDataPoint 
-					title='Discount' 
-					data={discountPercent} 
+				/>
+				<SpecificGameDataPoint
+					title='Discount'
+					data={discountPercent}
 					isGoodValue={goodDiscount}
-					isPercent={true} 
+					isPercent={true}
 					isBadValue={badDiscount}
 				/>
 			</div>
 			{(ssAppDetails && showSteamSpyAppDetails) &&
-				<SteamSpyAppDetails ssAppDetails={ssAppDetails}/>
+				<SteamSpyAppDetails ssAppDetails={ssAppDetails} />
 			}
 			{showGraph &&
 				<>

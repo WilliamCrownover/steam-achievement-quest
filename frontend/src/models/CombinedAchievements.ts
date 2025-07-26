@@ -9,4 +9,4 @@ export interface CombinedAchievements {
 	hoverInfo?: string
 }
 
-export interface CombinedAchievementsWithSchema extends CombinedAchievements, SteamAchievementSchema {}
+export interface CombinedAchievementsWithSchema extends CombinedAchievements, SteamAchievementSchema { }

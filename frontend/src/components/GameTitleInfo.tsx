@@ -36,11 +36,11 @@ export const GameTitleInfo = ({ game }: GameTitleInfoProps) => {
 					<p className={`${lastPlayedDate === 'Not Played' && 'notPlayed'}`}>{lastPlayedDate}</p>
 				</div>
 				{hoursPlayed > 0 &&
-					<SpecificGameDataPoint title='Hours Played' data={hoursPlayed}/>
+					<SpecificGameDataPoint title='Hours Played' data={hoursPlayed} />
 				}
 			</div>
-			<SpecificGameDataPoint title='Current Players' data={playerCount}/>
-			<SpecificGameDataPoint title='Total Reviews' data={total_reviews}/>
+			<SpecificGameDataPoint title='Current Players' data={playerCount} />
+			<SpecificGameDataPoint title='Total Reviews' data={total_reviews} />
 			<div className='specificGameDataPoint' style={{ backgroundColor: colorFill, color: 'black' }}>
 				<h4>Positive Reviews</h4>
 				<p>{reviewPercentPositive}%</p>

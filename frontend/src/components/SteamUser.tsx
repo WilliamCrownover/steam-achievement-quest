@@ -1,22 +1,22 @@
-import { 
-	ChangeEvent, 
-	useEffect, 
-	useState 
+import {
+	ChangeEvent,
+	useEffect,
+	useState
 } from "react";
 import Select from 'react-select';
-import { 
-	getSteamSpyData, 
-	getUserGameData, 
-	getUserInfo 
+import {
+	getSteamSpyData,
+	getUserGameData,
+	getUserInfo
 } from '../utils/api'
-import { 
-	round, 
-	sortAlphabeticalThenSetState 
+import {
+	round,
+	sortAlphabeticalThenSetState
 } from '../utils/utils';
-import { 
-	GameDataExpanded, 
-	PassDownSteamData, 
-	SteamUserInfo 
+import {
+	GameDataExpanded,
+	PassDownSteamData,
+	SteamUserInfo
 } from "../models";
 import { UserInfoSection } from "./UserInfoSection";
 import { GamesInfoSection } from "./GamesInfoSection";
@@ -62,8 +62,8 @@ export const SteamUser = () => {
 	const [selectedTagFiltersLength, setSelectedTagFiltersLength] = useState<number>(0);
 
 	const handleFilterChange = (
-		selectedOptions: filterOption[], 
-		property: string, 
+		selectedOptions: filterOption[],
+		property: string,
 		setFilterOptions: React.Dispatch<React.SetStateAction<filterOption[]>>,
 		filterOptionsLength: number,
 		setSelectedFilterOptionsLength: React.Dispatch<React.SetStateAction<number>>
@@ -72,11 +72,11 @@ export const SteamUser = () => {
 	};
 
 	const setUniqueFilterOptions = (
-		games: GameDataExpanded[], 
-		property: string, 
+		games: GameDataExpanded[],
+		property: string,
 		setFilterOptions: React.Dispatch<React.SetStateAction<filterOption[]>>
 	) => {
-		const allPropertyOptions: filterOption[] = Array.from(new Set(games.flatMap(game => game.ssAppDetails?.[property] ?? []))).sort().map(prop => { return { value: prop, label: prop }});
+		const allPropertyOptions: filterOption[] = Array.from(new Set(games.flatMap(game => game.ssAppDetails?.[property] ?? []))).sort().map(prop => { return { value: prop, label: prop } });
 		setFilterOptions(allPropertyOptions);
 	};
 
@@ -85,8 +85,8 @@ export const SteamUser = () => {
 	};
 
 	const filterGames = (
-		selectedOptions: filterOption[], 
-		property: string, 
+		selectedOptions: filterOption[],
+		property: string,
 		setFilterOptions: React.Dispatch<React.SetStateAction<filterOption[]>>,
 		filterOptionsLength: number,
 		setSelectedFilterOptionsLength: React.Dispatch<React.SetStateAction<number>>
@@ -98,7 +98,7 @@ export const SteamUser = () => {
 			setGamesWithoutAchievementsFiltered(gamesWithoutAchievements);
 			return;
 		}
-		
+
 		const selectedValues = selectedOptions.map(option => option.value);
 		let filteredGamesWithAchievements: GameDataExpanded[] = [];
 		let filteredGamesWithoutAchievements: GameDataExpanded[] = [];
@@ -116,7 +116,7 @@ export const SteamUser = () => {
 		setGamesWithAchievementsFiltered(filteredGamesWithAchievements);
 		setGamesWithoutAchievementsFiltered(filteredGamesWithoutAchievements);
 	};
-	
+
 	const handleIDChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setUserId(value);
@@ -318,10 +318,10 @@ export const SteamUser = () => {
 												className="basic-multi-select"
 												classNamePrefix="select"
 												onChange={(selectedOptions: filterOption[]) => handleFilterChange(
-													selectedOptions, 
-													'developer', 
-													setDeveloperFilterOptions, 
-													selectedDeveloperFiltersLength, 
+													selectedOptions,
+													'developer',
+													setDeveloperFilterOptions,
+													selectedDeveloperFiltersLength,
 													setSelectedDeveloperFiltersLength
 												)}
 											/>
@@ -336,10 +336,10 @@ export const SteamUser = () => {
 												className="basic-multi-select"
 												classNamePrefix="select"
 												onChange={(selectedOptions: filterOption[]) => handleFilterChange(
-													selectedOptions, 
-													'publisher', 
-													setPublisherFilterOptions, 
-													selectedPublisherFiltersLength, 
+													selectedOptions,
+													'publisher',
+													setPublisherFilterOptions,
+													selectedPublisherFiltersLength,
 													setSelectedPublisherFiltersLength
 												)}
 											/>
@@ -354,10 +354,10 @@ export const SteamUser = () => {
 												className="basic-multi-select"
 												classNamePrefix="select"
 												onChange={(selectedOptions: filterOption[]) => handleFilterChange(
-													selectedOptions, 
-													'genre', 
-													setGenreFilterOptions, 
-													selectedGenreFiltersLength, 
+													selectedOptions,
+													'genre',
+													setGenreFilterOptions,
+													selectedGenreFiltersLength,
 													setSelectedGenreFiltersLength
 												)}
 											/>
@@ -372,10 +372,10 @@ export const SteamUser = () => {
 												className="basic-multi-select"
 												classNamePrefix="select"
 												onChange={(selectedOptions: filterOption[]) => handleFilterChange(
-													selectedOptions, 
-													'tags', 
-													setTagFilterOptions, 
-													selectedTagFiltersLength, 
+													selectedOptions,
+													'tags',
+													setTagFilterOptions,
+													selectedTagFiltersLength,
 													setSelectedTagFiltersLength
 												)}
 											/>
@@ -385,34 +385,34 @@ export const SteamUser = () => {
 											<>
 												<label>
 													Show Steam Spy Data
-													<input 
-														type='checkbox' 
-														checked={showSteamSpyAppDetails} 
-														onChange={() => setShowSteamSpyAppDetails(!showSteamSpyAppDetails)} 
+													<input
+														type='checkbox'
+														checked={showSteamSpyAppDetails}
+														onChange={() => setShowSteamSpyAppDetails(!showSteamSpyAppDetails)}
 													/>
 												</label>
 												<label>
 													Show Achievement Graph
-													<input 
-														type='checkbox' 
-														checked={showGraph} 
-														onChange={() => setShowGraph(!showGraph)} 
+													<input
+														type='checkbox'
+														checked={showGraph}
+														onChange={() => setShowGraph(!showGraph)}
 													/>
 												</label>
 												<label>
 													Show Achievement List
-													<input 
-														type='checkbox' 
-														checked={showList} 
-														onChange={() => setShowList(!showList)} 
+													<input
+														type='checkbox'
+														checked={showList}
+														onChange={() => setShowList(!showList)}
 													/>
 												</label>
 												<label>
 													Show Achievement Icons
-													<input 
-														type='checkbox' 
-														checked={showIcons} 
-														onChange={() => setShowIcons(!showIcons)} 
+													<input
+														type='checkbox'
+														checked={showIcons}
+														onChange={() => setShowIcons(!showIcons)}
 													/>
 												</label>
 											</>
@@ -436,7 +436,7 @@ export const SteamUser = () => {
 							showSteamSpyAppDetails={showSteamSpyAppDetails}
 						/>
 					)}
-					{(hasGames && gamesWithoutAchievementsFiltered.length > 0) && 
+					{(hasGames && gamesWithoutAchievementsFiltered.length > 0) &&
 						<h2 className='gameWithoutAchievementsDivision'>Games Without Achievements</h2>
 					}
 					{gamesWithoutAchievementsFiltered.flatMap((game) =>

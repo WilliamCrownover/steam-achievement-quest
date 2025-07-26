@@ -1,7 +1,7 @@
 import { GameDataExpanded } from '../models';
-import { 
-	round, 
-	setColorFill 
+import {
+	round,
+	setColorFill
 } from '../utils/utils'
 
 type AchievementGraphProps = {

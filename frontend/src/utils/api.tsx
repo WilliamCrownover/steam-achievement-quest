@@ -1,28 +1,28 @@
-import { 
-	dateFormat, 
-	round, 
-	sorter, 
-	sortAlphabet, 
+import {
+	dateFormat,
+	round,
+	sorter,
+	sortAlphabet,
 	getOrSetLocalStorage,
 	splitStringListToArray,
 	sortKeysByValue
 } from './utils';
-import { 
+import {
 	CombinedAchievements,
-	GameDataExpanded, 
-	SteamAchievement, 
-	SteamAchievementConverted, 
-	SteamAchievementSchema, 
-	SteamOwnedGame, 
-	SteamSpyAppDetails, 
-	SteamSpyAppDetailsConverted, 
-	SteamUserAchievement, 
+	GameDataExpanded,
+	SteamAchievement,
+	SteamAchievementConverted,
+	SteamAchievementSchema,
+	SteamOwnedGame,
+	SteamSpyAppDetails,
+	SteamSpyAppDetailsConverted,
+	SteamUserAchievement,
 	SteamUserInfo
 } from '../models'
-import { 
-	defaultGameCosts, 
-	defaultGamePrices, 
-	defaultGameTimesToBeat, 
+import {
+	defaultGameCosts,
+	defaultGamePrices,
+	defaultGameTimesToBeat,
 	defaultMyReviews
 } from './variables';
 
@@ -30,9 +30,9 @@ const serverString = 'http://localhost:5000/';
 
 // Main API call to collect and process Steam data
 export const getUserGameData = async (
-	userId: string, 
-	gameList: number[], 
-	sampleSize = false, 
+	userId: string,
+	gameList: number[],
+	sampleSize = false,
 	setterGamesToLoad: React.Dispatch<React.SetStateAction<number>>
 ): Promise<GameDataExpanded[] | undefined> => {
 	setterGamesToLoad(0);
@@ -89,7 +89,7 @@ export const getUserGameData = async (
 			let reviewPercentNegative = 0;
 			if (reviewTotals !== 0) {
 				reviewPercentPositive = round(reviewData.total_positive / reviewTotals * 100);
-				reviewPercentNegative = round(reviewData.total_negative / reviewTotals * 100);	
+				reviewPercentNegative = round(reviewData.total_negative / reviewTotals * 100);
 			}
 			let lowestAchievementPercent = 0;
 			let cost = parseFloat(gameCosts[gameId] ?? 0);
@@ -124,7 +124,7 @@ export const getUserGameData = async (
 				review,
 				ssAppDetails
 			}
-			
+
 			// If the game has community data it likely has achievement data.
 			if (game.has_community_visible_stats) {
 				let achievements = await getGameAchievements(gameId);
@@ -143,10 +143,10 @@ export const getUserGameData = async (
 					const achievementSchemas = await getGameAchievementSchemas(gameId);
 					achievements = achievements.map(
 						(achievement, i) => (
-							{ 
-								...achievement, 
-								...(achievementSchemas?.[i] ?? {}), 
-								unlockDate: 'Unachieved' 
+							{
+								...achievement,
+								...(achievementSchemas?.[i] ?? {}),
+								unlockDate: 'Unachieved'
 							}
 						)
 					);
@@ -163,9 +163,9 @@ export const getUserGameData = async (
 
 					achievements = achievements?.map(
 						(achievement) => (
-							{ 
-								...achievement, 
-								hoverInfo: concatHoverInfo(achievement) 
+							{
+								...achievement,
+								hoverInfo: concatHoverInfo(achievement)
 							}
 						)
 					);
@@ -233,7 +233,7 @@ const getGameAchievements = async (appId: number) => {
 		const achievements: SteamAchievement[] = json.achievementpercentages?.achievements;
 		if (!achievements) return [];
 		const achievementsConverted: SteamAchievementConverted[] = achievements.map(achievement => {
-			return {...achievement, percent: parseFloat(achievement.percent)};
+			return { ...achievement, percent: parseFloat(achievement.percent) };
 		})
 		return achievementsConverted ? sorter(achievementsConverted, sortAlphabet('name')) : achievementsConverted;
 	} catch (error) {
@@ -286,8 +286,8 @@ export const getUserInfo = async (userId: string): Promise<SteamUserInfo> => {
 }
 
 export const getSteamSpyData = async (
-	userId: string, 
-	gameList: number[], 
+	userId: string,
+	gameList: number[],
 	sampleSize = false
 ): Promise<SteamSpyAppDetailsConverted[] | undefined> => {
 	const url = `${serverString}getOwnedGames/${userId}`;
@@ -373,7 +373,7 @@ const combineAchievements = (globalA: SteamAchievementConverted[], userA: SteamU
 	return combinedAchievements;
 }
 
-const sumTotalCompleted = (achievementList: SteamAchievementConverted[]) => 
+const sumTotalCompleted = (achievementList: SteamAchievementConverted[]) =>
 	achievementList.reduce(
 		(total, achievement) => total + achievement.achieved, 0
 	);
@@ -388,7 +388,7 @@ const concatHoverInfo = (achievement: SteamAchievementConverted) => {
 	return `${displayName}${description ? ` - ${description}` : ''} - ${unlockDate}`;
 }
 
-const averageAchievementPercent = (achievementList: SteamAchievementConverted[]) => 
+const averageAchievementPercent = (achievementList: SteamAchievementConverted[]) =>
 	achievementList.reduce(
 		(total, achievement) => total + achievement.percent, 0
 	) / achievementList.length;
@@ -399,8 +399,8 @@ const calcPricePerHour = (price: number, hoursPlayed: number) => {
 }
 
 const isOver24HoursOld = (date: Date): boolean => {
-    const now = new Date();
-    const diffInMilliseconds = now.getTime() - date.getTime();
-    const hoursDifference = diffInMilliseconds / (1000 * 60 * 60);
-    return hoursDifference > 24;
+	const now = new Date();
+	const diffInMilliseconds = now.getTime() - date.getTime();
+	const hoursDifference = diffInMilliseconds / (1000 * 60 * 60);
+	return hoursDifference > 24;
 };

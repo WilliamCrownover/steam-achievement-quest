@@ -151,12 +151,12 @@ app.get('/getSteamSpyAppDetails/:appId', cors(corsOptions), async (req, res) => 
 	try {
 		const response = await fetch(endpoint, fetchOptions);
 		const textResponse = await response.text();
-        try {
-            const jsonResponse = JSON.parse(textResponse);
-            res.json(jsonResponse);
-        } catch (jsonError) {
-            res.json({ message: textResponse });
-        }
+		try {
+			const jsonResponse = JSON.parse(textResponse);
+			res.json(jsonResponse);
+		} catch (jsonError) {
+			res.json({ message: textResponse });
+		}
 	} catch (error) {
 		console.log(error);
 		return { error: 'Could not fetch steamspy app details.', success: false };

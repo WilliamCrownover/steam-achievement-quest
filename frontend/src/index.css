@@ -294,8 +294,7 @@ input[type=submit]:hover {
 }
 
 .select__placeholder,
-.select__multi-value__label
-.select_input,
+.select__multi-value__label .select_input,
 .select__option,
 .select__multi-value__label,
 .select__menu-notice {
@@ -357,8 +356,8 @@ input[type=submit]:hover {
 	align-items: center;
 }
 
-.gameTitleInfo > *,
-.gameSpecificDataPoints > * {
+.gameTitleInfo>*,
+.gameSpecificDataPoints>* {
 	display: inline-block;
 	margin-right: 10px;
 	width: 25%;

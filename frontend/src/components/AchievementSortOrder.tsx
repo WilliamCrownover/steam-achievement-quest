@@ -1,12 +1,12 @@
 import { ChangeEvent } from 'react';
-import { 
-	CombinedAchievementsWithSchema, 
-	PassDownSteamData 
+import {
+	CombinedAchievementsWithSchema,
+	PassDownSteamData
 } from '../models';
-import { 
-	sorter, 
-	sortAlphabet, 
-	sortNumber 
+import {
+	sorter,
+	sortAlphabet,
+	sortNumber
 } from '../utils/utils';
 
 export const AchievementSortOrder = (props: PassDownSteamData) => {
