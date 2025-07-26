@@ -1,7 +1,7 @@
 export const dateFormat = (timestamp: number) => {
 	if (timestamp <= 100000) return 'Not Played';
 	const dateObject = new Date(timestamp * 1000);
-	return dateObject.toLocaleString('en-US', {dateStyle:'medium'});
+	return dateObject.toLocaleString('en-US', { dateStyle: 'medium' });
 }
 
 export const percent = (num: number, total: number) => `${round(num / total * 100)}%`;
@@ -44,15 +44,17 @@ export const setColorFill = (number: number, achieved = false) => {
 	}
 }
 
-export const sorter = <T>(array: T[], method: (a: T, b: T) => number) => 
+export const sorter = <T>(array: T[], method: (a: T, b: T) => number) =>
 	array.sort(method);
 
-export const sortAlphabet = <T>(property: keyof T) => 
+export const sortAlphabet = <T>(property: keyof T) =>
 	(a: T, b: T): number => {
 		const aValue = a[property];
 		const bValue = b[property];
 		if (typeof aValue === 'string' && typeof bValue === 'string') {
-			return aValue.localeCompare(bValue);
+			const aString = aValue.replace(/^The\s+/i, '');
+			const bString = bValue.replace(/^The\s+/i, '');
+			return aString.localeCompare(bString);
 		}
 		return 0;
 	}
@@ -69,10 +71,16 @@ export const sortNumber = <T>(property: keyof T, descending = false) =>
 		return 0;
 	}
 
-export const sortAlphabeticalThenSetState = <T>(setFunction: React.Dispatch<React.SetStateAction<T[]>>, array: T[], property: keyof T) => 
+export const sortKeysByValue = (obj: { [key: string]: number }): string[] => {
+	return Object.entries(obj)
+		.sort(([, a], [, b]) => b - a)
+		.map(([key]) => key);
+};
+
+export const sortAlphabeticalThenSetState = <T>(setFunction: React.Dispatch<React.SetStateAction<T[]>>, array: T[], property: keyof T) =>
 	setFunction(sorter(array, sortAlphabet(property)));
 
-export const sortNumberThenSetState = <T>(setFunction: React.Dispatch<React.SetStateAction<T[]>>, array: T[], property: keyof T, descending = false) => 
+export const sortNumberThenSetState = <T>(setFunction: React.Dispatch<React.SetStateAction<T[]>>, array: T[], property: keyof T, descending = false) =>
 	setFunction(sorter(array, sortNumber(property, descending)));
 
 export const getEnumKeyByValue = <T extends Object>(enumObj: T, value: string): keyof T | undefined => {
@@ -87,3 +95,9 @@ export const getOrSetLocalStorage = (storedName: string, defaultData: string) =>
 	}
 	return data;
 }
+
+export const splitStringListToArray = (stringList: string | null) => {
+	if (!stringList) return [];
+	if (stringList === '') return [];
+	return stringList.split(',').map(item => item.trim());
+};
