@@ -156,7 +156,7 @@ p {
 	padding: 5px;
 	border: none;
 	border-radius: 5px;
-	margin-left: 5px;
+	margin-right: 5px;
 }
 
 .multipleForms {
@@ -175,7 +175,7 @@ input[type=number] {
 }
 
 input[type=number] {
-	width: 70px;
+	width: 80px;
 }
 
 input[type=submit] {
@@ -261,7 +261,8 @@ input[type=submit]:hover {
 
 .sortOptionContainer2 {
 	border: none;
-	margin-left: 5px;
+	margin-right: 5px;
+	margin: 5px 0px;
 	z-index: 1;
 }
 
@@ -276,6 +277,51 @@ input[type=submit]:hover {
 
 .sortOptionContainer label {
 	margin-top: 10px;
+}
+
+.filterOption h4 {
+	margin-top: 10px;
+}
+
+.select__control {
+	background-color: var(--lightGray);
+	width: 250px;
+	min-height: auto !important;
+}
+
+.select__menu-list {
+	background-color: var(--lightGray);
+}
+
+.select__placeholder,
+.select__multi-value__label
+.select_input,
+.select__option,
+.select__multi-value__label,
+.select__menu-notice {
+	color: var(--background) !important;
+	padding-left: 5px;
+}
+
+.select__option {
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+.select__option:hover,
+.select__indicator:hover,
+.select__multi-value__remove:hover {
+	background-color: var(--medGray);
+}
+
+.select__indicator-separator {
+	background-color: var(--background);
+}
+
+.select__indicator,
+.select__multi-value__remove {
+	color: var(--background);
+	scale: 75%;
 }
 
 .gameWithAchievementsContainer,
@@ -372,7 +418,8 @@ input[type=submit]:hover {
 	padding: 5px;
 }
 
-.specificGameDataPoint h4 {
+.specificGameDataPoint h4,
+.gameStoreDetailDataPoint h4 {
 	margin: 0px;
 }
 
@@ -381,6 +428,21 @@ input[type=submit]:hover {
 	margin-top: 3px;
 	font-weight: 600;
 	font-size: 1rem;
+}
+
+.gameStoreDetailContainer {
+	display: flex;
+	flex-wrap: wrap;
+	margin-top: 5px;
+	background-color: var(--medGray);
+	border: solid 5px var(--darkGray);
+	border-radius: 10px;
+}
+
+.gameStoreDetailDataPoint {
+	align-items: center;
+	color: var(--lightGray);
+	margin: 5px 10px;
 }
 
 .dlc,
@@ -487,7 +549,7 @@ input[type=submit]:hover {
 
 .achievementLink {
 	display: flex;
-	margin: 5px 0px;
+	margin-top: 5px;
 	font-size: 1.15rem;
 }
 
