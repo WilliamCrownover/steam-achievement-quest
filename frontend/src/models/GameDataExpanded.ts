@@ -1,5 +1,6 @@
 import { CombinedAchievementsWithSchema } from "./CombinedAchievements"
 import { SteamOwnedGame } from "./SteamOwnedGame"
+import { SteamSpyAppDetailsConverted } from "./SteamSpyAppDetails"
 
 export interface GameDataExpanded extends Record<string, any>, SteamOwnedGame {
 	achievements: CombinedAchievementsWithSchema[]
@@ -11,6 +12,7 @@ export interface GameDataExpanded extends Record<string, any>, SteamOwnedGame {
 	costPerTimeToBeat: number
 	discountPercent: number
 	review: ReviewEnum
+	ssAppDetails: SteamSpyAppDetailsConverted | undefined
 }
 
 export enum ReviewEnum {
