@@ -30,7 +30,7 @@ app.get('/getOwnedGames/:userId', cors(corsOptions), async (req, res) => {
 	try {
 		const response = await fetch(endpoint, fetchOptions);
 		if (response.status !== 200) {
-			throw new Error('Could not fetch. Check User ID value.');
+			throw new Error('Could not fetch owned games. Check User ID value.');
 		}
 		const jsonResponse = await response.json();
 		res.json(jsonResponse);
@@ -53,6 +53,9 @@ app.get('/getUserInfo/:userId', cors(corsOptions), async (req, res) => {
 
 	try {
 		const response = await fetch(endpoint, fetchOptions);
+		if (response.status !== 200) {
+			throw new Error('Could not fetch user info. Check User ID value.');
+		}
 		const jsonResponse = await response.json();
 		res.json(jsonResponse);
 	} catch (error) {
@@ -147,8 +150,13 @@ app.get('/getSteamSpyAppDetails/:appId', cors(corsOptions), async (req, res) => 
 	}
 	try {
 		const response = await fetch(endpoint, fetchOptions);
-		const jsonResponse = await response.json();
-		res.json(jsonResponse);
+		const textResponse = await response.text();
+        try {
+            const jsonResponse = JSON.parse(textResponse);
+            res.json(jsonResponse);
+        } catch (jsonError) {
+            res.json({ message: textResponse });
+        }
 	} catch (error) {
 		console.log(error);
 		return { error: 'Could not fetch steamspy app details.', success: false };
