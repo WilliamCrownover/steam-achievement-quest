@@ -1,25 +1,25 @@
 import { 
-	GamePriceInput, 
-	GameTitleInfo, 
-	SpecificGameDataPoint, 
-	SteamSpyAppDetails 
-} from '.';
-import { 
 	GameDataExpanded, 
 	ReviewEnum 
 } from '../models';
 import { getEnumKeyByValue } from '../utils/utils';
+import { GamePriceInput } from './GamePriceInput';
+import { GameTitleInfo } from './GameTitleInfo';
+import { SpecificGameDataPoint } from './SpecificGameDataPoint';
+import { SteamSpyAppDetails } from './SteamSpyAppDetails';
 
 type GameWithoutAchievementsProps = {
 	game: GameDataExpanded
+	showSteamSpyAppDetails: boolean
 }
 
-export const GameWithoutAchievements = ({ game }: GameWithoutAchievementsProps) => {
+export const GameWithoutAchievements = ({ game, showSteamSpyAppDetails }: GameWithoutAchievementsProps) => {
 	const {
 		pricePerHour,
 		costPerTimeToBeat,
 		discountPercent,
-		review
+		review,
+		ssAppDetails,
 	} = game;
 
 	const goodPricePerHour = pricePerHour !== 0 && pricePerHour <= 0.5;
@@ -54,6 +54,9 @@ export const GameWithoutAchievements = ({ game }: GameWithoutAchievementsProps) 
 					isBadValue={badDiscount}
 				/>
 			</div>
+			{(ssAppDetails && showSteamSpyAppDetails) &&
+				<SteamSpyAppDetails ssAppDetails={ssAppDetails}/>
+			}
 		</div>
 	)
 }

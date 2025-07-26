@@ -7,14 +7,12 @@ import {
 	GameDataExpanded, 
 	ReviewEnum 
 } from '../models';
-import { 
-	AchievementGraph, 
-	AchievementPercentages, 
-	GamePriceInput, 
-	GameTitleInfo, 
-	SpecificGameDataPoint, 
-	SteamSpyAppDetails 
-} from '.';
+import { SteamSpyAppDetails } from './SteamSpyAppDetails';
+import { SpecificGameDataPoint } from './SpecificGameDataPoint';
+import { GameTitleInfo } from './GameTitleInfo';
+import { GamePriceInput } from './GamePriceInput';
+import { AchievementGraph } from './AchievementGraph';
+import { AchievementPercentages } from './AchievementPercentages';
 
 type GameWithAchievementsProps = {
 	key: number
@@ -23,6 +21,7 @@ type GameWithAchievementsProps = {
 	showGraph: boolean
 	showList: boolean
 	showIcons: boolean
+	showSteamSpyAppDetails: boolean
 }
 
 export const GameWithAchievements = (props: GameWithAchievementsProps) => {
@@ -32,6 +31,7 @@ export const GameWithAchievements = (props: GameWithAchievementsProps) => {
 		showGraph,
 		showList,
 		showIcons,
+		showSteamSpyAppDetails,
 	} = props
 
 	const {
@@ -45,7 +45,8 @@ export const GameWithAchievements = (props: GameWithAchievementsProps) => {
 		pricePerHour,
 		costPerTimeToBeat,
 		discountPercent,
-		review
+		review,
+		ssAppDetails
 	} = game;
 
 	const oneHundredPercent = percentComplete === 100.00 ? 'oneHundredPercent' : '';
@@ -74,8 +75,8 @@ export const GameWithAchievements = (props: GameWithAchievementsProps) => {
 						</>
 					}
 				</a>
-				<GamePriceInput game={game} />
 			</div>
+			<GamePriceInput game={game} />
 			<div className='gameSpecificDataPoints'>
 				<SpecificGameDataPoint 
 					title='Price/Hour Played $' 
@@ -97,6 +98,9 @@ export const GameWithAchievements = (props: GameWithAchievementsProps) => {
 					isBadValue={badDiscount}
 				/>
 			</div>
+			{(ssAppDetails && showSteamSpyAppDetails) &&
+				<SteamSpyAppDetails ssAppDetails={ssAppDetails}/>
+			}
 			{showGraph &&
 				<>
 					<AchievementGraph game={game} />
