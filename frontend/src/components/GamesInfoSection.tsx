@@ -1,6 +1,6 @@
-import { GameDataPoint } from '.';
 import { PassDownSteamData } from '../models';
 import { round } from '../utils/utils';
+import { GameDataPoint } from './GameDataPoint';
 
 export const GamesInfoSection = (props: PassDownSteamData) => {
 	const {
@@ -24,27 +24,28 @@ export const GamesInfoSection = (props: PassDownSteamData) => {
 	} = userData;
 
 	const hasAchievements = gamesWithAchievements.length > 0;
+	const totalGameCount = gamesWithAchievements.length + gamesWithoutAchievements.length;
 
 	const GameDataPoints = [
 		// 1
 		{
 			dataName: 'Total Number of Games',
-			dataArray: totalNumberOfGames,
-			total: totalNumberOfGames,
+			dataArray: totalGameCount,
+			total: totalGameCount,
 		},
 		// 2
 		{
 			dataName: 'With Achievements',
 			dataArray: gamesWithAchievements,
 			showPercent: true,
-			total: totalNumberOfGames,
+			total: totalGameCount,
 		},
 		// 3
 		{
 			dataName: 'Without Achievements',
 			dataArray: gamesWithoutAchievements,
 			showPercent: true,
-			total: totalNumberOfGames,
+			total: totalGameCount,
 		},
 		// 4
 		{
