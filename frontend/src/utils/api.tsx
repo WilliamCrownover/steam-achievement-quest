@@ -3,17 +3,22 @@ import {
 	round, 
 	sorter, 
 	sortAlphabet, 
-	getOrSetLocalStorage
+	getOrSetLocalStorage,
+	splitStringListToArray,
+	sortKeysByValue
 } from './utils';
 import { 
 	CombinedAchievements,
 	GameDataExpanded, 
 	SteamAchievement, 
+	SteamAchievementConverted, 
+	SteamAchievementSchema, 
 	SteamOwnedGame, 
+	SteamSpyAppDetails, 
+	SteamSpyAppDetailsConverted, 
 	SteamUserAchievement, 
 	SteamUserInfo
 } from '../models'
-import { SteamAchievementSchema } from '../models/SteamAchievementSchema';
 import { 
 	defaultGameCosts, 
 	defaultGamePrices, 
@@ -28,9 +33,9 @@ export const getUserGameData = async (
 	userId: string, 
 	gameList: number[], 
 	sampleSize = false, 
-	setterGamesToLoad: (count: string) => void
-) => {
-	setterGamesToLoad('');
+	setterGamesToLoad: React.Dispatch<React.SetStateAction<number>>
+): Promise<GameDataExpanded[] | undefined> => {
+	setterGamesToLoad(0);
 	const url = `${serverString}getOwnedGames/${userId}`;
 
 	try {
@@ -48,6 +53,11 @@ export const getUserGameData = async (
 			);
 		}
 
+		// Filter out game demos
+		allGamesData = allGamesData.filter(
+			(game: GameDataExpanded) => !game.name.toLowerCase().trim().endsWith(' demo')
+		);
+
 		const gamesLength = allGamesData.length
 		const totalGameCount = (sampleSize && gamesLength > 25) ? 25 : gamesLength;
 		setterGamesToLoad(totalGameCount);
@@ -62,6 +72,7 @@ export const getUserGameData = async (
 		const gamePrices = JSON.parse(getOrSetLocalStorage('gamePrices', defaultGamePrices));
 		const gameTimesToBeat = JSON.parse(getOrSetLocalStorage('gameTimesToBeat', defaultGameTimesToBeat));
 		const myReviews = JSON.parse(getOrSetLocalStorage('myReviews', defaultMyReviews));
+		const steamSpyAppDetails = JSON.parse(getOrSetLocalStorage('steamSpyAppDetails', "{}"));
 
 		// Get achievement data for each game and add extra properties.
 		const allGamesDataExpanded: GameDataExpanded[] = await Promise.all(allGamesData.slice(0, totalGameCount).map(async (game: SteamOwnedGame) => {
@@ -88,6 +99,7 @@ export const getUserGameData = async (
 			const costPerTimeToBeat = calcPricePerHour(cost, timeToBeat);
 			const discountPercent = round((cost - pricePaid) / cost * 100);
 			const review = myReviews[gameId];
+			const ssAppDetails = steamSpyAppDetails[gameId];
 
 			// Each game will have at least these properties.
 			const gameDataExpanded: GameDataExpanded = {
@@ -109,9 +121,10 @@ export const getUserGameData = async (
 				pricePerHour,
 				costPerTimeToBeat,
 				discountPercent: isNaN(discountPercent) ? 0 : discountPercent,
-				review
+				review,
+				ssAppDetails
 			}
-
+			
 			// If the game has community data it likely has achievement data.
 			if (game.has_community_visible_stats) {
 				let achievements = await getGameAchievements(gameId);
@@ -158,6 +171,9 @@ export const getUserGameData = async (
 					);
 					const percentComplete = round((totalCompletedAchievements / totalAchievements) * 100);
 
+					// Increment total game count to show loading progress
+					setterGamesToLoad((prevCount: number) => prevCount - 1);
+
 					return {
 						...gameDataExpanded,
 						achievements,
@@ -171,6 +187,9 @@ export const getUserGameData = async (
 					}
 				}
 			}
+
+			// Increment total game count to show loading progress
+			setterGamesToLoad((prevCount: number) => prevCount - 1);
 
 			return gameDataExpanded;
 		}));
@@ -212,7 +231,10 @@ const getGameAchievements = async (appId: number) => {
 		const res = await fetch(url);
 		const json = await res.json();
 		const achievements: SteamAchievement[] = json.achievementpercentages?.achievements;
-		return achievements ? sorter(achievements, sortAlphabet('name')) : achievements;
+		const achievementsConverted: SteamAchievementConverted[] = achievements.map(achievement => {
+			return {...achievement, percent: parseFloat(achievement.percent)};
+		})
+		return achievementsConverted ? sorter(achievementsConverted, sortAlphabet('name')) : achievementsConverted;
 	} catch (error) {
 		console.log(error);
 	}
@@ -261,8 +283,84 @@ export const getUserInfo = async (userId: string): Promise<SteamUserInfo> => {
 	}
 }
 
+export const getSteamSpyData = async (
+	userId: string, 
+	gameList: number[], 
+	sampleSize = false
+): Promise<SteamSpyAppDetailsConverted[] | undefined> => {
+	const url = `${serverString}getOwnedGames/${userId}`;
+
+	try {
+		const res = await fetch(url);
+		const json = await res.json();
+		let allGamesData = json.response.games;
+
+		// The profile is completely private and no game data is available.
+		if (!allGamesData) return;
+
+		// If a filter list is provided return games matching appids
+		if (gameList.length > 0) {
+			allGamesData = allGamesData.filter(
+				(game: GameDataExpanded) => gameList.includes(game.appid)
+			);
+		}
+
+		// Filter out game demos
+		allGamesData = allGamesData.filter(
+			(game: GameDataExpanded) => !game.name.toLowerCase().trim().endsWith(' demo')
+		);
+
+		const gamesLength = allGamesData.length
+		const totalGameCount = (sampleSize && gamesLength > 25) ? 25 : gamesLength;
+
+		const steamSpyAppDetails = JSON.parse(getOrSetLocalStorage('steamSpyAppDetails', "{}"));
+
+		for (const game of allGamesData.slice(0, totalGameCount)) {
+			const gameId = game.appid;
+			const ssAppDetails = steamSpyAppDetails[gameId];
+			if (!ssAppDetails || isOver24HoursOld(new Date(ssAppDetails.pullDate))) {
+				try {
+					let appDetails = await getSteamSpyAppDetails(gameId);
+					const appDetailsConverted: SteamSpyAppDetailsConverted = {
+						...appDetails,
+						developer: splitStringListToArray(appDetails.developer),
+						genre: splitStringListToArray(appDetails.genre),
+						languages: splitStringListToArray(appDetails.languages),
+						publisher: splitStringListToArray(appDetails.publisher),
+						tags: sortKeysByValue(appDetails.tags),
+					}
+					steamSpyAppDetails[gameId] = appDetailsConverted;
+					localStorage.setItem('steamSpyAppDetails', JSON.stringify(steamSpyAppDetails));
+				} catch (error) {
+					console.error(`Failed to fetch details for game ${game.name}:`, error);
+					continue;
+				}
+			}
+		};
+
+	} catch (error) {
+		console.log(error);
+	}
+}
+
+export const getSteamSpyAppDetails = async (appId: number): Promise<SteamSpyAppDetails> => {
+	const url = `${serverString}getSteamSpyAppDetails/${appId}`;
+
+	try {
+		const res = await fetch(url);
+		if (!res.ok) throw new Error(`Failed to fetch steam spy app details: ${res.statusText}`);
+		const json = await res.json();
+		const appDetails: SteamSpyAppDetails | undefined = json;
+		if (!appDetails) throw new Error(`Steam Spy app details not found for appId: ${appId}`);
+		appDetails.pullDate = new Date();
+		return appDetails;
+	} catch (error) {
+		throw error;
+	}
+}
+
 // API Util Functions
-const combineAchievements = (globalA: SteamAchievement[], userA: SteamUserAchievement[]) => {
+const combineAchievements = (globalA: SteamAchievementConverted[], userA: SteamUserAchievement[]) => {
 	const combinedAchievements: CombinedAchievements[] = globalA.map((achievement, i) => {
 		const userAchievement = userA[i];
 		const achieved = userAchievement.achieved === 1;
@@ -273,12 +371,12 @@ const combineAchievements = (globalA: SteamAchievement[], userA: SteamUserAchiev
 	return combinedAchievements;
 }
 
-const sumTotalCompleted = (achievementList: SteamAchievement[]) => 
+const sumTotalCompleted = (achievementList: SteamAchievementConverted[]) => 
 	achievementList.reduce(
 		(total, achievement) => total + achievement.achieved, 0
 	);
 
-const concatHoverInfo = (achievement: SteamAchievement) => {
+const concatHoverInfo = (achievement: SteamAchievementConverted) => {
 	const {
 		displayName,
 		description,
@@ -288,7 +386,7 @@ const concatHoverInfo = (achievement: SteamAchievement) => {
 	return `${displayName}${description ? ` - ${description}` : ''} - ${unlockDate}`;
 }
 
-const averageAchievementPercent = (achievementList: SteamAchievement[]) => 
+const averageAchievementPercent = (achievementList: SteamAchievementConverted[]) => 
 	achievementList.reduce(
 		(total, achievement) => total + achievement.percent, 0
 	) / achievementList.length;
@@ -297,3 +395,10 @@ const calcPricePerHour = (price: number, hoursPlayed: number) => {
 	if (price < 0 || hoursPlayed < 1) return 0;
 	return round(price / hoursPlayed);
 }
+
+const isOver24HoursOld = (date: Date): boolean => {
+    const now = new Date();
+    const diffInMilliseconds = now.getTime() - date.getTime();
+    const hoursDifference = diffInMilliseconds / (1000 * 60 * 60);
+    return hoursDifference > 24;
+};
