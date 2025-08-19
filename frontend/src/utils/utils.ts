@@ -99,5 +99,102 @@ export const getOrSetLocalStorage = (storedName: string, defaultData: string) =>
 export const splitStringListToArray = (stringList: string | null) => {
 	if (!stringList) return [];
 	if (stringList === '') return [];
-	return stringList.split(',').map(item => item.trim());
+
+	let sanitized = stringList;
+	const commaSuffixes = [
+		{ pattern: /, Inc.\b/gi, replacement: " Inc" },
+		{ pattern: /, Inc\b/gi, replacement: " Inc" },
+		{ pattern: /, LLC\b/gi, replacement: " LLC" },
+		{ pattern: /, Ltd.\b/gi, replacement: "Ltd" },
+		{ pattern: /, LTD\b/gi, replacement: "Ltd" },
+		{ pattern: /, LTD.\b/gi, replacement: "Ltd" },
+		{ pattern: /, S\.L\.(?:\b|$)/gi, replacement: "" },
+		{ pattern: /, a\.s\.(?:\b|$)/gi, replacement: "" },
+		{ pattern: /, and\b/gi, replacement: "," },
+		{ pattern: /\(Mac\)/gi, replacement: "" },
+		{ pattern: /\(Linux\)/gi, replacement: "" },
+		{ pattern: /\(Linux\/Mac\)/gi, replacement: "" },
+		{ pattern: /\(Mac, Linux\)/gi, replacement: "" },
+		{ pattern: /\(Mac, Linux, & Windows Update\)/gi, replacement: "" },
+		{ pattern: /, a Ubisoft Studio\b/gi, replacement: " a Ubisoft Studio" },
+		{ pattern: /in collaboration with\b/gi, replacement: "" },
+		{ pattern: /DON'T NOD\b/gi, replacement: "DONTNOD Entertainment" },
+		{ pattern: /Eidos Montreal\b/gi, replacement: "Eidos-Montréal" },
+		{ pattern: /Io-Interactive A\/S\b/gi, replacement: "IO Interactive" },
+	]
+
+	commaSuffixes.forEach(({ pattern, replacement }) => {
+		sanitized = sanitized.replace(pattern, replacement);
+	});
+
+	const individualStrings = sanitized.split(',').map(item => item.trim());
+	
+	const prefixes = [
+		"22cans",
+		"2K",
+		"4Divinity",
+		"Activision",
+		"Arkane",
+		"Aspyr",
+		"BANDAI NAMCO",
+		"Bethesda",
+		"Blind Squirrel",
+		"Bloober Team",
+		"CAPCOM",
+		"Codemasters Racing",
+		"Comcept",
+		"Croteam",
+		"Crytek",
+		"Cyanide Studio",
+		"D3T",
+		"Digital Dreams Entertainment",
+		"EA",
+		"Feral Interactive",
+		"FireFly Studios",
+		"FromSoftware Inc.",
+		"GSC Game World",
+		"High Voltage",
+		"IDEA FACTORY",
+		"Interplay",
+		"IO Interactive",
+		"Keen Games",
+		"Marvelous",
+		"Monolith",
+		"Nixxes",
+		"Oddworld Inhabitants",
+		"PlatinumGames",
+		"PlayStation Publishing LLC",
+		"Reality Pump",
+		"Red Storm",
+		"Rockstar",
+		"SEGA",
+		"Shiver",
+		"SkyBox Labs",
+		"Stainless Games",
+		"Starbreeze",
+		"Team17",
+		"Techland",
+		"Telltale",
+		"THQ Nordic",
+		"TimeGate",
+		"Topware Interactive",
+		"Toronto",
+		"TT Games",
+		"Ubisoft",
+		"UL",
+		"Warner Bros.",
+		"Wizards of the Coast",
+		"方块游戏",
+	];
+
+	const processedStrings = individualStrings.map(item => {
+		let processedItem = item;
+		prefixes.forEach(prefix => {
+			const pattern = new RegExp(`^(${prefix}).*`, 'i');
+			processedItem = processedItem.replace(pattern, prefix);
+		});
+		return processedItem.trim();
+	});
+
+	return [...new Set(processedStrings)];
 };
