@@ -19,6 +19,7 @@
 	--badValueHighlight: rgb(233, 49, 49);
 	--thumbsUp: rgb(141, 179, 139);
 	--thumbsDown: rgb(179, 139, 139);
+	--brightHighlight: rgb(37, 175, 255);
 }
 
 body {
@@ -178,6 +179,14 @@ input[type=number] {
 	width: 80px;
 }
 
+input[type=text] {
+	width: 100px;
+}
+
+.userIDInput {
+	width: 180px !important;
+}
+
 input[type=submit] {
 	background-color: var(--medGray);
 	color: var(--lightGray);
@@ -262,7 +271,6 @@ input[type=submit]:hover {
 .sortOptionContainer2 {
 	border: none;
 	margin-right: 5px;
-	margin: 5px 0px;
 	z-index: 1;
 }
 
@@ -328,7 +336,7 @@ input[type=submit]:hover {
 	background-color: var(--lightGray);
 	padding: 10px;
 	border-radius: 10px;
-	margin-bottom: 5px;
+	margin-top: 15px;
 }
 
 .gameWithAchievementsContainer a {
@@ -550,6 +558,7 @@ input[type=submit]:hover {
 	display: flex;
 	margin-top: 5px;
 	font-size: 1.15rem;
+	width: 100%;
 }
 
 .achievementLink h3 {
@@ -566,9 +575,9 @@ input[type=submit]:hover {
 }
 
 .gameWithoutAchievementsDivision {
-	background-color: var(--darkGray);
-	color: var(--lightGray);
-	border: solid 5px var(--lightGray);
+	background-color: var(--brightHighlight);
+	color: var(--darkGray);
+	border: solid 5px var(--medGray);
 	border-radius: 10px;
 	padding: 5px;
 	text-align: center;
