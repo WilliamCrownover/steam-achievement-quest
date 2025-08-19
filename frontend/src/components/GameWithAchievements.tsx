@@ -18,6 +18,7 @@ type GameWithAchievementsProps = {
 	key: number
 	game: GameDataExpanded
 	privateProfile?: boolean
+	showSavedDataPoints: boolean
 	showGraph: boolean
 	showList: boolean
 	showIcons: boolean
@@ -28,6 +29,7 @@ export const GameWithAchievements = (props: GameWithAchievementsProps) => {
 	const {
 		game,
 		privateProfile,
+		showSavedDataPoints,
 		showGraph,
 		showList,
 		showIcons,
@@ -76,28 +78,32 @@ export const GameWithAchievements = (props: GameWithAchievementsProps) => {
 					}
 				</a>
 			</div>
-			<GamePriceInput game={game} />
-			<div className='gameSpecificDataPoints'>
-				<SpecificGameDataPoint
-					title='Price/Hour Played $'
-					data={pricePerHour}
-					isGoodValue={goodPricePerHour}
-					isBadValue={badPricePerHour}
-				/>
-				<SpecificGameDataPoint
-					title='Cost/Hour Time to Beat $'
-					data={costPerTimeToBeat}
-					isGoodValue={goodCostPerTimeToBeat}
-					isBadValue={badCostPerTimeToBeat}
-				/>
-				<SpecificGameDataPoint
-					title='Discount'
-					data={discountPercent}
-					isGoodValue={goodDiscount}
-					isPercent={true}
-					isBadValue={badDiscount}
-				/>
-			</div>
+			{showSavedDataPoints && 
+				<>
+					<GamePriceInput game={game} />
+					<div className='gameSpecificDataPoints'>
+						<SpecificGameDataPoint
+							title='Price/Hour Played $'
+							data={pricePerHour}
+							isGoodValue={goodPricePerHour}
+							isBadValue={badPricePerHour}
+						/>
+						<SpecificGameDataPoint
+							title='Cost/Hour Time to Beat $'
+							data={costPerTimeToBeat}
+							isGoodValue={goodCostPerTimeToBeat}
+							isBadValue={badCostPerTimeToBeat}
+						/>
+						<SpecificGameDataPoint
+							title='Discount'
+							data={discountPercent}
+							isGoodValue={goodDiscount}
+							isPercent={true}
+							isBadValue={badDiscount}
+						/>
+					</div>
+				</>
+			}
 			{(ssAppDetails && showSteamSpyAppDetails) &&
 				<SteamSpyAppDetails ssAppDetails={ssAppDetails} />
 			}

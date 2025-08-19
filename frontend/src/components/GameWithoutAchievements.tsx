@@ -10,10 +10,11 @@ import { SteamSpyAppDetails } from './SteamSpyAppDetails';
 
 type GameWithoutAchievementsProps = {
 	game: GameDataExpanded
+	showSavedDataPoints: boolean
 	showSteamSpyAppDetails: boolean
 }
 
-export const GameWithoutAchievements = ({ game, showSteamSpyAppDetails }: GameWithoutAchievementsProps) => {
+export const GameWithoutAchievements = ({ game, showSavedDataPoints, showSteamSpyAppDetails }: GameWithoutAchievementsProps) => {
 	const {
 		pricePerHour,
 		costPerTimeToBeat,
@@ -32,28 +33,32 @@ export const GameWithoutAchievements = ({ game, showSteamSpyAppDetails }: GameWi
 	return (
 		<div className={`gameWithoutAchievements ${getEnumKeyByValue(ReviewEnum, review)}`}>
 			<GameTitleInfo game={game} />
-			<GamePriceInput game={game} />
-			<div className='gameSpecificDataPoints'>
-				<SpecificGameDataPoint
-					title='Price/Hour Played $'
-					data={pricePerHour}
-					isGoodValue={goodPricePerHour}
-					isBadValue={badPricePerHour}
-				/>
-				<SpecificGameDataPoint
-					title='Cost/Hour Time to Beat $'
-					data={costPerTimeToBeat}
-					isGoodValue={goodCostPerTimeToBeat}
-					isBadValue={badCostPerTimeToBeat}
-				/>
-				<SpecificGameDataPoint
-					title='Discount'
-					data={discountPercent}
-					isGoodValue={goodDiscount}
-					isPercent={true}
-					isBadValue={badDiscount}
-				/>
-			</div>
+			{showSavedDataPoints && 
+				<>
+					<GamePriceInput game={game} />
+					<div className='gameSpecificDataPoints'>
+						<SpecificGameDataPoint
+							title='Price/Hour Played $'
+							data={pricePerHour}
+							isGoodValue={goodPricePerHour}
+							isBadValue={badPricePerHour}
+						/>
+						<SpecificGameDataPoint
+							title='Cost/Hour Time to Beat $'
+							data={costPerTimeToBeat}
+							isGoodValue={goodCostPerTimeToBeat}
+							isBadValue={badCostPerTimeToBeat}
+						/>
+						<SpecificGameDataPoint
+							title='Discount'
+							data={discountPercent}
+							isGoodValue={goodDiscount}
+							isPercent={true}
+							isBadValue={badDiscount}
+						/>
+					</div>
+				</>
+	}
 			{(ssAppDetails && showSteamSpyAppDetails) &&
 				<SteamSpyAppDetails ssAppDetails={ssAppDetails} />
 			}
