@@ -1,5 +1,5 @@
 import { ChangeEvent } from 'react';
-import { PassDownSteamData } from '../models';
+import { GameDataExpanded, PassDownSteamData } from '../models';
 import {
 	sorter,
 	sortNumber,
@@ -17,6 +17,36 @@ export const GameSortOrder = (props: PassDownSteamData) => {
 	} = props;
 
 	const hasAchievements = gamesWithAchievements.length > 0;
+
+	// Console.log count of dates by year and month
+	const countPurchaseDates = (games: GameDataExpanded[]) => {
+		const purchaseDates: { [key: string]: {[key: string]: number }} = {};
+		for(let year = 2010; year <= 2025; year++) {
+			for(let month = 1; month <= 12; month++) {
+				const monthString = month < 10 ? `0${month}` : `${month}`;
+				purchaseDates[year] = {
+					...purchaseDates[year],
+					[monthString]: 0
+				};
+			}
+		}
+		games.forEach(game => {
+			const dateYear = game.purchaseDate.split('-')[0];
+			const dateMonth = game.purchaseDate.split('-')[1];
+			if (dateYear) {
+				purchaseDates[dateYear] = {
+					...purchaseDates[dateYear],
+					[dateMonth]: (purchaseDates[dateYear]?.[dateMonth] || 0) + 1
+				};
+			}
+		});
+		console.log('Purchase Dates Count:', purchaseDates);
+		const purchaseDatesYearTotals: { [key: string]: number } = {};
+		Object.keys(purchaseDates).forEach(year => {
+			purchaseDatesYearTotals[year] = Object.values(purchaseDates[year]).reduce((acc, count) => acc + count, 0);
+		});
+		console.log('Purchase Dates Year Totals:', purchaseDatesYearTotals);
+	}
 
 	const changeGameOrder = (e: ChangeEvent<HTMLSelectElement>) => {
 		const value = e.target.value;
@@ -70,6 +100,19 @@ export const GameSortOrder = (props: PassDownSteamData) => {
 				break;
 			case value === 'timeToBeat':
 				sharedSort(value);
+				break;
+			case value === 'purchaseDate':
+				sortAlphabeticalThenSetState(
+					setGamesWithAchievements,
+					[...gamesWithAchievements],
+					value
+				);
+				sortAlphabeticalThenSetState(
+					setGamesWithoutAchievements,
+					[...gamesWithoutAchievements],
+					value
+				);
+				countPurchaseDates([...gamesWithAchievements, ...gamesWithoutAchievements]);
 				break;
 			case value === 'pricePerHour':
 				sharedSort(value);
@@ -150,6 +193,7 @@ export const GameSortOrder = (props: PassDownSteamData) => {
 				<option value='cost' > Game Cost</option>
 				<option value='pricePaid' > Price Paid</option>
 				<option value='timeToBeat' > Time to Beat</option>
+				<option value='purchaseDate' > Purchase Date</option>
 				<option value='pricePerHour' > Price per Hour</option>
 				<option value='costPerTimeToBeat' > Cost per Time to Beat</option>
 				<option value='discountPercent' > Discount Percent</option>
