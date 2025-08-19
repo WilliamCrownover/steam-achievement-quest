@@ -10,6 +10,7 @@ import {
 import {
 	CombinedAchievements,
 	GameDataExpanded,
+	ReviewEnum,
 	SteamAchievement,
 	SteamAchievementConverted,
 	SteamAchievementSchema,
@@ -71,6 +72,8 @@ export const getUserGameData = async (
 		const gameCosts = JSON.parse(getOrSetLocalStorage('gameCosts', defaultGameCosts));
 		const gamePrices = JSON.parse(getOrSetLocalStorage('gamePrices', defaultGamePrices));
 		const gameTimesToBeat = JSON.parse(getOrSetLocalStorage('gameTimesToBeat', defaultGameTimesToBeat));
+		const gamePurchaseDates = JSON.parse(getOrSetLocalStorage('gamePurchaseDates', "{}"));
+		const focusedGames = JSON.parse(getOrSetLocalStorage('gameFocus', "{}"));
 		const myReviews = JSON.parse(getOrSetLocalStorage('myReviews', defaultMyReviews));
 		const steamSpyAppDetails = JSON.parse(getOrSetLocalStorage('steamSpyAppDetails', "{}"));
 
@@ -95,10 +98,12 @@ export const getUserGameData = async (
 			let cost = parseFloat(gameCosts[gameId] ?? 0);
 			let pricePaid = parseFloat(gamePrices[gameId] ?? 0);
 			let timeToBeat = parseFloat(gameTimesToBeat[gameId] ?? 0);
+			const purchaseDate = gamePurchaseDates[gameId] || '';
+			const focused = focusedGames[gameId] || false;
 			const pricePerHour = calcPricePerHour(pricePaid, hoursPlayed);
 			const costPerTimeToBeat = calcPricePerHour(cost, timeToBeat);
-			const discountPercent = round((cost - pricePaid) / cost * 100);
-			const review = myReviews[gameId];
+			const discountPercent = pricePaid > 0 ? round((cost - pricePaid) / cost * 100) : 100;
+			const review = myReviews[gameId] || ReviewEnum.noReview;
 			const ssAppDetails = steamSpyAppDetails[gameId];
 
 			// Each game will have at least these properties.
@@ -118,6 +123,8 @@ export const getUserGameData = async (
 				cost: isNaN(cost) ? 0 : cost.toFixed(2),
 				pricePaid: isNaN(pricePaid) ? 0 : pricePaid.toFixed(2),
 				timeToBeat: isNaN(timeToBeat) ? 0 : timeToBeat.toFixed(1),
+				purchaseDate,
+				focused,
 				pricePerHour,
 				costPerTimeToBeat,
 				discountPercent: isNaN(discountPercent) ? 0 : discountPercent,
@@ -288,8 +295,10 @@ export const getUserInfo = async (userId: string): Promise<SteamUserInfo> => {
 export const getSteamSpyData = async (
 	userId: string,
 	gameList: number[],
-	sampleSize = false
+	sampleSize = false,
+	setterGamesToLoad: React.Dispatch<React.SetStateAction<number>>
 ): Promise<SteamSpyAppDetailsConverted[] | undefined> => {
+	setterGamesToLoad(0);
 	const url = `${serverString}getOwnedGames/${userId}`;
 
 	try {
@@ -314,6 +323,7 @@ export const getSteamSpyData = async (
 
 		const gamesLength = allGamesData.length
 		const totalGameCount = (sampleSize && gamesLength > 25) ? 25 : gamesLength;
+		setterGamesToLoad(totalGameCount);
 
 		const steamSpyAppDetails = JSON.parse(getOrSetLocalStorage('steamSpyAppDetails', "{}"));
 
@@ -335,9 +345,9 @@ export const getSteamSpyData = async (
 					localStorage.setItem('steamSpyAppDetails', JSON.stringify(steamSpyAppDetails));
 				} catch (error) {
 					console.error(`Failed to fetch details for game ${game.name}:`, error);
-					continue;
 				}
 			}
+			setterGamesToLoad((prevCount: number) => prevCount - 1);
 		};
 
 	} catch (error) {
