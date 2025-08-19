@@ -7,9 +7,13 @@ type GamePriceInputProps = {
 }
 
 export const GamePriceInput = ({ game }: GamePriceInputProps) => {
-	const [cost, setCost] = useState(game.cost);
-	const [price, setPrice] = useState(game.pricePaid);
-	const [timeToBeat, setTimeToBeat] = useState(game.timeToBeat);
+	const [cost, setCost] = useState(game.cost || "");
+	const [price, setPrice] = useState(game.pricePaid || "");
+	const [timeToBeat, setTimeToBeat] = useState(game.timeToBeat || "");
+	const [purchaseDate, setPurchaseDate] = useState(game.purchaseDate || "");
+	const [focused, setFocused] = useState(game.focused || false);
+
+
 
 	const handleCostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
@@ -27,6 +31,25 @@ export const GamePriceInput = ({ game }: GamePriceInputProps) => {
 		const value = e.target.value;
 		setTimeToBeat(value);
 		e.preventDefault();
+	}
+
+	const handlePurchaseDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value;
+		setPurchaseDate(value);
+		e.preventDefault();
+	}
+
+	const handleFocusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.checked;
+		setFocused(value);
+
+		let gameFocus = JSON.parse(localStorage.getItem('gameFocus') ?? '{}');
+		const gameId = game.appid;
+		gameFocus = {
+			...gameFocus,
+			[gameId]: value
+		}
+		localStorage.setItem('gameFocus', JSON.stringify(gameFocus));
 	}
 
 	const handleSubmitCost = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -71,6 +94,20 @@ export const GamePriceInput = ({ game }: GamePriceInputProps) => {
 		setTimeToBeat(inputValue);
 	}
 
+	const handleSubmitPurchaseDate = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		const form = e.target as HTMLFormElement;
+		const inputValue = (form.elements[0] as HTMLInputElement).value;
+		let gamePurchaseDates = JSON.parse(localStorage.getItem('gamePurchaseDates') ?? '{}');
+		const gameId = game.appid;
+		gamePurchaseDates = {
+			...gamePurchaseDates,
+			[gameId]: inputValue
+		}
+		localStorage.setItem('gamePurchaseDates', JSON.stringify(gamePurchaseDates))
+		setPurchaseDate(inputValue);
+	}
+
 	return (
 		<div className='multipleForms'>
 			<form className='formContainer formContainerTwo' onSubmit={handleSubmitCost}>
@@ -100,7 +137,24 @@ export const GamePriceInput = ({ game }: GamePriceInputProps) => {
 					<input type='submit' value='S' />
 				</div>
 			</form>
+			<form className='formContainer formContainerTwo' onSubmit={handleSubmitPurchaseDate}>
+				<div>
+					<label>
+						Purchase Date
+						<input type='text' value={purchaseDate} onChange={handlePurchaseDateChange} />
+					</label>
+					<input type='submit' value='S' />
+				</div>
+			</form>
 			<ReviewSelectDropdown game={game} />
+			<form className='formContainer formContainerTwo'>
+				<div>
+					<label>
+						Focus
+						<input type='checkbox' checked={focused} onChange={handleFocusChange} />
+					</label>
+				</div>
+			</form>
 		</div>
 	)
 }
