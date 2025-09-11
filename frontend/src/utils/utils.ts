@@ -97,8 +97,8 @@ export const getOrSetLocalStorage = (storedName: string, defaultData: string) =>
 }
 
 export const splitStringListToArray = (stringList: string | null) => {
-	if (!stringList) return [];
-	if (stringList === '') return [];
+	if (!stringList) return ["Unknown"];
+	if (stringList === '') return ["Unknown"];
 
 	let sanitized = stringList;
 	const commaSuffixes = [
@@ -121,6 +121,7 @@ export const splitStringListToArray = (stringList: string | null) => {
 		{ pattern: /DON'T NOD\b/gi, replacement: "DONTNOD Entertainment" },
 		{ pattern: /Eidos Montreal\b/gi, replacement: "Eidos-Montréal" },
 		{ pattern: /Io-Interactive A\/S\b/gi, replacement: "IO Interactive" },
+		{ pattern: /Free to Play\b/gi, replacement: "Free To Play" },
 	]
 
 	commaSuffixes.forEach(({ pattern, replacement }) => {

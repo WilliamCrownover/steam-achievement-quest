@@ -16,7 +16,7 @@ export const SteamSpyAppDetails = (props: SteamSpyAppDetailsProps) => {
 
     const detailsList = (dataType: string[], label: string) => (
         <>
-            {dataType.length > 0 &&
+            {(dataType.length > 0 && !dataType.includes("Unknown")) &&
                 <div className='gameStoreDetailContainer'>
                     <h4 className='gameStoreDetailDataPoint'>{label}:</h4>
                     {dataType.map((string, index) =>
