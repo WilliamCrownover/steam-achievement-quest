@@ -86,6 +86,9 @@ export const GameSortOrder = (props: PassDownSteamData) => {
 			case value === 'playerCount':
 				sharedSort(value);
 				break;
+			case value === 'ownersCount':
+				sharedSort(value);
+				break;
 			case value === 'total_reviews':
 				sharedSort(value);
 				break;
@@ -188,6 +191,7 @@ export const GameSortOrder = (props: PassDownSteamData) => {
 				<option value='hoursPlayed' > Playtime</option>
 				<option value='rtime_last_played' > Last Played Date</option>
 				<option value='playerCount' > Current Player Count</option>
+				<option value='ownersCount' > Owners Count</option>
 				<option value='total_reviews' > Total Reviews</option>
 				<option value='reviewPercentPositive' > Positive Review Percent</option>
 				<option value='cost' > Game Cost</option>
