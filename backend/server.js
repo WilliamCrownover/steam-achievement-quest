@@ -70,11 +70,23 @@ app.get('/getGameAchievements/:appId', cors(corsOptions), async (req, res) => {
 		?gameid=${req.params.appId}
 	`;
 	const fetchOptions = {
-		method: 'GET'
+		method: 'GET',
+		timeout: 10000
 	}
-	const response = await fetch(endpoint, fetchOptions);
-	const jsonResponse = await response.json();
-	res.json(jsonResponse);
+	try {
+		const response = await fetch(endpoint, fetchOptions);
+		const jsonResponse = await response.json();
+		res.json(jsonResponse);
+	} catch (error) {
+		console.log(`Error fetching game achievements for app ${req.params.appId}:`, error.message);
+		res.status(503).json({ 
+			error: 'Could not fetch game achievements', 
+			success: false,
+			message: error.message || 'Connection timed out',
+			code: error.code || 'UNKNOWN_ERROR',
+			retryable: true
+		});
+	}
 });
 
 app.get('/getSchemaForGame/:appId', cors(corsOptions), async (req, res) => {
@@ -84,11 +96,23 @@ app.get('/getSchemaForGame/:appId', cors(corsOptions), async (req, res) => {
 		&appid=${req.params.appId}
 	`;
 	const fetchOptions = {
-		method: 'GET'
+		method: 'GET',
+		timeout: 10000
 	}
-	const response = await fetch(endpoint, fetchOptions);
-	const jsonResponse = await response.json();
-	res.json(jsonResponse);
+	try {
+		const response = await fetch(endpoint, fetchOptions);
+		const jsonResponse = await response.json();
+		res.json(jsonResponse);
+	} catch (error) {
+		console.log(`Error fetching schema for app ${req.params.appId}:`, error.message);
+		res.status(503).json({ 
+			error: 'Could not fetch game schema', 
+			success: false,
+			message: error.message || 'Connection timed out',
+			code: error.code || 'UNKNOWN_ERROR',
+			retryable: true
+		});
+	}
 });
 
 app.get('/getCurrentPlayersForGame/:appId', cors(corsOptions), async (req, res) => {
@@ -98,11 +122,23 @@ app.get('/getCurrentPlayersForGame/:appId', cors(corsOptions), async (req, res) 
 		&appid=${req.params.appId}
 	`;
 	const fetchOptions = {
-		method: 'GET'
+		method: 'GET',
+		timeout: 10000
 	}
-	const response = await fetch(endpoint, fetchOptions);
-	const jsonResponse = await response.json();
-	res.json(jsonResponse);
+	try {
+		const response = await fetch(endpoint, fetchOptions);
+		const jsonResponse = await response.json();
+		res.json(jsonResponse);
+	} catch (error) {
+		console.log(`Error fetching current players for app ${req.params.appId}:`, error.message);
+		res.status(503).json({ 
+			error: 'Could not fetch current players', 
+			success: false,
+			message: error.message || 'Connection timed out',
+			code: error.code || 'UNKNOWN_ERROR',
+			retryable: true
+		});
+	}
 });
 
 app.get('/getReviewsForGame/:appId', cors(corsOptions), async (req, res) => {
@@ -112,15 +148,22 @@ app.get('/getReviewsForGame/:appId', cors(corsOptions), async (req, res) => {
 		?num_per_page=0&json=1
 	`;
 	const fetchOptions = {
-		method: 'GET'
+		method: 'GET',
+		timeout: 10000
 	}
 	try {
 		const response = await fetch(endpoint, fetchOptions);
 		const jsonResponse = await response.json();
 		res.json(jsonResponse);
 	} catch (error) {
-		console.log(error);
-		return { error: 'Could not fetch app reviews.', success: false };
+		console.log(`Error fetching reviews for app ${req.params.appId}:`, error.message);
+		res.status(503).json({ 
+            error: 'Could not fetch app reviews', 
+            success: false,
+            message: error.message || 'Connection timed out',
+            code: error.code || 'UNKNOWN_ERROR',
+            retryable: true
+        });
 	}
 });
 
@@ -132,11 +175,23 @@ app.get('/getUserAchievements/:appId/:userId', cors(corsOptions), async (req, re
 		&steamid=${req.params.userId}
 	`;
 	const fetchOptions = {
-		method: 'GET'
+		method: 'GET',
+		timeout: 10000
 	}
-	const response = await fetch(endpoint, fetchOptions);
-	const jsonResponse = await response.json();
-	res.json(jsonResponse);
+	try {
+		const response = await fetch(endpoint, fetchOptions);
+		const jsonResponse = await response.json();
+		res.json(jsonResponse);
+	} catch (error) {
+		console.log(`Error fetching user achievements for app ${req.params.appId} and user ${req.params.userId}:`, error.message);
+		res.status(503).json({ 
+			error: 'Could not fetch user achievements', 
+			success: false,
+			message: error.message || 'Connection timed out',
+			code: error.code || 'UNKNOWN_ERROR',
+			retryable: true
+		});
+	}
 });
 
 app.get('/getSteamSpyAppDetails/:appId', cors(corsOptions), async (req, res) => {
