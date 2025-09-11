@@ -6,4 +6,5 @@ export interface SteamAchievement extends Record<string, any> {
 export interface SteamAchievementConverted extends Record<string, any> {
 	name: string;
 	percent: number;
+	pullDate: Date;
 }

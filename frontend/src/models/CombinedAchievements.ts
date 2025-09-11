@@ -7,6 +7,7 @@ export interface CombinedAchievements {
 	unlockDate: string;
 	unlockTime: number;
 	hoverInfo?: string
+	pullDate: Date;
 }
 
 export interface CombinedAchievementsWithSchema extends CombinedAchievements, SteamAchievementSchema { }
