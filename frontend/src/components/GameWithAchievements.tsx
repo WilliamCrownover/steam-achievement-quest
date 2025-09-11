@@ -118,7 +118,7 @@ export const GameWithAchievements = (props: GameWithAchievementsProps) => {
 					</h3>
 				</>
 			}
-			{showList && <AchievementPercentages achievements={achievements} showIcons={showIcons} />}
+			{(showList && achievements) && <AchievementPercentages achievements={achievements} showIcons={showIcons} />}
 		</div>
 	)
 }

@@ -20,7 +20,7 @@ export const AchievementSortOrder = (props: PassDownSteamData) => {
 		const value = e.target.value;
 		setGamesWithAchievements(gamesWithAchievements.map((game) => {
 			const sortProperty = (property: string) => {
-				const achievements = game.achievements;
+				const achievements = game.achievements || [];
 				const achievementsSortedByPercent: CombinedAchievementsWithSchema[] = sorter(achievements, sortNumber('percent', true));
 				switch (property) {
 					case 'name':
