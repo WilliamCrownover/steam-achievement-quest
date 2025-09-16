@@ -23,6 +23,7 @@ type GameWithAchievementsProps = {
 	showList: boolean
 	showIcons: boolean
 	showSteamSpyAppDetails: boolean
+	updateGameFocus?: (gameId: number, focused: boolean) => void
 }
 
 export const GameWithAchievements = (props: GameWithAchievementsProps) => {
@@ -34,6 +35,7 @@ export const GameWithAchievements = (props: GameWithAchievementsProps) => {
 		showList,
 		showIcons,
 		showSteamSpyAppDetails,
+		updateGameFocus
 	} = props
 
 	const {
@@ -80,7 +82,7 @@ export const GameWithAchievements = (props: GameWithAchievementsProps) => {
 			</div>
 			{showSavedDataPoints && 
 				<>
-					<GamePriceInput game={game} />
+					<GamePriceInput game={game} updateGameFocus={updateGameFocus} />
 					<div className='gameSpecificDataPoints'>
 						<SpecificGameDataPoint
 							title='Price/Hour Played $'

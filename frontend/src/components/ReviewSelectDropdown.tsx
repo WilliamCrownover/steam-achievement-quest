@@ -7,6 +7,7 @@ import {
 	ReviewEnum
 } from "../models"
 import { getEnumKeyByValue } from "../utils/utils"
+import { getOrSetFileStorage, saveDataToBackend } from "../utils/api"
 
 type ReviewSelectDropdownProps = {
 	game: GameDataExpanded
@@ -15,17 +16,17 @@ type ReviewSelectDropdownProps = {
 export const ReviewSelectDropdown = ({ game }: ReviewSelectDropdownProps) => {
 	const [review, setReview] = useState(game.review);
 
-	const changeReview = (e: ChangeEvent<HTMLSelectElement>) => {
+	const changeReview = async (e: ChangeEvent<HTMLSelectElement>) => {
 		e.preventDefault();
 		const value = e.target.value as keyof typeof ReviewEnum;
 		const parsedValue = ReviewEnum[value];
-		let myReviews = JSON.parse(localStorage.getItem('myReviews') ?? '{}');
+		let myReviews = JSON.parse(await getOrSetFileStorage('myReviews', '{}'));
 		const gameId = game.appid;
 		myReviews = {
 			...myReviews,
 			[gameId]: parsedValue
 		}
-		localStorage.setItem('myReviews', JSON.stringify(myReviews))
+		await saveDataToBackend('myReviews', myReviews);
 		setReview(parsedValue);
 	}
 

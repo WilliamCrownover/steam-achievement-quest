@@ -12,9 +12,10 @@ type GameWithoutAchievementsProps = {
 	game: GameDataExpanded
 	showSavedDataPoints: boolean
 	showSteamSpyAppDetails: boolean
+	updateGameFocus?: (gameId: number, focused: boolean) => void
 }
 
-export const GameWithoutAchievements = ({ game, showSavedDataPoints, showSteamSpyAppDetails }: GameWithoutAchievementsProps) => {
+export const GameWithoutAchievements = ({ game, showSavedDataPoints, showSteamSpyAppDetails, updateGameFocus }: GameWithoutAchievementsProps) => {
 	const {
 		pricePerHour,
 		costPerTimeToBeat,
@@ -35,7 +36,7 @@ export const GameWithoutAchievements = ({ game, showSavedDataPoints, showSteamSp
 			<GameTitleInfo game={game} />
 			{showSavedDataPoints && 
 				<>
-					<GamePriceInput game={game} />
+					<GamePriceInput game={game} updateGameFocus={updateGameFocus} />
 					<div className='gameSpecificDataPoints'>
 						<SpecificGameDataPoint
 							title='Price/Hour Played $'

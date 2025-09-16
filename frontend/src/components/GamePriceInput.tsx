@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { GameDataExpanded } from "../models";
 import { ReviewSelectDropdown } from "./ReviewSelectDropdown";
+import { getOrSetFileStorage, saveDataToBackend } from "../utils/api";
 
 type GamePriceInputProps = {
-	game: GameDataExpanded
+	game: GameDataExpanded,
+	updateGameFocus?: (gameId: number, focused: boolean) => void
 }
 
-export const GamePriceInput = ({ game }: GamePriceInputProps) => {
+export const GamePriceInput = ({ game, updateGameFocus }: GamePriceInputProps) => {
 	const [cost, setCost] = useState(game.cost || "");
 	const [price, setPrice] = useState(game.pricePaid || "");
 	const [timeToBeat, setTimeToBeat] = useState(game.timeToBeat || "");
@@ -39,30 +41,34 @@ export const GamePriceInput = ({ game }: GamePriceInputProps) => {
 		e.preventDefault();
 	}
 
-	const handleFocusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleFocusChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.checked;
 		setFocused(value);
 
-		let gameFocus = JSON.parse(localStorage.getItem('gameFocus') ?? '{}');
+		if (updateGameFocus) {
+            updateGameFocus(game.appid, value);
+        }
+
+		let gameFocus = JSON.parse(await getOrSetFileStorage('gameFocus', '{}'));
 		const gameId = game.appid;
 		gameFocus = {
 			...gameFocus,
 			[gameId]: value
 		}
-		localStorage.setItem('gameFocus', JSON.stringify(gameFocus));
+		await saveDataToBackend('gameFocus', gameFocus);
 	}
 
 	const handleSubmitCost = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		const form = e.target as HTMLFormElement;
 		const inputValue = (form.elements[0] as HTMLInputElement).value;
-		let gameCosts = JSON.parse(localStorage.getItem('gameCosts') ?? '');
+		let gameCosts = JSON.parse(await getOrSetFileStorage('gameCosts', '{}'));
 		const gameId = game.appid;
 		gameCosts = {
 			...gameCosts,
 			[gameId]: inputValue
 		}
-		localStorage.setItem('gameCosts', JSON.stringify(gameCosts))
+		await saveDataToBackend('gameCosts', gameCosts);
 		setCost(inputValue);
 	}
 
@@ -70,13 +76,13 @@ export const GamePriceInput = ({ game }: GamePriceInputProps) => {
 		e.preventDefault();
 		const form = e.target as HTMLFormElement;
 		const inputValue = (form.elements[0] as HTMLInputElement).value;
-		let gamePrices = JSON.parse(localStorage.getItem('gamePrices') ?? '');
+		let gamePrices = JSON.parse(await getOrSetFileStorage('gamePrices', '{}'));
 		const gameId = game.appid;
 		gamePrices = {
 			...gamePrices,
 			[gameId]: inputValue
 		}
-		localStorage.setItem('gamePrices', JSON.stringify(gamePrices))
+		await saveDataToBackend('gamePrices', gamePrices);
 		setPrice(inputValue);
 	}
 
@@ -84,13 +90,13 @@ export const GamePriceInput = ({ game }: GamePriceInputProps) => {
 		e.preventDefault();
 		const form = e.target as HTMLFormElement;
 		const inputValue = (form.elements[0] as HTMLInputElement).value;
-		let gameTimesToBeat = JSON.parse(localStorage.getItem('gameTimesToBeat') ?? '');
+		let gameTimesToBeat = JSON.parse(await getOrSetFileStorage('gameTimesToBeat', '{}'));
 		const gameId = game.appid;
 		gameTimesToBeat = {
 			...gameTimesToBeat,
 			[gameId]: inputValue
 		}
-		localStorage.setItem('gameTimesToBeat', JSON.stringify(gameTimesToBeat))
+		await saveDataToBackend('gameTimesToBeat', gameTimesToBeat);
 		setTimeToBeat(inputValue);
 	}
 
@@ -98,13 +104,13 @@ export const GamePriceInput = ({ game }: GamePriceInputProps) => {
 		e.preventDefault();
 		const form = e.target as HTMLFormElement;
 		const inputValue = (form.elements[0] as HTMLInputElement).value;
-		let gamePurchaseDates = JSON.parse(localStorage.getItem('gamePurchaseDates') ?? '{}');
+		let gamePurchaseDates = JSON.parse(await getOrSetFileStorage('gamePurchaseDates', '{}'));
 		const gameId = game.appid;
 		gamePurchaseDates = {
 			...gamePurchaseDates,
 			[gameId]: inputValue
 		}
-		localStorage.setItem('gamePurchaseDates', JSON.stringify(gamePurchaseDates))
+		await saveDataToBackend('gamePurchaseDates', gamePurchaseDates);
 		setPurchaseDate(inputValue);
 	}
 

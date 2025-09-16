@@ -229,6 +229,19 @@ export const SteamUser = () => {
 		setLoadingModifiedComplete(true);
 	}
 
+	const updateGameFocus = (gameId: number, focused: boolean) => {
+		setGamesWithAchievements(prevGames => 
+			prevGames.map(game => 
+				game.appid === gameId ? { ...game, focused } : game
+			)
+		);
+		setGamesWithoutAchievements(prevGames => 
+			prevGames.map(game => 
+				game.appid === gameId ? { ...game, focused } : game
+			)
+		);
+	};
+
 	useEffect(() => {
 		const packageData = () => {
 			if (!userData) {
@@ -266,13 +279,36 @@ export const SteamUser = () => {
 		gamesWithoutAchievementsFiltered,
 	])
 
+	useEffect(() => {
+		if (showFocusedGames) {
+			const focusedGamesWithAchievements = gamesWithAchievements.filter(game => game.focused);
+			const focusedGamesWithoutAchievements = gamesWithoutAchievements.filter(game => game.focused);
+			setGamesWithAchievementsFiltered(focusedGamesWithAchievements);
+			setGamesWithoutAchievementsFiltered(focusedGamesWithoutAchievements);
+		} else {
+			setGamesWithAchievementsFiltered(gamesWithAchievements);
+			setGamesWithoutAchievementsFiltered(gamesWithoutAchievements);
+		}
+	}, [
+		showFocusedGames,
+		gamesWithAchievements,
+		gamesWithoutAchievements,
+	]);
+
+	useEffect(() => {
+		if (userData && gamesWithAchievementsFiltered && gamesWithoutAchievementsFiltered) {
+		  addMoreDataToUser(userData, gamesWithAchievementsFiltered, gamesWithoutAchievementsFiltered);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	  }, [gamesWithAchievementsFiltered, gamesWithoutAchievementsFiltered]);
+
 	return (
 		<>
 			<form className='formContainer' onSubmit={handleSubmit}>
 				<div>
 					<label>
 						Steam User ID
-						<input type='text' value={userId} onChange={handleIDChange} />
+						<input className='userIDInput' type='text' value={userId} onChange={handleIDChange} />
 					</label>
 					<input type='submit' name='search' value='Search' disabled={!userIdCheck} />
 				</div>
@@ -281,7 +317,6 @@ export const SteamUser = () => {
 						Sample Size 25 Games
 						<input type='checkbox' checked={sampleSize} onChange={() => setSampleSize(!sampleSize)} />
 					</label>
-					<input type='submit' name='steamSpy' value='Refresh Steam Spy Data' disabled={!userIdCheck} />
 				</div>
 			</form>
 			{!userIdCheck && <p className='alertTextInvert'>Not a valid User ID</p>}
@@ -430,10 +465,12 @@ export const SteamUser = () => {
 							key={game.appid}
 							game={game}
 							privateProfile={userData?.privateProfile}
+							showSavedDataPoints={showSavedDataPoints}
 							showGraph={showGraph}
 							showList={showList}
 							showIcons={showIcons}
 							showSteamSpyAppDetails={showSteamSpyAppDetails}
+							updateGameFocus={updateGameFocus}
 						/>
 					)}
 					{(hasGames && gamesWithoutAchievementsFiltered.length > 0) &&
@@ -443,7 +480,9 @@ export const SteamUser = () => {
 						<GameWithoutAchievements
 							key={game.appid}
 							game={game}
+							showSavedDataPoints={showSavedDataPoints}
 							showSteamSpyAppDetails={showSteamSpyAppDetails}
+							updateGameFocus={updateGameFocus}
 						/>
 					)}
 				</>
