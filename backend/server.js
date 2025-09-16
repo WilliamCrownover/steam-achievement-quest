@@ -3,14 +3,60 @@ dotenv.config()
 import express from 'express';
 import cors from 'cors';
 import fetch from 'node-fetch';
+import fs from 'fs/promises';
+import path from 'path';
 
 const PORT = 5000;
 const app = express();
 
+app.use(express.json({ limit: '50mb' }));
 app.use(cors());
 const corsOptions = {
 	origin: "http://localhost:3000"
 };
+
+const DATA_DIR = path.join(process.cwd(), 'data');
+fs.mkdir(DATA_DIR, { recursive: true }).catch(console.error);
+
+app.post('/saveData/:key', cors(corsOptions), async (req, res) => {
+    try {
+        const { key } = req.params;
+        const data = req.body;
+        const filePath = path.join(DATA_DIR, `${key}.json`);
+        await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error saving data:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.get('/loadData/:key', cors(corsOptions), async (req, res) => {
+    try {
+        const { key } = req.params;
+        const filePath = path.join(DATA_DIR, `${key}.json`);
+        const data = await fs.readFile(filePath, 'utf8');
+        res.json(JSON.parse(data));
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            res.status(404).json({ error: 'Data not found' });
+        } else {
+            console.error('Error loading data:', error);
+            res.status(500).json({ error: error.message });
+        }
+    }
+});
+
+app.get('/checkForDataFile/:key', cors(corsOptions), async (req, res) => {
+    try {
+        const { key } = req.params;
+        const filePath = path.join(DATA_DIR, `${key}.json`);
+        await fs.access(filePath);
+        res.json({ exists: true });
+    } catch (error) {
+        res.json({ exists: false });
+    }
+});
 
 app.get('/getOwnedGames/:userId', cors(corsOptions), async (req, res) => {
 	const endpoint = `
