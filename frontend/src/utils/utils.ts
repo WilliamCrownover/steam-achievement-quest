@@ -87,15 +87,6 @@ export const getEnumKeyByValue = <T extends Object>(enumObj: T, value: string): 
 	return (Object.keys(enumObj) as Array<keyof T>).find(key => enumObj[key] === value);
 }
 
-export const getOrSetLocalStorage = (storedName: string, defaultData: string) => {
-	const data = localStorage.getItem(storedName);
-	if (!data) {
-		localStorage.setItem(storedName, defaultData);
-		return defaultData;
-	}
-	return data;
-}
-
 export const splitStringListToArray = (stringList: string | null) => {
 	if (!stringList) return ["Unknown"];
 	if (stringList === '') return ["Unknown"];
