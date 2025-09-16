@@ -5,7 +5,6 @@ import {
 } from "react";
 import Select from 'react-select';
 import {
-	getSteamSpyData,
 	getUserGameData,
 	getUserInfo
 } from '../utils/api'
@@ -28,6 +27,7 @@ import { GameWithoutAchievements } from "./GameWithoutAchievements";
 type filterOption = {
 	value: string;
 	label: string;
+	count: number;
 };
 
 export const SteamUser = () => {
@@ -43,15 +43,22 @@ export const SteamUser = () => {
 	const userIdRegex = new RegExp('^(7656[0-9]{13}?)$');
 	const [userData, setUserData] = useState<SteamUserInfo>();
 	const [hasGames, setHasGames] = useState(false);
+	
 	const [gamesWithAchievements, setGamesWithAchievements] = useState<GameDataExpanded[]>([]);
 	const [gamesWithAchievementsFiltered, setGamesWithAchievementsFiltered] = useState<GameDataExpanded[]>([]);
 	const [gamesWithoutAchievements, setGamesWithoutAchievements] = useState<GameDataExpanded[]>([]);
 	const [gamesWithoutAchievementsFiltered, setGamesWithoutAchievementsFiltered] = useState<GameDataExpanded[]>([]);
 	const [passDownSteamData, setPassDownSteamData] = useState<PassDownSteamData>();
-	const [showGraph, setShowGraph] = useState(true);
-	const [showList, setShowList] = useState(true);
-	const [showIcons, setShowIcons] = useState(true);
-	const [showSteamSpyAppDetails, setShowSteamSpyAppDetails] = useState(true);
+
+	const [showFocusedGames, setShowFocusedGames] = useState(false);
+	const [showSavedDataPoints, setShowSavedDataPoints] = useState(false);
+	const [showGraph, setShowGraph] = useState(false);
+	const [showList, setShowList] = useState(false);
+	const [showIcons, setShowIcons] = useState(false);
+	const [showSteamSpyAppDetails, setShowSteamSpyAppDetails] = useState(false);
+
+	const [reviewFilterOptions, setReviewFilterOptions] = useState<filterOption[]>([]);
+	const [selectedReviewFiltersLength, setSelectedReviewFiltersLength] = useState<number>(0);
 	const [developerFilterOptions, setDeveloperFilterOptions] = useState<filterOption[]>([]);
 	const [selectedDeveloperFiltersLength, setSelectedDeveloperFiltersLength] = useState<number>(0);
 	const [publisherFilterOptions, setPublisherFilterOptions] = useState<filterOption[]>([]);
@@ -76,12 +83,47 @@ export const SteamUser = () => {
 		property: string,
 		setFilterOptions: React.Dispatch<React.SetStateAction<filterOption[]>>
 	) => {
-		const allPropertyOptions: filterOption[] = Array.from(new Set(games.flatMap(game => game.ssAppDetails?.[property] ?? []))).sort().map(prop => { return { value: prop, label: prop } });
-		setFilterOptions(allPropertyOptions);
+		const uniqueProps = Array.from(new Set(games.flatMap(game => game.ssAppDetails?.[property] ?? game[property] ?? [])));
+	
+		const sortedProps = uniqueProps.sort((a, b) => 
+			a.toString().localeCompare(b.toString(), undefined, {sensitivity: 'base'})
+		);
+
+		const allPropertyOptions: filterOption[] = sortedProps.map(prop => {
+			const count = games.filter(game =>
+				game.ssAppDetails?.[property]?.includes(prop) || game[property] === prop
+			).length;
+	
+			return {
+				count: count,
+				value: prop,
+				label: `(${count}) ${prop}`,
+			};
+		});
+	
+		const sortedOptions = allPropertyOptions.sort((a, b) => {
+			const countDiff = b.count - a.count;
+			if (countDiff !== 0) return countDiff;
+			return (a.value as string).localeCompare(b.value as string);
+		});
+	
+		setFilterOptions(sortedOptions);
 	};
 
-	const filterEvery = (games: GameDataExpanded[], selectedValues: string[], property: string,) => {
-		return games.filter(game => selectedValues.every(value => game.ssAppDetails?.[property].includes(value)));
+	const filterEvery = (games: GameDataExpanded[], selectedValues: string[], property: string) => {
+		return games.filter(game => 
+			selectedValues.every(value => {
+				if (game[property] === value) {
+					return true;
+				}
+				
+				if (Array.isArray(game.ssAppDetails?.[property]) && game.ssAppDetails?.[property].includes(value)) {
+					return true;
+				}
+				
+				return false;
+			})
+		);
 	};
 
 	const filterGames = (
@@ -141,24 +183,16 @@ export const SteamUser = () => {
 		e.preventDefault();
 		const form = e.target as HTMLFormElement;
 		const inputValue = (form.elements[0] as HTMLInputElement).value;
-		const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLInputElement;
-		const submittername = submitter.name;
-		if (submittername === 'steamSpy') {
-			await getSteamSpyData(inputValue, [], sampleSize);
+		reset();
+		const uData = await getUserInfo(inputValue);
+		setUserData(uData);
+		setLoadingUserComplete(true);
+		if (!uData) {
 			setLoadingGamesComplete(true);
 			setLoadingModifiedComplete(true);
-		} else {
-			reset();
-			const uData = await getUserInfo(inputValue);
-			setUserData(uData);
-			setLoadingUserComplete(true);
-			if (!uData) {
-				setLoadingGamesComplete(true);
-				setLoadingModifiedComplete(true);
-				return;
-			}
-			getGamesData(uData);
+			return;
 		}
+		getGamesData(uData);
 	}
 
 	const getGamesData = async (user: SteamUserInfo) => {
@@ -177,6 +211,7 @@ export const SteamUser = () => {
 		sortAlphabeticalThenSetState(setGamesWithoutAchievementsFiltered, gamesWithoutAchievementsData, 'name');
 		addMoreDataToUser(user, gamesWithAchievementsData, gamesWithoutAchievementsData);
 
+		setUniqueFilterOptions(gameData, 'review', setReviewFilterOptions);
 		setUniqueFilterOptions(gameData, 'developer', setDeveloperFilterOptions);
 		setUniqueFilterOptions(gameData, 'publisher', setPublisherFilterOptions);
 		setUniqueFilterOptions(gameData, 'genre', setGenreFilterOptions);
@@ -270,6 +305,7 @@ export const SteamUser = () => {
 	]);
 
 	useEffect(() => {
+		setUniqueFilterOptions([...gamesWithAchievementsFiltered, ...gamesWithoutAchievementsFiltered], 'review', setReviewFilterOptions);
 		setUniqueFilterOptions([...gamesWithAchievementsFiltered, ...gamesWithoutAchievementsFiltered], 'developer', setDeveloperFilterOptions);
 		setUniqueFilterOptions([...gamesWithAchievementsFiltered, ...gamesWithoutAchievementsFiltered], 'publisher', setPublisherFilterOptions);
 		setUniqueFilterOptions([...gamesWithAchievementsFiltered, ...gamesWithoutAchievementsFiltered], 'genre', setGenreFilterOptions);
@@ -321,7 +357,9 @@ export const SteamUser = () => {
 			</form>
 			{!userIdCheck && <p className='alertTextInvert'>Not a valid User ID</p>}
 
-			{packageDataComplete ? (
+			{!packageDataComplete ? (
+				<h1 className='loadingText'>Loading {gamesToLoadCount} Games! Please Wait...</h1>
+			) : (
 				<>
 					{(!firstLoad && userData && passDownSteamData) ?
 						<>
@@ -342,6 +380,32 @@ export const SteamUser = () => {
 												{...passDownSteamData}
 											/>
 										}
+										<div >
+											<h4>Review</h4>
+											<Select
+												unstyled
+												isMulti
+												name='Review Filter'
+												options={reviewFilterOptions}
+												className="basic-multi-select"
+												classNamePrefix="select"
+												onChange={(selectedOptions: filterOption[]) => handleFilterChange(
+													selectedOptions,
+													'review',
+													setReviewFilterOptions,
+													selectedReviewFiltersLength,
+													setSelectedReviewFiltersLength
+												)}
+											/>
+										</div>
+										<label>
+											Focused Games
+											<input
+												type='checkbox'
+												checked={showFocusedGames}
+												onChange={() => setShowFocusedGames(!showFocusedGames)}
+											/>
+										</label>
 										<div className='flexLineBreak' />
 										<div className='filterOption'>
 											<h4>Developer</h4>
@@ -419,7 +483,7 @@ export const SteamUser = () => {
 										{gamesWithAchievementsFiltered.length > 0 &&
 											<>
 												<label>
-													Show Steam Spy Data
+													Steam Spy Data
 													<input
 														type='checkbox'
 														checked={showSteamSpyAppDetails}
@@ -427,7 +491,15 @@ export const SteamUser = () => {
 													/>
 												</label>
 												<label>
-													Show Achievement Graph
+													Saved Data Points
+													<input
+														type='checkbox'
+														checked={showSavedDataPoints}
+														onChange={() => setShowSavedDataPoints(!showSavedDataPoints)}
+													/>
+												</label>
+												<label>
+													Achievement Graph
 													<input
 														type='checkbox'
 														checked={showGraph}
@@ -435,7 +507,7 @@ export const SteamUser = () => {
 													/>
 												</label>
 												<label>
-													Show Achievement List
+													Achievement List
 													<input
 														type='checkbox'
 														checked={showList}
@@ -443,7 +515,7 @@ export const SteamUser = () => {
 													/>
 												</label>
 												<label>
-													Show Achievement Icons
+													Achievement Icons
 													<input
 														type='checkbox'
 														checked={showIcons}
@@ -486,10 +558,7 @@ export const SteamUser = () => {
 						/>
 					)}
 				</>
-			) : (
-				<h1 className='loadingText'>Loading {gamesToLoadCount} Games! Please Wait...</h1>
-			)
-			}
+			)}
 		</>
 	)
 }
