@@ -23,8 +23,11 @@ export const GamesInfoSection = (props: PassDownSteamData) => {
 		totalTimeToBeat,
 	} = userData;
 
-	const hasAchievements = gamesWithAchievements.length > 0;
-	const totalGameCount = gamesWithAchievements.length + gamesWithoutAchievements.length;
+	const visibleGamesWithAchievements = gamesWithAchievements.filter(game => !game.isHidden);
+	const visibleGamesWithoutAchievements = gamesWithoutAchievements.filter(game => !game.isHidden);
+
+	const hasAchievements = visibleGamesWithAchievements.length > 0;
+	const totalGameCount = visibleGamesWithAchievements.length + visibleGamesWithoutAchievements.length;
 
 	const GameDataPoints = [
 		// 1
@@ -36,14 +39,14 @@ export const GamesInfoSection = (props: PassDownSteamData) => {
 		// 2
 		{
 			dataName: 'With Achievements',
-			dataArray: gamesWithAchievements,
+			dataArray: visibleGamesWithAchievements,
 			showPercent: true,
 			total: totalGameCount,
 		},
 		// 3
 		{
 			dataName: 'Without Achievements',
-			dataArray: gamesWithoutAchievements,
+			dataArray: visibleGamesWithoutAchievements,
 			showPercent: true,
 			total: totalGameCount,
 		},
@@ -52,7 +55,7 @@ export const GamesInfoSection = (props: PassDownSteamData) => {
 			dataName: '100% Complete',
 			dataArray: totalOneHundredPercentComplete,
 			showPercent: true,
-			total: gamesWithAchievements.length,
+			total: visibleGamesWithAchievements.length,
 		},
 		// 5
 		{

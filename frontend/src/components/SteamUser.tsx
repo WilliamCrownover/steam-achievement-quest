@@ -1,6 +1,8 @@
 import {
 	ChangeEvent,
+	useCallback,
 	useEffect,
+	useRef,
 	useState
 } from "react";
 import Select from 'react-select';
@@ -45,10 +47,16 @@ export const SteamUser = () => {
 	const [hasGames, setHasGames] = useState(false);
 	
 	const [gamesWithAchievements, setGamesWithAchievements] = useState<GameDataExpanded[]>([]);
-	const [gamesWithAchievementsFiltered, setGamesWithAchievementsFiltered] = useState<GameDataExpanded[]>([]);
 	const [gamesWithoutAchievements, setGamesWithoutAchievements] = useState<GameDataExpanded[]>([]);
-	const [gamesWithoutAchievementsFiltered, setGamesWithoutAchievementsFiltered] = useState<GameDataExpanded[]>([]);
 	const [passDownSteamData, setPassDownSteamData] = useState<PassDownSteamData>();
+
+	const gamesWithAchievementsRef = useRef<GameDataExpanded[]>([]);
+	const gamesWithoutAchievementsRef = useRef<GameDataExpanded[]>([]);
+
+	useEffect(() => {
+		gamesWithAchievementsRef.current = gamesWithAchievements;
+		gamesWithoutAchievementsRef.current = gamesWithoutAchievements;
+	}, [gamesWithAchievements, gamesWithoutAchievements]);
 
 	const [showFocusedGames, setShowFocusedGames] = useState(false);
 	const [showSavedDataPoints, setShowSavedDataPoints] = useState(false);
@@ -58,25 +66,107 @@ export const SteamUser = () => {
 	const [showSteamSpyAppDetails, setShowSteamSpyAppDetails] = useState(false);
 
 	const [reviewFilterOptions, setReviewFilterOptions] = useState<filterOption[]>([]);
-	const [selectedReviewFiltersLength, setSelectedReviewFiltersLength] = useState<number>(0);
+	const [selectedReviewFilters, setSelectedReviewFilters] = useState<filterOption[]>([]);
 	const [developerFilterOptions, setDeveloperFilterOptions] = useState<filterOption[]>([]);
-	const [selectedDeveloperFiltersLength, setSelectedDeveloperFiltersLength] = useState<number>(0);
+	const [selectedDeveloperFilters, setSelectedDeveloperFilters] = useState<filterOption[]>([]);
 	const [publisherFilterOptions, setPublisherFilterOptions] = useState<filterOption[]>([]);
-	const [selectedPublisherFiltersLength, setSelectedPublisherFiltersLength] = useState<number>(0);
+	const [selectedPublisherFilters, setSelectedPublisherFilters] = useState<filterOption[]>([]);
 	const [genreFilterOptions, setGenreFilterOptions] = useState<filterOption[]>([]);
-	const [selectedGenreFiltersLength, setSelectedGenreFiltersLength] = useState<number>(0);
+	const [selectedGenreFilters, setSelectedGenreFilters] = useState<filterOption[]>([]);
 	const [tagFilterOptions, setTagFilterOptions] = useState<filterOption[]>([]);
-	const [selectedTagFiltersLength, setSelectedTagFiltersLength] = useState<number>(0);
+	const [selectedTagFilters, setSelectedTagFilters] = useState<filterOption[]>([]);
+
+	const getVisibleGames = (games: GameDataExpanded[]) => {
+		return games.filter(game => !game.isHidden);
+	};
 
 	const handleFilterChange = (
 		selectedOptions: filterOption[],
 		property: string,
-		setFilterOptions: React.Dispatch<React.SetStateAction<filterOption[]>>,
-		filterOptionsLength: number,
-		setSelectedFilterOptionsLength: React.Dispatch<React.SetStateAction<number>>
+		setSelectedFilters: React.Dispatch<React.SetStateAction<filterOption[]>>
 	) => {
-		filterGames(selectedOptions, property, setFilterOptions, filterOptionsLength, setSelectedFilterOptionsLength);
+		setSelectedFilters(selectedOptions);
+		applyAllFilters(selectedOptions, property);
 	};
+
+	const applyAllFilters = useCallback((changedOptions?: filterOption[], changedProperty?: string) => {
+		const reviewFilters = changedProperty === 'review' ? changedOptions : selectedReviewFilters;
+		const developerFilters = changedProperty === 'developer' ? changedOptions : selectedDeveloperFilters;
+		const publisherFilters = changedProperty === 'publisher' ? changedOptions : selectedPublisherFilters;
+		const genreFilters = changedProperty === 'genre' ? changedOptions : selectedGenreFilters;
+		const tagFilters = changedProperty === 'tags' ? changedOptions : selectedTagFilters;
+
+		const allGames = [...gamesWithAchievementsRef.current, ...gamesWithoutAchievementsRef.current];
+		
+		const updatedGames = allGames.map(game => {
+			let isHidden = false;
+
+			// Apply focus filter
+			if (showFocusedGames && !game.focused) {
+				isHidden = true;
+			}
+
+			// Apply property filters
+			if (!isHidden && reviewFilters && reviewFilters.length > 0) {
+				const reviewValues = reviewFilters.map(option => option.value);
+				if (!reviewValues.includes(game.review)) {
+					isHidden = true;
+				}
+			}
+
+			if (!isHidden && developerFilters && developerFilters.length > 0) {
+				const developerValues = developerFilters.map(option => option.value);
+				if (!developerValues.includes(game.developer) && 
+					!game.ssAppDetails?.developer?.some(dev => developerValues.includes(dev))) {
+					isHidden = true;
+				}
+			}
+
+			if (!isHidden && publisherFilters && publisherFilters.length > 0) {
+				const publisherValues = publisherFilters.map(option => option.value);
+				if (!publisherValues.includes(game.publisher) && 
+					!game.ssAppDetails?.publisher?.some(pub => publisherValues.includes(pub))) {
+					isHidden = true;
+				}
+			}
+
+			if (!isHidden && genreFilters && genreFilters.length > 0) {
+				const genreValues = genreFilters.map(option => option.value);
+				if (!game.ssAppDetails?.genre?.some(genre => genreValues.includes(genre))) {
+					isHidden = true;
+				}
+			}
+
+			if (!isHidden && tagFilters && tagFilters.length > 0) {
+				const tagValues = tagFilters.map(option => option.value);
+				if (!game.ssAppDetails?.tags?.some(tag => tagValues.includes(tag))) {
+					isHidden = true;
+				}
+			}
+
+			return { ...game, isHidden };
+		});
+
+		const updatedWithAchievements = updatedGames.filter(game => game.achievements);
+		const updatedWithoutAchievements = updatedGames.filter(game => !game.achievements);
+		
+		setGamesWithAchievements(updatedWithAchievements);
+		setGamesWithoutAchievements(updatedWithoutAchievements);
+
+		const visibleGames = updatedGames.filter(game => !game.isHidden);
+		setUniqueFilterOptions(visibleGames, 'review', setReviewFilterOptions);
+		setUniqueFilterOptions(visibleGames, 'developer', setDeveloperFilterOptions);
+		setUniqueFilterOptions(visibleGames, 'publisher', setPublisherFilterOptions);
+		setUniqueFilterOptions(visibleGames, 'genre', setGenreFilterOptions);
+		setUniqueFilterOptions(visibleGames, 'tags', setTagFilterOptions);
+	}, [
+		selectedReviewFilters, 
+		selectedDeveloperFilters, 
+		selectedPublisherFilters, 
+		selectedGenreFilters, 
+		selectedTagFilters,
+		showFocusedGames
+	]);
 
 	const setUniqueFilterOptions = (
 		games: GameDataExpanded[],
@@ -110,55 +200,6 @@ export const SteamUser = () => {
 		setFilterOptions(sortedOptions);
 	};
 
-	const filterEvery = (games: GameDataExpanded[], selectedValues: string[], property: string) => {
-		return games.filter(game => 
-			selectedValues.every(value => {
-				if (game[property] === value) {
-					return true;
-				}
-				
-				if (Array.isArray(game.ssAppDetails?.[property]) && game.ssAppDetails?.[property].includes(value)) {
-					return true;
-				}
-				
-				return false;
-			})
-		);
-	};
-
-	const filterGames = (
-		selectedOptions: filterOption[],
-		property: string,
-		setFilterOptions: React.Dispatch<React.SetStateAction<filterOption[]>>,
-		filterOptionsLength: number,
-		setSelectedFilterOptionsLength: React.Dispatch<React.SetStateAction<number>>
-	) => {
-		if (selectedOptions.length === 0) {
-			setUniqueFilterOptions([...gamesWithAchievements, ...gamesWithoutAchievements], property, setFilterOptions);
-			setSelectedFilterOptionsLength(0);
-			setGamesWithAchievementsFiltered(gamesWithAchievements);
-			setGamesWithoutAchievementsFiltered(gamesWithoutAchievements);
-			return;
-		}
-
-		const selectedValues = selectedOptions.map(option => option.value);
-		let filteredGamesWithAchievements: GameDataExpanded[] = [];
-		let filteredGamesWithoutAchievements: GameDataExpanded[] = [];
-
-		if (selectedOptions.length < filterOptionsLength) {
-			filteredGamesWithAchievements = filterEvery(gamesWithAchievements, selectedValues, property);
-			filteredGamesWithoutAchievements = filterEvery(gamesWithoutAchievements, selectedValues, property);
-		} else {
-			filteredGamesWithAchievements = filterEvery(gamesWithAchievementsFiltered, selectedValues, property);
-			filteredGamesWithoutAchievements = filterEvery(gamesWithoutAchievementsFiltered, selectedValues, property);
-		}
-
-		setUniqueFilterOptions([...filteredGamesWithAchievements, ...filteredGamesWithoutAchievements], property, setFilterOptions);
-		setSelectedFilterOptionsLength(selectedOptions.length);
-		setGamesWithAchievementsFiltered(filteredGamesWithAchievements);
-		setGamesWithoutAchievementsFiltered(filteredGamesWithoutAchievements);
-	};
-
 	const handleIDChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setUserId(value);
@@ -177,6 +218,11 @@ export const SteamUser = () => {
 		setGamesWithAchievements([]);
 		setGamesWithoutAchievements([]);
 		setPassDownSteamData(undefined);
+		setSelectedReviewFilters([]);
+		setSelectedDeveloperFilters([]);
+		setSelectedPublisherFilters([]);
+		setSelectedGenreFilters([]);
+		setSelectedTagFilters([]);
 	}
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -203,12 +249,12 @@ export const SteamUser = () => {
 			return;
 		}
 		setHasGames(true);
+				
 		const gamesWithAchievementsData = gameData.filter(game => game.achievements);
 		const gamesWithoutAchievementsData = gameData.filter(game => !game.achievements);
+		
 		sortAlphabeticalThenSetState(setGamesWithAchievements, gamesWithAchievementsData, 'name');
-		sortAlphabeticalThenSetState(setGamesWithAchievementsFiltered, gamesWithAchievementsData, 'name');
 		sortAlphabeticalThenSetState(setGamesWithoutAchievements, gamesWithoutAchievementsData, 'name');
-		sortAlphabeticalThenSetState(setGamesWithoutAchievementsFiltered, gamesWithoutAchievementsData, 'name');
 		addMoreDataToUser(user, gamesWithAchievementsData, gamesWithoutAchievementsData);
 
 		setUniqueFilterOptions(gameData, 'review', setReviewFilterOptions);
@@ -219,42 +265,46 @@ export const SteamUser = () => {
 	};
 
 	const addMoreDataToUser = (user: SteamUserInfo, withAchieves: GameDataExpanded[], withoutAchieves: GameDataExpanded[]) => {
-		const allGames = [...withAchieves, ...withoutAchieves];
-		const totalAchievements = withAchieves.reduce(
+		// Use visible games for calculations
+		const visibleWithAchieves = getVisibleGames(withAchieves);
+		const visibleWithoutAchieves = getVisibleGames(withoutAchieves);
+		const allVisibleGames = [...visibleWithAchieves, ...visibleWithoutAchieves];
+		
+		const totalAchievements = visibleWithAchieves.reduce(
 			(total, current) => total + current.totalAchievements, 0
 		);
-		const totalAchievementsCompleted = withAchieves.reduce(
+		const totalAchievementsCompleted = visibleWithAchieves.reduce(
 			(total, current) => total + current.totalCompletedAchievements, 0
 		);
 		setUserData({
 			...user,
 			privateProfile: withAchieves[0]?.privateProfile,
-			totalNumberOfGames: allGames.length,
+			totalNumberOfGames: allVisibleGames.length,
 			totalAchievements,
 			totalAchievementsCompleted,
 			totalAchievementsIncomplete: totalAchievements - totalAchievementsCompleted,
-			totalPlaytime: round(allGames.reduce(
+			totalPlaytime: round(allVisibleGames.reduce(
 				(total, game) => total + parseFloat(game.hoursPlayed), 0
 			)),
-			totalNeverPlayed: allGames.reduce(
+			totalNeverPlayed: allVisibleGames.reduce(
 				(total, game) => total + (game.lastPlayedDate === 'Not Played' ? 1 : 0), 0
 			),
-			totalOneHundredPercentComplete: allGames.reduce(
+			totalOneHundredPercentComplete: allVisibleGames.reduce(
 				(total, game) => total + (game.percentComplete === 100.00 ? 1 : 0), 0
 			),
-			totalCosts: parseFloat(allGames.reduce(
+			totalCosts: parseFloat(allVisibleGames.reduce(
 				(total, game) => {
 					const cost = !isNaN(parseFloat(game.cost)) ? parseFloat(game.cost) : 0
 					return total + cost
 				}, 0
 			).toFixed(2)),
-			totalPayed: parseFloat(allGames.reduce(
+			totalPayed: parseFloat(allVisibleGames.reduce(
 				(total, game) => {
 					const price = !isNaN(parseFloat(game.pricePaid)) ? parseFloat(game.pricePaid) : 0
 					return total + price
 				}, 0
 			).toFixed(2)),
-			totalTimeToBeat: parseFloat(allGames.reduce(
+			totalTimeToBeat: parseFloat(allVisibleGames.reduce(
 				(total, game) => {
 					const time = !isNaN(parseFloat(game.timeToBeat)) ? parseFloat(game.timeToBeat) : 0
 					return total + time
@@ -284,10 +334,10 @@ export const SteamUser = () => {
 			}
 			setPassDownSteamData({
 				userData: userData,
-				gamesWithAchievements: gamesWithAchievementsFiltered,
-				setGamesWithAchievements: setGamesWithAchievementsFiltered,
-				gamesWithoutAchievements: gamesWithoutAchievementsFiltered,
-				setGamesWithoutAchievements: setGamesWithoutAchievementsFiltered,
+				gamesWithAchievements: gamesWithAchievements,
+				setGamesWithAchievements: setGamesWithAchievements,
+				gamesWithoutAchievements: gamesWithoutAchievements,
+				setGamesWithoutAchievements: setGamesWithoutAchievements,
 			});
 			setPackageDataComplete(true);
 		}
@@ -296,47 +346,22 @@ export const SteamUser = () => {
 	}, [
 		userData,
 		gamesWithAchievements,
-		gamesWithAchievementsFiltered,
 		gamesWithoutAchievements,
-		gamesWithoutAchievementsFiltered,
 		loadingUserComplete,
 		loadingGamesComplete,
 		loadingModifiedComplete
 	]);
 
 	useEffect(() => {
-		setUniqueFilterOptions([...gamesWithAchievementsFiltered, ...gamesWithoutAchievementsFiltered], 'review', setReviewFilterOptions);
-		setUniqueFilterOptions([...gamesWithAchievementsFiltered, ...gamesWithoutAchievementsFiltered], 'developer', setDeveloperFilterOptions);
-		setUniqueFilterOptions([...gamesWithAchievementsFiltered, ...gamesWithoutAchievementsFiltered], 'publisher', setPublisherFilterOptions);
-		setUniqueFilterOptions([...gamesWithAchievementsFiltered, ...gamesWithoutAchievementsFiltered], 'genre', setGenreFilterOptions);
-		setUniqueFilterOptions([...gamesWithAchievementsFiltered, ...gamesWithoutAchievementsFiltered], 'tags', setTagFilterOptions);
-	}, [
-		gamesWithAchievementsFiltered,
-		gamesWithoutAchievementsFiltered,
-	])
+		applyAllFilters();
+	}, [showFocusedGames, applyAllFilters]);
 
 	useEffect(() => {
-		if (showFocusedGames) {
-			const focusedGamesWithAchievements = gamesWithAchievements.filter(game => game.focused);
-			const focusedGamesWithoutAchievements = gamesWithoutAchievements.filter(game => game.focused);
-			setGamesWithAchievementsFiltered(focusedGamesWithAchievements);
-			setGamesWithoutAchievementsFiltered(focusedGamesWithoutAchievements);
-		} else {
-			setGamesWithAchievementsFiltered(gamesWithAchievements);
-			setGamesWithoutAchievementsFiltered(gamesWithoutAchievements);
-		}
-	}, [
-		showFocusedGames,
-		gamesWithAchievements,
-		gamesWithoutAchievements,
-	]);
-
-	useEffect(() => {
-		if (userData && gamesWithAchievementsFiltered && gamesWithoutAchievementsFiltered) {
-		  addMoreDataToUser(userData, gamesWithAchievementsFiltered, gamesWithoutAchievementsFiltered);
+		if (userData && gamesWithAchievements && gamesWithoutAchievements) {
+		  addMoreDataToUser(userData, gamesWithAchievements, gamesWithoutAchievements);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	  }, [gamesWithAchievementsFiltered, gamesWithoutAchievementsFiltered]);
+	}, [gamesWithAchievements, gamesWithoutAchievements]);
 
 	return (
 		<>
@@ -375,7 +400,7 @@ export const SteamUser = () => {
 										<GameSortOrder
 											{...passDownSteamData}
 										/>
-										{gamesWithAchievementsFiltered.length > 0 &&
+										{getVisibleGames(gamesWithAchievements).length > 0 &&
 											<AchievementSortOrder
 												{...passDownSteamData}
 											/>
@@ -389,12 +414,11 @@ export const SteamUser = () => {
 												options={reviewFilterOptions}
 												className="basic-multi-select"
 												classNamePrefix="select"
+												value={selectedReviewFilters}
 												onChange={(selectedOptions: filterOption[]) => handleFilterChange(
 													selectedOptions,
 													'review',
-													setReviewFilterOptions,
-													selectedReviewFiltersLength,
-													setSelectedReviewFiltersLength
+													setSelectedReviewFilters
 												)}
 											/>
 										</div>
@@ -416,12 +440,11 @@ export const SteamUser = () => {
 												options={developerFilterOptions}
 												className="basic-multi-select"
 												classNamePrefix="select"
+												value={selectedDeveloperFilters}
 												onChange={(selectedOptions: filterOption[]) => handleFilterChange(
 													selectedOptions,
 													'developer',
-													setDeveloperFilterOptions,
-													selectedDeveloperFiltersLength,
-													setSelectedDeveloperFiltersLength
+													setSelectedDeveloperFilters
 												)}
 											/>
 										</div>
@@ -434,12 +457,11 @@ export const SteamUser = () => {
 												options={publisherFilterOptions}
 												className="basic-multi-select"
 												classNamePrefix="select"
+												value={selectedPublisherFilters}
 												onChange={(selectedOptions: filterOption[]) => handleFilterChange(
 													selectedOptions,
 													'publisher',
-													setPublisherFilterOptions,
-													selectedPublisherFiltersLength,
-													setSelectedPublisherFiltersLength
+													setSelectedPublisherFilters
 												)}
 											/>
 										</div>
@@ -452,12 +474,11 @@ export const SteamUser = () => {
 												options={genreFilterOptions}
 												className="basic-multi-select"
 												classNamePrefix="select"
+												value={selectedGenreFilters}
 												onChange={(selectedOptions: filterOption[]) => handleFilterChange(
 													selectedOptions,
 													'genre',
-													setGenreFilterOptions,
-													selectedGenreFiltersLength,
-													setSelectedGenreFiltersLength
+													setSelectedGenreFilters
 												)}
 											/>
 										</div>
@@ -470,17 +491,16 @@ export const SteamUser = () => {
 												options={tagFilterOptions}
 												className="basic-multi-select"
 												classNamePrefix="select"
+												value={selectedTagFilters}
 												onChange={(selectedOptions: filterOption[]) => handleFilterChange(
 													selectedOptions,
 													'tags',
-													setTagFilterOptions,
-													selectedTagFiltersLength,
-													setSelectedTagFiltersLength
+													setSelectedTagFilters
 												)}
 											/>
 										</div>
 										<div className='flexLineBreak' />
-										{gamesWithAchievementsFiltered.length > 0 &&
+										{getVisibleGames(gamesWithAchievements).length > 0 &&
 											<>
 												<label>
 													Steam Spy Data
@@ -532,7 +552,7 @@ export const SteamUser = () => {
 						:
 						(!firstLoad && <p className='alertText'>Steam User Profile does not exist.</p>)
 					}
-					{gamesWithAchievementsFiltered.flatMap((game) =>
+					{gamesWithAchievements.filter(game => !game.isHidden).map((game) =>
 						<GameWithAchievements
 							key={game.appid}
 							game={game}
@@ -545,10 +565,10 @@ export const SteamUser = () => {
 							updateGameFocus={updateGameFocus}
 						/>
 					)}
-					{(hasGames && gamesWithoutAchievementsFiltered.length > 0) &&
+					{(hasGames && getVisibleGames(gamesWithoutAchievements).length > 0) &&
 						<h2 className='gameWithoutAchievementsDivision'>Games Without Achievements</h2>
 					}
-					{gamesWithoutAchievementsFiltered.flatMap((game) =>
+					{gamesWithoutAchievements.filter(game => !game.isHidden).map((game) =>
 						<GameWithoutAchievements
 							key={game.appid}
 							game={game}

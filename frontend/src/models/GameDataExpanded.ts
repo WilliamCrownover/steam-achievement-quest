@@ -10,6 +10,7 @@ export interface GameDataExpanded extends Record<string, any>, SteamOwnedGame {
 	timeToBeat: string
 	purchaseDate: string
 	focused: boolean
+	isHidden: boolean
 	pricePerHour: number
 	costPerTimeToBeat: number
 	discountPercent: number

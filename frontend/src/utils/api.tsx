@@ -206,6 +206,7 @@ export const getUserGameData = async (
 				timeToBeat: isNaN(timeToBeat) ? "0" : timeToBeat.toFixed(1),
 				purchaseDate,
 				focused,
+				isHidden: false,
 				pricePerHour,
 				costPerTimeToBeat,
 				discountPercent: isNaN(discountPercent) ? 0 : discountPercent,
