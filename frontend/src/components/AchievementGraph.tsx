@@ -1,12 +1,9 @@
 import { GameDataExpanded } from '../models';
-import {
-	round,
-	setColorFill
-} from '../utils/utils'
+import { round, setColorFill } from '../utils/utils';
 
 type AchievementGraphProps = {
-	game: GameDataExpanded
-}
+	game: GameDataExpanded;
+};
 
 export const AchievementGraph = ({ game }: AchievementGraphProps) => {
 	const achievements = game.achievements || [];
@@ -18,22 +15,18 @@ export const AchievementGraph = ({ game }: AchievementGraphProps) => {
 	const heightFactor = 1.5;
 
 	return (
-		<div className='achievementGraph'>
-			{achievements.map((achievement) => {
-				const {
-					achieved,
-					name,
-					hoverInfo,
-				} = achievement;
+		<div className="achievementGraph">
+			{achievements.map(achievement => {
+				const { achieved, name, hoverInfo } = achievement;
 				const percent = round(achievement.percent);
 				const colorFill = setColorFill(percent);
 				const colorFillAchieved = setColorFill(percent, achieved);
 				return (
 					<div
 						key={name}
-						className='graphVerticalBar'
+						className="graphVerticalBar"
 						style={{
-							width: `${1 / achievements.length * 100}%`,
+							width: `${(1 / achievements.length) * 100}%`,
 						}}
 					>
 						<div
@@ -41,26 +34,26 @@ export const AchievementGraph = ({ game }: AchievementGraphProps) => {
 							style={{
 								height: `${(100 - percent) * heightFactor}px`,
 								backgroundColor: colorFill,
-								opacity: 0.4
+								opacity: 0.4,
 							}}
 						/>
 						<div
 							title={hoverInfo}
 							style={{
 								height: `${percent * heightFactor}px`,
-								backgroundColor: colorFillAchieved
+								backgroundColor: colorFillAchieved,
 							}}
 						/>
 					</div>
-				)
+				);
 			})}
-			{lineArray.map((line) =>
+			{lineArray.map(line => (
 				<div key={line.class} className={`horizontalGraphLine ${line.class}`} />
-			)}
+			))}
 			<div
-				className='horizontalGraphLine averagePercentLine'
+				className="horizontalGraphLine averagePercentLine"
 				style={{ top: `${(100 - game.averagePercent) * heightFactor}px` }}
 			/>
 		</div>
-	)
-}
+	);
+};

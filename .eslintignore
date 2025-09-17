@@ -1,0 +1,10 @@
+node_modules/
+dist/
+build/
+coverage/
+*.min.js
+*.bundle.js
+frontend/build/
+backend/data/
+backend/data_backups/
+*.log

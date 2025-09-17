@@ -170,16 +170,16 @@ input {
 	margin-left: 10px;
 }
 
-input[type=text],
-input[type=number] {
+input[type='text'],
+input[type='number'] {
 	background-color: var(--lightGray);
 }
 
-input[type=number] {
+input[type='number'] {
 	width: 80px;
 }
 
-input[type=text] {
+input[type='text'] {
 	width: 100px;
 }
 
@@ -187,14 +187,14 @@ input[type=text] {
 	width: 180px !important;
 }
 
-input[type=submit] {
+input[type='submit'] {
 	background-color: var(--medGray);
 	color: var(--lightGray);
 	border: solid 1px var(--lightGray);
 	padding: 2px 5px;
 }
 
-input[type=submit]:hover {
+input[type='submit']:hover {
 	background-color: var(--darkGray);
 }
 
@@ -368,8 +368,8 @@ input[type=submit]:hover {
 	align-items: center;
 }
 
-.gameTitleInfo>*,
-.gameSpecificDataPoints>* {
+.gameTitleInfo > *,
+.gameSpecificDataPoints > * {
 	display: inline-block;
 	margin-right: 10px;
 	width: 25%;
@@ -501,17 +501,17 @@ input[type=submit]:hover {
 
 .ninetyPercent {
 	background-color: yellowgreen;
-	top: calc(var(--graphHeight)*0.1);
+	top: calc(var(--graphHeight) * 0.1);
 }
 
 .fiftyPercent {
 	background-color: yellow;
-	top: calc(var(--graphHeight)/2);
+	top: calc(var(--graphHeight) / 2);
 }
 
 .tenPercent {
 	background-color: rgb(252, 108, 108);
-	top: calc(var(--graphHeight)*0.9);
+	top: calc(var(--graphHeight) * 0.9);
 }
 
 .averagePercentLine {
