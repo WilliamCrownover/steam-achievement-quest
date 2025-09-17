@@ -68,7 +68,8 @@ export const getUserGameData = async (
 	userId: string,
 	gameList: number[],
 	sampleSize = false,
-	setterGamesToLoad: React.Dispatch<React.SetStateAction<number>>
+	setterGamesToLoad: React.Dispatch<React.SetStateAction<number>>,
+	includeCurrentPlayers = false,
 ): Promise<GameDataExpanded[] | undefined> => {
 	setterGamesToLoad(0);
 	const url = `${serverString}getOwnedGames/${userId}`;
@@ -121,14 +122,21 @@ export const getUserGameData = async (
 		const allReviewData: {[key: number]: ReviewData} = {};
 		const allAchievementsCombined: {[key: number]: CombinedAchievementsWithSchema[]} = {};
 
+		const gameSteamSpyDetailsFile = JSON.parse(await getOrSetFileStorage('steamSpyAppDetails'));
+		const gamePlayerCountFile = JSON.parse(await getOrSetFileStorage('gamePlayerCount'));
+		const gameReviewsFile = JSON.parse(await getOrSetFileStorage('gameReviews'));
+		const gameAchievementsFile = JSON.parse(await getOrSetFileStorage('gameAchievements'));
+		const gameAchievementSchemasFile = JSON.parse(await getOrSetFileStorage('gameAchievementSchemas'));
+		const gameUserAchievementsFile = JSON.parse(await getOrSetFileStorage('gameUserAchievements'));
+
 		for (const gameId of gameIds) {
-			steamSpyAppDetails[gameId] = await getSteamSpyAppDetails(gameId);
-			allPlayerCounts[gameId] = await getGamePlayerCount(gameId);
-			allReviewData[gameId] = await getGameReviewData(gameId);
+			steamSpyAppDetails[gameId] = await getSteamSpyAppDetails(gameId, gameSteamSpyDetailsFile[gameId]);
+			allPlayerCounts[gameId] = await getGamePlayerCount(gameId, gamePlayerCountFile[gameId], includeCurrentPlayers);
+			allReviewData[gameId] = await getGameReviewData(gameId, gameReviewsFile[gameId]);
 			if (allGamesDataObject[gameId].has_community_visible_stats) {
-				const gameAchievements = await getGameAchievements(gameId);
+				const gameAchievements = await getGameAchievements(gameId, gameAchievementsFile[gameId]);
 				if (gameAchievements !== undefined && gameAchievements.length > 0) {
-					const gameAchievementSchema = await getGameAchievementSchemas(gameId);
+					const gameAchievementSchema = await getGameAchievementSchemas(gameId, gameAchievementSchemasFile[gameId]);
 					allAchievementsCombined[gameId] = gameAchievements.map(
 						(achievement, i) => (
 							{
@@ -140,7 +148,7 @@ export const getUserGameData = async (
 							}
 						)
 					);
-					const gameUserAchievements = await getUserAchievements(gameId, userId);
+					const gameUserAchievements = await getUserAchievements(gameId, userId, gameUserAchievementsFile[gameId]);
 					if (gameUserAchievements.length > 0) {
 						allAchievementsCombined[gameId] = combineAchievements(allAchievementsCombined[gameId], gameUserAchievements);
 					}
@@ -287,14 +295,12 @@ const checkForPrivateProfile = async (userId: string): Promise<boolean> => {
 	}
 }
 
-const getGamePlayerCount = async (appId: number): Promise<number> => {
+const getGamePlayerCount = async (appId: number, playerCount: { pullDate: Date; player_count: any; }, includeCurrentPlayers: boolean): Promise<number> => {
 	const url = `${serverString}getCurrentPlayersForGame/${appId}`;
 
-	const gamePlayerCount = JSON.parse(await getOrSetFileStorage('gamePlayerCount'));
-	const playerCount = gamePlayerCount[appId];
-
-	if (!playerCount || isOver1HourOld(new Date(playerCount.pullDate))) {
+	if (includeCurrentPlayers && (!playerCount || isOver1HourOld(new Date(playerCount.pullDate)))) {
 		try {
+			const gamePlayerCount = JSON.parse(await getOrSetFileStorage('gamePlayerCount'));
 			const res = await fetch(url);
 			if (!res.ok) throw new Error(`Failed to fetch player count: ${res.statusText}`);
 			const json = await res.json();
@@ -311,11 +317,9 @@ const getGamePlayerCount = async (appId: number): Promise<number> => {
 	return playerCount?.player_count || 0;
 }
 
-const getGameReviewData = async (appId: number): Promise<ReviewData> => {
+const getGameReviewData = async (appId: number, reviewData: ReviewData | undefined): Promise<ReviewData> => {
 	const url = `${serverString}getReviewsForGame/${appId}`;
 
-	const gameReviews = JSON.parse(await getOrSetFileStorage('gameReviews'));
-	const reviewData = gameReviews[appId];
 	const noReviewData: ReviewData = {
 		total_reviews: 0,
 		total_positive: 0,
@@ -325,6 +329,7 @@ const getGameReviewData = async (appId: number): Promise<ReviewData> => {
 
 	if (!reviewData || isOver24HoursOld(new Date(reviewData.pullDate))) {
 		try {
+			const gameReviews = JSON.parse(await getOrSetFileStorage('gameReviews'));
 			const res = await fetch(url);
 			if (!res.ok) throw new Error(`Failed to fetch steam reviews: ${res.statusText}`);
 			const json = await res.json();
@@ -347,15 +352,14 @@ const getGameReviewData = async (appId: number): Promise<ReviewData> => {
 	return reviewData;
 }
 
-const getGameAchievements = async (appId: number): Promise<SteamAchievementConverted[]> => {
+const getGameAchievements = async (appId: number, achievementData: SteamAchievementConverted[] | undefined): Promise<SteamAchievementConverted[]> => {
 	const url = `${serverString}getGameAchievements/${appId}`;
 
-	const gameAchievements = JSON.parse(await getOrSetFileStorage('gameAchievements'));
-	const achievementData = gameAchievements[appId];
 	const noAchievementData: SteamAchievementConverted[] = [];
 
 	if (!achievementData || isOver7DaysOld(new Date(achievementData[0].pullDate))) {
 		try {
+			const gameAchievements = JSON.parse(await getOrSetFileStorage('gameAchievements'));
 			const res = await fetch(url);
 			if (!res.ok) throw new Error(`Failed to fetch steam achievements: ${res.statusText}`);
 			const json = await res.json();
@@ -380,15 +384,14 @@ const getGameAchievements = async (appId: number): Promise<SteamAchievementConve
 	return achievementData;
 }
 
-const getGameAchievementSchemas = async (appId: number): Promise<SteamAchievementSchema[]> => {
+const getGameAchievementSchemas = async (appId: number, schemaData: SteamAchievementSchema[] | undefined): Promise<SteamAchievementSchema[]> => {
 	const url = `${serverString}getSchemaForGame/${appId}`;
 
-	const gameAchievementSchemas = JSON.parse(await getOrSetFileStorage('gameAchievementSchemas'));
-	const schemaData = gameAchievementSchemas[appId];
 	const noSchemaData: SteamAchievementSchema[] = [];
 
 	if (!schemaData || isOver7DaysOld(new Date(schemaData[0].pullDate))) {
 		try {
+			const gameAchievementSchemas = JSON.parse(await getOrSetFileStorage('gameAchievementSchemas'));
 			const res = await fetch(url);
 			if (!res.ok) throw new Error(`Failed to fetch steam achievement schemas: ${res.statusText}`);
 			const json = await res.json();
@@ -415,21 +418,23 @@ const getGameAchievementSchemas = async (appId: number): Promise<SteamAchievemen
 	return schemaData;
 }
 
-const getUserAchievements = async (appId: number, userId: string): Promise<SteamUserAchievement[]> => {
+const getUserAchievements = async (appId: number, userId: string, userAchievementData: SteamUserAchievement[] | undefined): Promise<SteamUserAchievement[]> => {
 	const url = `${serverString}getUserAchievements/${appId}/${userId}`;
 
-	const gameUserAchievements = JSON.parse(await getOrSetFileStorage('gameUserAchievements'));
-	const userAchievementData = gameUserAchievements[appId];
 	const noUserAchievementData: SteamUserAchievement[] = [];
 
 	if (!userAchievementData || isOver24HoursOld(new Date(userAchievementData[0].pullDate))) {
 		try {
+			const gameUserAchievements = JSON.parse(await getOrSetFileStorage('gameUserAchievements'));
 			const res = await fetch(url);
 			if (!res.ok) throw new Error(`Failed to fetch user achievements: ${res.statusText}`);
 			const json = await res.json();
 			const userAchievements: SteamUserAchievement[] | undefined = json.playerstats.achievements
 			if (!userAchievements) return [];
-            gameUserAchievements[appId] = userAchievements;
+            gameUserAchievements[appId] = userAchievements.map(achievement => ({
+				...achievement,
+				pullDate: new Date()
+			}));
             await saveDataToBackend('gameUserAchievements', gameUserAchievements);
 			return sorter(userAchievements, sortAlphabet('apiname'));
 		} catch (error) {
@@ -455,14 +460,12 @@ export const getUserInfo = async (userId: string): Promise<SteamUserInfo> => {
 	}
 }
 
-export const getSteamSpyAppDetails = async (appId: number): Promise<SteamSpyAppDetailsConverted | undefined> => {
+export const getSteamSpyAppDetails = async (appId: number, gameSpyData: SteamSpyAppDetailsConverted | undefined): Promise<SteamSpyAppDetailsConverted | undefined> => {
 	const url = `${serverString}getSteamSpyAppDetails/${appId}`;
-
-	const gameSteamSpyDetails = JSON.parse(await getOrSetFileStorage('steamSpyAppDetails'));
-	const gameSpyData = gameSteamSpyDetails[appId];
 
 	if (!gameSpyData || isOver7DaysOld(new Date(gameSpyData.pullDate))) {
 		try {
+			const gameSteamSpyDetails = JSON.parse(await getOrSetFileStorage('steamSpyAppDetails'));
 			const res = await fetch(url);
 			if (!res.ok) throw new Error(`Failed to fetch steam spy app details: ${res.statusText}`);
 			const json = await res.json();

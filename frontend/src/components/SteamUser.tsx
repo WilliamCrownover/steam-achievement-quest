@@ -58,6 +58,7 @@ export const SteamUser = () => {
 		gamesWithoutAchievementsRef.current = gamesWithoutAchievements;
 	}, [gamesWithAchievements, gamesWithoutAchievements]);
 
+	const [includeCurrentPlayers, setIncludeCurrentPlayers] = useState(false);
 	const [showFocusedGames, setShowFocusedGames] = useState(false);
 	const [showSavedDataPoints, setShowSavedDataPoints] = useState(false);
 	const [showGraph, setShowGraph] = useState(false);
@@ -242,7 +243,7 @@ export const SteamUser = () => {
 	}
 
 	const getGamesData = async (user: SteamUserInfo) => {
-		const gameData = await getUserGameData(user.steamid, [], sampleSize, setGamesToLoadCount);
+		const gameData = await getUserGameData(user.steamid, [], sampleSize, setGamesToLoadCount, includeCurrentPlayers);
 		setLoadingGamesComplete(true);
 		if (!gameData) {
 			setLoadingModifiedComplete(true);
@@ -375,6 +376,10 @@ export const SteamUser = () => {
 				</div>
 				<div>
 					<label>
+						Get Current Player Counts (Slow Loading)
+						<input type='checkbox' checked={includeCurrentPlayers} onChange={() => setIncludeCurrentPlayers(!includeCurrentPlayers)} />
+					</label>
+					<label className='sampleSizeLabel'>
 						Sample Size 25 Games
 						<input type='checkbox' checked={sampleSize} onChange={() => setSampleSize(!sampleSize)} />
 					</label>

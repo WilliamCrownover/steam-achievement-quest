@@ -198,6 +198,10 @@ input[type=submit]:hover {
 	background-color: var(--darkGray);
 }
 
+.sampleSizeLabel {
+	margin-left: 20px;
+}
+
 .gamesInfoSection {
 	display: flex;
 	flex-wrap: wrap;
