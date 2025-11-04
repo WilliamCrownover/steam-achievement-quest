@@ -44,8 +44,10 @@ export const SteamUser = () => {
 		gamesWithoutAchievementsRef.current = gamesWithoutAchievements;
 	}, [gamesWithAchievements, gamesWithoutAchievements]);
 
+	const [useWishlist, setUseWishlist] = useState(false);
 	const [includeCurrentPlayers, setIncludeCurrentPlayers] = useState(false);
 	const [showFocusedGames, setShowFocusedGames] = useState(false);
+	const [showGameDemos, setShowGameDemos] = useState(false);
 	const [showSavedDataPoints, setShowSavedDataPoints] = useState(false);
 	const [showGraph, setShowGraph] = useState(false);
 	const [showList, setShowList] = useState(false);
@@ -98,6 +100,11 @@ export const SteamUser = () => {
 
 				// Apply focus filter
 				if (showFocusedGames && !game.focused) {
+					isHidden = true;
+				}
+
+				// Apply demo filter
+				if (showGameDemos && !game.demo) {
 					isHidden = true;
 				}
 
@@ -166,6 +173,7 @@ export const SteamUser = () => {
 			selectedGenreFilters,
 			selectedTagFilters,
 			showFocusedGames,
+			showGameDemos,
 		]
 	);
 
@@ -250,6 +258,7 @@ export const SteamUser = () => {
 			[],
 			sampleSize,
 			setGamesToLoadCount,
+			useWishlist,
 			includeCurrentPlayers
 		);
 		setLoadingGamesComplete(true);
@@ -381,7 +390,7 @@ export const SteamUser = () => {
 
 	useEffect(() => {
 		applyAllFilters();
-	}, [showFocusedGames, applyAllFilters]);
+	}, [showFocusedGames, showGameDemos, applyAllFilters]);
 
 	useEffect(() => {
 		if (userData && gamesWithAchievements && gamesWithoutAchievements) {
@@ -404,10 +413,18 @@ export const SteamUser = () => {
 						/>
 					</label>
 					<input type="submit" name="search" value="Search" disabled={!userIdCheck} />
+					<label className="sampleSizeLabel">
+						Wishlist
+						<input
+							type="checkbox"
+							checked={useWishlist}
+							onChange={() => setUseWishlist(!useWishlist)}
+						/>
+					</label>
 				</div>
 				<div>
 					<label>
-						Get Current Player Counts (Slow Loading)
+						Current Player Counts
 						<input
 							type="checkbox"
 							checked={includeCurrentPlayers}
@@ -460,16 +477,29 @@ export const SteamUser = () => {
 												}
 											/>
 										</div>
-										<label>
-											Focused Games
-											<input
-												type="checkbox"
-												checked={showFocusedGames}
-												onChange={() =>
-													setShowFocusedGames(!showFocusedGames)
-												}
-											/>
-										</label>
+										<div>
+											<label>
+												Focused Games
+												<input
+													type="checkbox"
+													checked={showFocusedGames}
+													onChange={() =>
+														setShowFocusedGames(!showFocusedGames)
+													}
+												/>
+											</label>
+											<br />
+											<label>
+												Demos
+												<input
+													type="checkbox"
+													checked={showGameDemos}
+													onChange={() =>
+														setShowGameDemos(!showGameDemos)
+													}
+												/>
+											</label>
+										</div>
 										<div className="flexLineBreak" />
 										<div className="filterOption">
 											<h4>Developer</h4>

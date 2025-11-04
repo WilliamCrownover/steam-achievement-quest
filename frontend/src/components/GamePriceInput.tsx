@@ -6,14 +6,16 @@ import { getOrSetFileStorage, saveDataToBackend } from '../utils/api';
 type GamePriceInputProps = {
 	game: GameDataExpanded;
 	updateGameFocus?: (gameId: number, focused: boolean) => void;
+	updateGameDemo?: (gameId: number, demo: boolean) => void;
 };
 
-export const GamePriceInput = ({ game, updateGameFocus }: GamePriceInputProps) => {
+export const GamePriceInput = ({ game, updateGameFocus, updateGameDemo }: GamePriceInputProps) => {
 	const [cost, setCost] = useState(game.cost || '');
 	const [price, setPrice] = useState(game.pricePaid || '');
 	const [timeToBeat, setTimeToBeat] = useState(game.timeToBeat || '');
 	const [purchaseDate, setPurchaseDate] = useState(game.purchaseDate || '');
 	const [focused, setFocused] = useState(game.focused || false);
+	const [demo, setDemo] = useState(game.demo || false);
 
 	const handleCostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
@@ -54,6 +56,23 @@ export const GamePriceInput = ({ game, updateGameFocus }: GamePriceInputProps) =
 			[gameId]: value,
 		};
 		await saveDataToBackend('gameFocus', gameFocus);
+	};
+
+	const handleDemoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.checked;
+		setDemo(value);
+
+		if (updateGameDemo) {
+			updateGameDemo(game.appid, value);
+		}
+
+		let gameDemo = JSON.parse(await getOrSetFileStorage('gameDemo', '{}'));
+		const gameId = game.appid;
+		gameDemo = {
+			...gameDemo,
+			[gameId]: value,
+		};
+		await saveDataToBackend('gameDemo', gameDemo);
 	};
 
 	const handleSubmitCost = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -165,7 +184,8 @@ export const GamePriceInput = ({ game, updateGameFocus }: GamePriceInputProps) =
 				</div>
 			</form>
 			<ReviewSelectDropdown game={game} />
-			<form className="formContainer formContainerTwo">
+			<div className="formLineBreak" />
+			<form className="formContainer formContainerTwo formContainerThree">
 				<div>
 					<label>
 						Focus
@@ -173,6 +193,30 @@ export const GamePriceInput = ({ game, updateGameFocus }: GamePriceInputProps) =
 					</label>
 				</div>
 			</form>
+			<form className="formContainer formContainerTwo formContainerThree">
+				<div>
+					<label>
+						Demo
+						<input type="checkbox" checked={demo} onChange={handleDemoChange} />
+					</label>
+				</div>
+			</form>
+			<a
+				className="youtubeLink formContainerThree"
+				href={game.youtubeUrl}
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				YouTube
+			</a>
+			<a
+				className="youtubeLink formContainerThree"
+				href={game.howLongToBeatUrl}
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				HowLongToBeat
+			</a>
 		</div>
 	);
 };

@@ -24,7 +24,7 @@ export const GameTitleInfo = ({ game }: GameTitleInfoProps) => {
 	return (
 		<div className="gameTitleInfo">
 			<a className="gameTitleLink" href={gameUrl} target="_blank" rel="noreferrer">
-				<img src={gameIcon} alt={name} height="50" width="50" loading="lazy" />
+				<img src={gameIcon} alt={name} height="50" width="100" loading="lazy" />
 				<div className="gameNameContainer">
 					<h3>{name}</h3>
 					{has_dlc && <p className="dlc">+DLC</p>}

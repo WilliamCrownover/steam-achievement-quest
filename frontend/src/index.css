@@ -160,10 +160,20 @@ p {
 	margin-right: 5px;
 }
 
+.formContainerThree {
+	margin-top: 0px;
+	margin-bottom: 5px;
+}
+
+.formLineBreak {
+	flex-basis: 100%;
+}
+
 .multipleForms {
 	display: flex;
 	justify-content: left;
 	align-items: center;
+	flex-wrap: wrap;
 }
 
 input {
@@ -199,7 +209,7 @@ input[type='submit']:hover {
 }
 
 .sampleSizeLabel {
-	margin-left: 20px;
+	margin-left: 15px;
 }
 
 .gamesInfoSection {
@@ -586,4 +596,20 @@ input[type='submit']:hover {
 	padding: 5px;
 	text-align: center;
 	margin: 30px 0px;
+}
+
+.youtubeLink {
+	transition: all var(--transitionSpeed);
+	text-decoration: none;
+	color: var(--lightGray);
+	background-color: var(--darkGray);
+	padding: 5px;
+	margin-right: 5px;
+	border-radius: 5px;
+}
+
+.youtubeLink:hover {
+	transition: all var(--transitionSpeed);
+	background-color: var(--lightGray);
+	color: var(--darkGray);
 }
