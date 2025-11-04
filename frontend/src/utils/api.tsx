@@ -19,6 +19,7 @@ import {
 	SteamUserAchievement,
 	SteamUserInfo,
 } from '../models';
+import { SteamWishlistItem } from '../models/SteamWishlistItem';
 
 const serverString = 'http://localhost:5000/';
 
@@ -72,34 +73,44 @@ export const getUserGameData = async (
 	gameList: number[],
 	sampleSize = false,
 	setterGamesToLoad: React.Dispatch<React.SetStateAction<number>>,
+	useWishlist = false,
 	includeCurrentPlayers = false
 ): Promise<GameDataExpanded[] | undefined> => {
 	setterGamesToLoad(0);
-	const url = `${serverString}getOwnedGames/${userId}`;
+	const url = useWishlist
+		? `${serverString}getUserWishlist/${userId}`
+		: `${serverString}getOwnedGames/${userId}`;
 
 	try {
 		const res = await fetch(url);
 		const json = await res.json();
-		let allGamesData: SteamOwnedGame[] = json.response.games;
+		let allGamesData: SteamOwnedGame[] | SteamWishlistItem[] = useWishlist
+			? json.response.items
+			: json.response.games;
 
 		// The profile is completely private and no game data is available.
 		if (!allGamesData) return;
 
 		// If a filter list is provided return games matching appids
 		if (gameList.length > 0) {
-			allGamesData = allGamesData.filter((game: SteamOwnedGame) =>
+			allGamesData = allGamesData.filter((game: SteamOwnedGame | SteamWishlistItem) =>
 				gameList.includes(game.appid)
 			);
 		}
 
 		// Filter out game demos
-		allGamesData = allGamesData.filter(
-			(game: SteamOwnedGame) => !game.name.toLowerCase().trim().endsWith(' demo')
-		);
+		if (!useWishlist) {
+			allGamesData = allGamesData.filter(
+				(game: SteamOwnedGame) => !game.name.toLowerCase().trim().endsWith(' demo')
+			);
+		}
 
 		// Create object version of allGamesData
-		const allGamesDataObject = allGamesData.reduce(
-			(acc: { [key: number]: SteamOwnedGame }, game: SteamOwnedGame) => {
+		const allGamesDataObject = (allGamesData as (SteamOwnedGame | SteamWishlistItem)[]).reduce(
+			(
+				acc: { [key: number]: SteamOwnedGame | SteamWishlistItem },
+				game: SteamOwnedGame | SteamWishlistItem
+			) => {
 				acc[game.appid] = game;
 				return acc;
 			},
@@ -119,11 +130,12 @@ export const getUserGameData = async (
 		const gameTimesToBeat = JSON.parse(await getOrSetFileStorage('gameTimesToBeat'));
 		const gamePurchaseDates = JSON.parse(await getOrSetFileStorage('gamePurchaseDates'));
 		const focusedGames = JSON.parse(await getOrSetFileStorage('gameFocus'));
+		const gameDemos = JSON.parse(await getOrSetFileStorage('gameDemo'));
 		const myReviews = JSON.parse(await getOrSetFileStorage('myReviews'));
 
 		const gameIds = allGamesData
 			.slice(0, totalGameCount)
-			.map((game: SteamOwnedGame) => game.appid);
+			.map((game: SteamOwnedGame | SteamWishlistItem) => game.appid);
 
 		const steamSpyAppDetails: {
 			[key: number]: SteamSpyAppDetailsConverted | undefined;
@@ -156,7 +168,7 @@ export const getUserGameData = async (
 				includeCurrentPlayers
 			);
 			allReviewData[gameId] = await getGameReviewData(gameId, gameReviewsFile[gameId]);
-			if (allGamesDataObject[gameId].has_community_visible_stats) {
+			if (useWishlist || allGamesDataObject[gameId].has_community_visible_stats) {
 				const gameAchievements = await getGameAchievements(
 					gameId,
 					gameAchievementsFile[gameId]
@@ -173,16 +185,18 @@ export const getUserGameData = async (
 						achieved: false,
 						unlockTime: 0,
 					}));
-					const gameUserAchievements = await getUserAchievements(
-						gameId,
-						userId,
-						gameUserAchievementsFile[gameId]
-					);
-					if (gameUserAchievements.length > 0) {
-						allAchievementsCombined[gameId] = combineAchievements(
-							allAchievementsCombined[gameId],
-							gameUserAchievements
+					if (!useWishlist) {
+						const gameUserAchievements = await getUserAchievements(
+							gameId,
+							userId,
+							gameUserAchievementsFile[gameId]
 						);
+						if (gameUserAchievements.length > 0) {
+							allAchievementsCombined[gameId] = combineAchievements(
+								allAchievementsCombined[gameId],
+								gameUserAchievements
+							);
+						}
 					}
 					allAchievementsCombined[gameId] = allAchievementsCombined[gameId].map(
 						achievement => ({
@@ -198,117 +212,145 @@ export const getUserGameData = async (
 		// Get achievement data for each game and add extra properties.
 		setterGamesToLoad(totalGameCount);
 		const allGamesDataExpanded: GameDataExpanded[] = await Promise.all(
-			allGamesData.slice(0, totalGameCount).map(async (game: SteamOwnedGame) => {
-				const gameId = game.appid;
-				const gameIcon = `https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/${gameId}/${game.img_icon_url}.jpg`;
-				const hoursPlayed = round(game.playtime_forever / 60);
-				const lastPlayedDate = dateFormat(game.rtime_last_played);
-				const gameUrl = `https://store.steampowered.com/app/${gameId}`;
-				const achievementsUrl = `https://steamcommunity.com/stats/${gameId}/achievements`;
-				const playerCount = allPlayerCounts[gameId];
-				const reviewData = allReviewData[gameId];
-				const reviewTotals = reviewData.total_reviews;
-				let reviewPercentPositive = 0;
-				let reviewPercentNegative = 0;
-				if (reviewTotals !== 0) {
-					reviewPercentPositive = round((reviewData.total_positive / reviewTotals) * 100);
-					reviewPercentNegative = round((reviewData.total_negative / reviewTotals) * 100);
-				}
-				let lowestAchievementPercent = 0;
-				let cost = parseFloat(gameCosts[gameId] ?? 0);
-				let pricePaid = parseFloat(gamePrices[gameId] ?? 0);
-				let timeToBeat = parseFloat(gameTimesToBeat[gameId] ?? 0);
-				const purchaseDate = gamePurchaseDates[gameId] || '';
-				const focused = focusedGames[gameId] || false;
-				const pricePerHour = calcPricePerHour(pricePaid, hoursPlayed);
-				const costPerTimeToBeat = calcPricePerHour(cost, timeToBeat);
-				const discountPercent =
-					pricePaid > 0 ? round(((cost - pricePaid) / cost) * 100) : 100;
-				const review = myReviews[gameId] || ReviewEnum.noReview;
-				const ssAppDetails = steamSpyAppDetails[gameId];
-
-				// Each game will have at least these properties.
-				const gameDataExpanded: GameDataExpanded = {
-					...game,
-					gameIcon,
-					hoursPlayed,
-					lastPlayedDate,
-					gameUrl,
-					achievementsUrl,
-					playerCount,
-					...reviewData,
-					reviewPercentPositive,
-					reviewPercentNegative,
-					lowestAchievementPercent,
-					achievements: undefined,
-					cost: isNaN(cost) ? '0' : cost.toFixed(2),
-					pricePaid: isNaN(pricePaid) ? '0' : pricePaid.toFixed(2),
-					timeToBeat: isNaN(timeToBeat) ? '0' : timeToBeat.toFixed(1),
-					purchaseDate,
-					focused,
-					isHidden: false,
-					pricePerHour,
-					costPerTimeToBeat,
-					discountPercent: isNaN(discountPercent) ? 0 : discountPercent,
-					review,
-					ssAppDetails,
-					ownersCount: ssAppDetails?.owners
-						? parseInt(ssAppDetails.owners.split('..')[1].trim().replace(/,/g, ''))
-						: 0,
-					percentComplete: 0,
-				};
-
-				// If the game has community data it likely has achievement data.
-				if (game.has_community_visible_stats) {
-					let achievements = allAchievementsCombined[gameId];
-
-					// If it does indeed have achievements, elaborate the data.
-					if (achievements !== undefined && achievements.length > 0) {
-						lowestAchievementPercent = round(
-							Math.min(...achievements.map(achievement => achievement.percent))
+			allGamesData
+				.slice(0, totalGameCount)
+				.map(async (game: SteamOwnedGame | SteamWishlistItem) => {
+					const gameId = game.appid;
+					const gameIcon = `https://cdn.akamai.steamstatic.com/steam/apps/${gameId}/header.jpg`;
+					const hoursPlayed = game.playtime_forever
+						? round(game.playtime_forever / 60)
+						: 0;
+					const lastPlayedDate = dateFormat(game.rtime_last_played);
+					const gameUrl = `https://store.steampowered.com/app/${gameId}`;
+					const achievementsUrl = `https://steamcommunity.com/stats/${gameId}/achievements`;
+					const playerCount = allPlayerCounts[gameId] || 0;
+					const reviewData = allReviewData[gameId];
+					const reviewTotals = reviewData.total_reviews;
+					let reviewPercentPositive = 0;
+					let reviewPercentNegative = 0;
+					if (reviewTotals !== 0) {
+						reviewPercentPositive = round(
+							(reviewData.total_positive / reviewTotals) * 100
 						);
-						const totalAchievements = achievements.length;
-						let totalCompletedAchievements = 0;
-						let totalIncompleteAchievements = totalAchievements;
-						let privateProfile = true;
-
-						achievements = achievements.filter(
-							achievement => achievement.defaultvalue !== undefined
+						reviewPercentNegative = round(
+							(reviewData.total_negative / reviewTotals) * 100
 						);
-
-						// If the user's achievements are public, combine data and sum total completed achievements.
-						if (publicProfileCheck) {
-							totalCompletedAchievements = sumTotalCompleted(achievements);
-							totalIncompleteAchievements -= totalCompletedAchievements;
-							privateProfile = false;
-						}
-
-						const percentComplete = round(
-							(totalCompletedAchievements / totalAchievements) * 100
-						);
-
-						// Increment total game count to show loading progress
-						setterGamesToLoad((prevCount: number) => prevCount - 1);
-
-						return {
-							...gameDataExpanded,
-							achievements,
-							lowestAchievementPercent,
-							totalAchievements,
-							totalCompletedAchievements,
-							totalIncompleteAchievements,
-							privateProfile,
-							percentComplete,
-							averagePercent: round(averageAchievementPercent(achievements)),
-						};
 					}
-				}
+					let lowestAchievementPercent = 0;
+					let cost = parseFloat(gameCosts[gameId] ?? 0);
+					let pricePaid = parseFloat(gamePrices[gameId] ?? 0);
+					let timeToBeat = parseFloat(gameTimesToBeat[gameId] ?? 0);
+					const purchaseDate = gamePurchaseDates[gameId] || '';
+					const focused = focusedGames[gameId] || false;
+					const demo = gameDemos[gameId] || false;
+					const pricePerHour = calcPricePerHour(pricePaid, hoursPlayed);
+					const costPerTimeToBeat = calcPricePerHour(cost, timeToBeat);
+					const discountPercent =
+						pricePaid > 0 ? round(((cost - pricePaid) / cost) * 100) : 100;
+					const review = myReviews[gameId] || ReviewEnum.noReview;
+					const ssAppDetails = steamSpyAppDetails[gameId];
+					const urlName = (ssAppDetails?.name || game.name)
+						.replace(/['’.,]/g, '')
+						.replace(/[-–_|/+（）®Ⓡ™©:;"!?()[\]{}]/g, ' ')
+						.replace(/&/g, '%26')
+						.trim()
+						.replace(/\s+/g, '+');
 
-				// Increment total game count to show loading progress
-				setterGamesToLoad((prevCount: number) => prevCount - 1);
+					// Each game will have at least these properties.
+					const gameDataExpanded: GameDataExpanded = {
+						...game,
+						name: game.name || ssAppDetails?.name || 'Unknown',
+						gameIcon,
+						hoursPlayed,
+						lastPlayedDate,
+						gameUrl,
+						achievementsUrl,
+						playerCount,
+						...reviewData,
+						reviewPercentPositive,
+						reviewPercentNegative,
+						lowestAchievementPercent,
+						achievements: undefined,
+						cost: isNaN(cost) ? '0' : cost.toFixed(2),
+						pricePaid: isNaN(pricePaid) ? '0' : pricePaid.toFixed(2),
+						timeToBeat: isNaN(timeToBeat) ? '0' : timeToBeat.toFixed(1),
+						purchaseDate,
+						focused,
+						demo,
+						isHidden: false,
+						pricePerHour,
+						costPerTimeToBeat,
+						discountPercent: isNaN(discountPercent) ? 0 : discountPercent,
+						review,
+						ssAppDetails,
+						ownersCount: ssAppDetails?.owners
+							? parseInt(ssAppDetails.owners.split('..')[1].trim().replace(/,/g, ''))
+							: 0,
+						percentComplete: 0,
+						youtubeUrl:
+							ssAppDetails?.name || game.name
+								? `https://www.youtube.com/results?search_query=lets+play+${urlName}`
+								: 'No Link',
+						howLongToBeatUrl:
+							ssAppDetails?.name || game.name
+								? `https://howlongtobeat.com/?q=${urlName}`
+								: 'No Link',
+					};
 
-				return gameDataExpanded;
-			})
+					// If the game has community data it likely has achievement data.
+					if (
+						game.has_community_visible_stats ||
+						allAchievementsCombined[gameId]?.length > 0
+					) {
+						let achievements = allAchievementsCombined[gameId];
+
+						// If it does indeed have achievements, elaborate the data.
+						if (achievements !== undefined && achievements.length > 0) {
+							lowestAchievementPercent = round(
+								Math.min(...achievements.map(achievement => achievement.percent))
+							);
+							const totalAchievements = achievements.length;
+							let totalCompletedAchievements = 0;
+							let totalIncompleteAchievements = totalAchievements;
+							let privateProfile = true;
+
+							achievements = achievements.filter(
+								achievement => achievement.defaultvalue !== undefined
+							);
+
+							// If the user's achievements are public, combine data and sum total completed achievements.
+							if (publicProfileCheck) {
+								totalCompletedAchievements = sumTotalCompleted(achievements);
+								totalIncompleteAchievements -= totalCompletedAchievements;
+								privateProfile = false;
+							}
+
+							const percentComplete = round(
+								(totalCompletedAchievements / totalAchievements) * 100
+							);
+
+							// Increment total game count to show loading progress
+							setterGamesToLoad((prevCount: number) => prevCount - 1);
+
+							return {
+								...gameDataExpanded,
+								achievements,
+								lowestAchievementPercent,
+								totalAchievements,
+								totalCompletedAchievements,
+								totalIncompleteAchievements,
+								privateProfile,
+								percentComplete,
+								averagePercent: round(averageAchievementPercent(achievements)),
+							};
+						}
+					}
+
+					// Increment total game count to show loading progress
+					setterGamesToLoad((prevCount: number) => prevCount - 1);
+
+					return gameDataExpanded;
+				})
 		);
 
 		return allGamesDataExpanded;
@@ -339,7 +381,12 @@ const getGamePlayerCount = async (
 ): Promise<number> => {
 	const url = `${serverString}getCurrentPlayersForGame/${appId}`;
 
-	if (includeCurrentPlayers && (!playerCount || isOver1HourOld(new Date(playerCount.pullDate)))) {
+	if (
+		includeCurrentPlayers &&
+		(!playerCount ||
+			isOver1HourOld(new Date(playerCount.pullDate)) ||
+			!playerCount.player_count)
+	) {
 		try {
 			const gamePlayerCount = JSON.parse(await getOrSetFileStorage('gamePlayerCount'));
 			const res = await fetch(url);
@@ -530,7 +577,11 @@ export const getSteamSpyAppDetails = async (
 ): Promise<SteamSpyAppDetailsConverted | undefined> => {
 	const url = `${serverString}getSteamSpyAppDetails/${appId}`;
 
-	if (!gameSpyData || isOver7DaysOld(new Date(gameSpyData.pullDate))) {
+	if (
+		!gameSpyData ||
+		isOver7DaysOld(new Date(gameSpyData.pullDate)) ||
+		gameSpyData.name === 'Unknown'
+	) {
 		try {
 			const gameSteamSpyDetails = JSON.parse(await getOrSetFileStorage('steamSpyAppDetails'));
 			const res = await fetch(url);
@@ -539,7 +590,8 @@ export const getSteamSpyAppDetails = async (
 			const json = await res.json();
 			if (!json) return;
 			const gameSpyDataConverted: SteamSpyAppDetailsConverted = {
-				owners: json.owners ? json.owners : '0 .. 0',
+				name: json.name || 'Unknown',
+				owners: json.owners || '0 .. 0',
 				pullDate: new Date(),
 				developer: splitStringListToArray(json.developer),
 				genre: splitStringListToArray(json.genre),
@@ -565,9 +617,9 @@ const combineAchievements = (
 ) => {
 	const combinedAchievements: CombinedAchievementsWithSchema[] = globalA.map((achievement, i) => {
 		const userAchievement = userA[i];
-		const achieved = userAchievement.achieved === 1;
+		const achieved = userAchievement?.achieved === 1;
 		const unlockTime =
-			userAchievement.unlocktime === 0 ? 9999999999 : userAchievement.unlocktime;
+			userAchievement?.unlocktime === 0 ? 9999999999 : userAchievement?.unlocktime;
 		const unlockDate = unlockTime === 9999999999 ? 'Unachieved' : dateFormat(unlockTime);
 		return { ...achievement, achieved, unlockDate, unlockTime };
 	});

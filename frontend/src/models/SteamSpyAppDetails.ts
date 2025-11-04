@@ -3,6 +3,7 @@ interface Tags {
 }
 
 interface SharedSteamSpyAppDetails {
+	name: string;
 	owners: string;
 	pullDate: Date;
 }

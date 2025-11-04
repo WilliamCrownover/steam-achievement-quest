@@ -10,6 +10,7 @@ export interface GameDataExpanded extends Record<string, any>, SteamOwnedGame {
 	timeToBeat: string;
 	purchaseDate: string;
 	focused: boolean;
+	demo: boolean;
 	isHidden: boolean;
 	pricePerHour: number;
 	costPerTimeToBeat: number;
@@ -20,6 +21,8 @@ export interface GameDataExpanded extends Record<string, any>, SteamOwnedGame {
 	total_reviews: number;
 	total_positive: number;
 	total_negative: number;
+	youtubeUrl: string;
+	howLongToBeatUrl: string;
 }
 
 export enum ReviewEnum {
