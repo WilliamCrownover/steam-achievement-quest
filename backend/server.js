@@ -110,6 +110,29 @@ app.get('/getUserInfo/:userId', cors(corsOptions), async (req, res) => {
 	}
 });
 
+app.get('/getUserWishlist/:userId', cors(corsOptions), async (req, res) => {
+	const endpoint = `
+		https://api.steampowered.com/IWishlistService/GetWishlist/v1
+		?key=${process.env.REACT_APP_STEAM_KEY}
+		&steamid=${req.params.userId}
+	`;
+	const fetchOptions = {
+		method: 'GET',
+	};
+
+	try {
+		const response = await fetch(endpoint, fetchOptions);
+		if (response.status !== 200) {
+			throw new Error('Could not fetch user wishlist.');
+		}
+		const jsonResponse = await response.json();
+		res.json(jsonResponse);
+	} catch (error) {
+		console.log(error);
+		return { error: 'Could not fetch user wishlist.', success: false };
+	}
+});
+
 app.get('/getGameAchievements/:appId', cors(corsOptions), async (req, res) => {
 	const endpoint = `
 		https://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/
@@ -251,6 +274,7 @@ app.get('/getSteamSpyAppDetails/:appId', cors(corsOptions), async (req, res) => 
 	`;
 	const fetchOptions = {
 		method: 'GET',
+		timeout: 10000,
 	};
 	try {
 		const response = await fetch(endpoint, fetchOptions);
@@ -263,7 +287,13 @@ app.get('/getSteamSpyAppDetails/:appId', cors(corsOptions), async (req, res) => 
 		}
 	} catch (error) {
 		console.log(error);
-		return { error: 'Could not fetch steamspy app details.', success: false };
+		res.status(503).json({
+			error: 'Could not fetch steamspy app details',
+			success: false,
+			message: error.message || 'Connection timed out',
+			code: error.code || 'UNKNOWN_ERROR',
+			retryable: true,
+		});
 	}
 });
 
