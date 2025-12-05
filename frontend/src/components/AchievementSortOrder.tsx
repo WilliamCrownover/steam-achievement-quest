@@ -1,9 +1,12 @@
 import { ChangeEvent } from 'react';
-import { CombinedAchievementsWithSchema, PassDownSteamData } from '../models';
-import { 
-	sorter, 
-	sortAlphabet, 
-	sortNumber 
+import {
+	CombinedAchievementsWithSchema,
+	PassDownSteamData
+} from '../models';
+import {
+	sorter,
+	sortAlphabet,
+	sortNumber
 } from '../utils/utils';
 
 export const AchievementSortOrder = (props: PassDownSteamData) => {
@@ -17,7 +20,7 @@ export const AchievementSortOrder = (props: PassDownSteamData) => {
 		const value = e.target.value;
 		setGamesWithAchievements(gamesWithAchievements.map((game) => {
 			const sortProperty = (property: string) => {
-				const achievements = game.achievements;
+				const achievements = game.achievements || [];
 				const achievementsSortedByPercent: CombinedAchievementsWithSchema[] = sorter(achievements, sortNumber('percent', true));
 				switch (property) {
 					case 'name':

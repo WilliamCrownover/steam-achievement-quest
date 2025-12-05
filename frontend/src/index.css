@@ -16,6 +16,10 @@
 	--notPlayed: rgb(137, 62, 57);
 	--transitionSpeed: 0.4s;
 	--oneHundredPercent: rgb(52, 233, 49);
+	--badValueHighlight: rgb(233, 49, 49);
+	--thumbsUp: rgb(141, 179, 139);
+	--thumbsDown: rgb(179, 139, 139);
+	--brightHighlight: rgb(37, 175, 255);
 }
 
 body {
@@ -151,6 +155,9 @@ p {
 	align-items: center;
 	margin: 5px 0px;
 	padding: 5px;
+	border: none;
+	border-radius: 5px;
+	margin-right: 5px;
 }
 
 .multipleForms {
@@ -169,7 +176,15 @@ input[type=number] {
 }
 
 input[type=number] {
-	width: 70px;
+	width: 80px;
+}
+
+input[type=text] {
+	width: 100px;
+}
+
+.userIDInput {
+	width: 180px !important;
 }
 
 input[type=submit] {
@@ -181,6 +196,10 @@ input[type=submit] {
 
 input[type=submit]:hover {
 	background-color: var(--darkGray);
+}
+
+.sampleSizeLabel {
+	margin-left: 20px;
 }
 
 .gamesInfoSection {
@@ -230,16 +249,33 @@ input[type=submit]:hover {
 	font-weight: 400;
 }
 
-.sortOptionContainer {
+.sortOptionContainer,
+.sortOptionContainer2,
+.sortOption2 {
 	display: flex;
-	flex-wrap: wrap;
 	align-items: center;
+}
+
+.sortOptionContainer,
+.sortOptionContainer2 {
+	border-radius: 5px;
+	padding: 7px;
+}
+
+.sortOptionContainer {
+	flex-wrap: wrap;
 	margin: 5px 0px;
 	justify-content: space-around;
 	position: -webkit-sticky;
 	position: sticky;
 	top: 0;
 	z-index: 2;
+}
+
+.sortOptionContainer2 {
+	border: none;
+	margin-right: 5px;
+	z-index: 1;
 }
 
 .sortOption select {
@@ -255,12 +291,56 @@ input[type=submit]:hover {
 	margin-top: 10px;
 }
 
+.filterOption h4 {
+	margin-top: 10px;
+}
+
+.select__control {
+	background-color: var(--lightGray);
+	width: 250px;
+	min-height: auto !important;
+}
+
+.select__menu-list {
+	background-color: var(--lightGray);
+}
+
+.select__placeholder,
+.select__multi-value__label .select_input,
+.select__option,
+.select__multi-value__label,
+.select__menu-notice {
+	color: var(--background) !important;
+	padding-left: 5px;
+}
+
+.select__option {
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+.select__option:hover,
+.select__indicator:hover,
+.select__multi-value__remove:hover {
+	background-color: var(--medGray);
+}
+
+.select__indicator-separator {
+	background-color: var(--background);
+}
+
+.select__indicator,
+.select__multi-value__remove {
+	color: var(--background);
+	scale: 75%;
+}
+
 .gameWithAchievementsContainer,
 .gameWithoutAchievements {
 	background-color: var(--lightGray);
 	padding: 10px;
 	border-radius: 10px;
-	margin-bottom: 5px;
+	margin-top: 15px;
 }
 
 .gameWithAchievementsContainer a {
@@ -274,12 +354,22 @@ input[type=submit]:hover {
 	font-size: 0.9rem;
 }
 
-.gameTitleInfo {
+.thumbsUp {
+	background-color: var(--thumbsUp);
+}
+
+.thumbsDown {
+	background-color: var(--thumbsDown);
+}
+
+.gameTitleInfo,
+.gameSpecificDataPoints {
 	display: flex;
 	align-items: center;
 }
 
-.gameTitleInfo>* {
+.gameTitleInfo>*,
+.gameSpecificDataPoints>* {
 	display: inline-block;
 	margin-right: 10px;
 	width: 25%;
@@ -319,9 +409,13 @@ input[type=submit]:hover {
 	width: 50%;
 }
 
+.playtimeDataContainerFirst {
+	margin-right: 10px;
+}
+
 .playtimeDataContainer .specificGameDataPoint,
 .playtimeDataContainer .specificGameDataPoint:last-child {
-	flex: 1 0 50%;
+	flex: 1 0 0%;
 }
 
 .specificGameDataPoint {
@@ -335,7 +429,8 @@ input[type=submit]:hover {
 	padding: 5px;
 }
 
-.specificGameDataPoint h4 {
+.specificGameDataPoint h4,
+.gameStoreDetailDataPoint h4 {
 	margin: 0px;
 }
 
@@ -344,6 +439,21 @@ input[type=submit]:hover {
 	margin-top: 3px;
 	font-weight: 600;
 	font-size: 1rem;
+}
+
+.gameStoreDetailContainer {
+	display: flex;
+	flex-wrap: wrap;
+	margin-top: 5px;
+	background-color: var(--medGray);
+	border: solid 5px var(--darkGray);
+	border-radius: 10px;
+}
+
+.gameStoreDetailDataPoint {
+	align-items: center;
+	color: var(--lightGray);
+	margin: 5px 10px;
 }
 
 .dlc,
@@ -374,6 +484,7 @@ input[type=submit]:hover {
 	align-items: flex-end;
 	height: var(--graphHeight);
 	width: 100%;
+	margin-top: 10px;
 }
 
 .graphVerticalBar {
@@ -449,22 +560,28 @@ input[type=submit]:hover {
 
 .achievementLink {
 	display: flex;
-	margin: 5px 0px;
+	margin-top: 5px;
 	font-size: 1.15rem;
+	width: 100%;
 }
 
 .achievementLink h3 {
 	margin-right: 20px;
 }
 
-.oneHundredPercent {
+.oneHundredPercent,
+.goodValueHighlight {
 	border: solid 5px var(--oneHundredPercent);
 }
 
+.badValueHighlight {
+	border: solid 5px var(--badValueHighlight);
+}
+
 .gameWithoutAchievementsDivision {
-	background-color: var(--darkGray);
-	color: var(--lightGray);
-	border: solid 5px var(--lightGray);
+	background-color: var(--brightHighlight);
+	color: var(--darkGray);
+	border: solid 5px var(--medGray);
 	border-radius: 10px;
 	padding: 5px;
 	text-align: center;

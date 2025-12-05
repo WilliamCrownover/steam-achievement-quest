@@ -1,7 +1,7 @@
 import { CombinedAchievementsWithSchema } from '../models'
-import { 
-	round, 
-	setColorFill 
+import {
+	round,
+	setColorFill
 } from '../utils/utils'
 
 type AchievementPercentagesProps = {
@@ -19,17 +19,17 @@ export const AchievementPercentages = ({ achievements, showIcons }: AchievementP
 				const achieved = achievement.achieved && 'achieved'
 				return (
 					<div key={achievement.name} title={achievement.hoverInfo}>
-						<h3 
-							style={{ backgroundColor: colorFill }} 
+						<h3
+							style={{ backgroundColor: colorFill }}
 							className={`${achieved} ${showIcons ? 'withIcons' : 'noIcons'}`}
 						>{percent}</h3>
-						{showIcons && 
-							<img 
-								src={achievement.icon} 
-								alt={achievement.displayName} 
-								height='40' 
-								width='40' 
-								loading='lazy' 
+						{showIcons &&
+							<img
+								src={achievement.icon}
+								alt={achievement.displayName}
+								height='40'
+								width='40'
+								loading='lazy'
 							/>
 						}
 					</div>

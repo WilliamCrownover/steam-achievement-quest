@@ -1,7 +1,7 @@
 import { GameDataExpanded } from '../models';
-import { 
-	round, 
-	setColorFill 
+import {
+	round,
+	setColorFill
 } from '../utils/utils'
 
 type AchievementGraphProps = {
@@ -9,7 +9,7 @@ type AchievementGraphProps = {
 }
 
 export const AchievementGraph = ({ game }: AchievementGraphProps) => {
-	const achievements = game.achievements;
+	const achievements = game.achievements || [];
 	const lineArray = [
 		{ class: 'ninetyPercent' },
 		{ class: 'fiftyPercent' },
