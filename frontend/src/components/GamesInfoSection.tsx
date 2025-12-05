@@ -3,11 +3,7 @@ import { round } from '../utils/utils';
 import { GameDataPoint } from './GameDataPoint';
 
 export const GamesInfoSection = (props: PassDownSteamData) => {
-	const {
-		userData,
-		gamesWithAchievements,
-		gamesWithoutAchievements,
-	} = props;
+	const { userData, gamesWithAchievements, gamesWithoutAchievements } = props;
 
 	const {
 		privateProfile,
@@ -27,7 +23,8 @@ export const GamesInfoSection = (props: PassDownSteamData) => {
 	const visibleGamesWithoutAchievements = gamesWithoutAchievements.filter(game => !game.isHidden);
 
 	const hasAchievements = visibleGamesWithAchievements.length > 0;
-	const totalGameCount = visibleGamesWithAchievements.length + visibleGamesWithoutAchievements.length;
+	const totalGameCount =
+		visibleGamesWithAchievements.length + visibleGamesWithoutAchievements.length;
 
 	const GameDataPoints = [
 		// 1
@@ -98,23 +95,23 @@ export const GamesInfoSection = (props: PassDownSteamData) => {
 			total: totalAchievements,
 			privateProfile: privateProfile,
 		},
-	]
+	];
 
 	return (
-		<div className='gamesInfoSection'>
+		<div className="gamesInfoSection">
 			<GameDataPoint {...GameDataPoints[0]} />
-			{hasAchievements &&
+			{hasAchievements && (
 				<>
 					<GameDataPoint {...GameDataPoints[1]} />
 					<GameDataPoint {...GameDataPoints[2]} />
 					<GameDataPoint {...GameDataPoints[3]} />
 				</>
-			}
+			)}
 			<GameDataPoint {...GameDataPoints[4]} />
 
-			<div className='flexLineBreak' />
+			<div className="flexLineBreak" />
 
-			{hasAchievements &&
+			{hasAchievements && (
 				<>
 					<GameDataPoint {...GameDataPoints[5]} />
 					<GameDataPoint {...GameDataPoints[6]} />
@@ -122,13 +119,13 @@ export const GamesInfoSection = (props: PassDownSteamData) => {
 					<GameDataPoint {...GameDataPoints[8]} />
 					<GameDataPoint {...GameDataPoints[9]} />
 				</>
-			}
+			)}
 
-			<div className='flexLineBreak' />
+			<div className="flexLineBreak" />
 
-			<div className='gameDataPoint'>
+			<div className="gameDataPoint">
 				<h3>Total Time Played</h3>
-				<div className='timePlayedContainer'>
+				<div className="timePlayedContainer">
 					<h3>{totalPlaytime} Hours</h3>
 					<h3>{round(totalPlaytime / 24)} Days</h3>
 					<h3>{round(totalPlaytime / 24 / 7)} Weeks</h3>
@@ -136,6 +133,6 @@ export const GamesInfoSection = (props: PassDownSteamData) => {
 					<h3>{totalTimeToBeat} Hours to Beat</h3>
 				</div>
 			</div>
-		</div >
-	)
-}
+		</div>
+	);
+};

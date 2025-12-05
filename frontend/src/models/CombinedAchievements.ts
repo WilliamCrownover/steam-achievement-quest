@@ -1,4 +1,4 @@
-import { SteamAchievementSchema } from "./SteamAchievementSchema";
+import { SteamAchievementSchema } from './SteamAchievementSchema';
 
 export interface CombinedAchievements {
 	name: string;
@@ -6,8 +6,10 @@ export interface CombinedAchievements {
 	achieved: boolean;
 	unlockDate: string;
 	unlockTime: number;
-	hoverInfo?: string
+	hoverInfo?: string;
 	pullDate: Date;
 }
 
-export interface CombinedAchievementsWithSchema extends CombinedAchievements, SteamAchievementSchema { }
+export interface CombinedAchievementsWithSchema
+	extends CombinedAchievements,
+		SteamAchievementSchema {}

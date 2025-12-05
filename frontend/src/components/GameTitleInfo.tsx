@@ -1,10 +1,10 @@
 import { GameDataExpanded } from '../models';
-import { setColorFill } from '../utils/utils'
+import { setColorFill } from '../utils/utils';
 import { SpecificGameDataPoint } from './SpecificGameDataPoint';
 
 type GameTitleInfoProps = {
-	game: GameDataExpanded
-}
+	game: GameDataExpanded;
+};
 
 export const GameTitleInfo = ({ game }: GameTitleInfoProps) => {
 	const {
@@ -16,35 +16,40 @@ export const GameTitleInfo = ({ game }: GameTitleInfoProps) => {
 		total_reviews,
 		reviewPercentPositive,
 		gameUrl,
-		has_dlc
+		has_dlc,
 	} = game;
 
-	const colorFill = setColorFill((reviewPercentPositive * (100 + 90) / 100 - 90));
+	const colorFill = setColorFill((reviewPercentPositive * (100 + 90)) / 100 - 90);
 
 	return (
-		<div className='gameTitleInfo'>
-			<a className='gameTitleLink' href={gameUrl} target='_blank' rel='noreferrer'>
-				<img src={gameIcon} alt={name} height='50' width='50' loading='lazy' />
-				<div className='gameNameContainer'>
+		<div className="gameTitleInfo">
+			<a className="gameTitleLink" href={gameUrl} target="_blank" rel="noreferrer">
+				<img src={gameIcon} alt={name} height="50" width="100" loading="lazy" />
+				<div className="gameNameContainer">
 					<h3>{name}</h3>
-					{has_dlc && <p className='dlc'>+DLC</p>}
+					{has_dlc && <p className="dlc">+DLC</p>}
 				</div>
 			</a>
-			<div className='playtimeDataContainer'>
-				<div className='specificGameDataPoint playtimeDataContainerFirst'>
+			<div className="playtimeDataContainer">
+				<div className="specificGameDataPoint playtimeDataContainerFirst">
 					<h4>Last Played</h4>
-					<p className={`${lastPlayedDate === 'Not Played' && 'notPlayed'}`}>{lastPlayedDate}</p>
+					<p className={`${lastPlayedDate === 'Not Played' && 'notPlayed'}`}>
+						{lastPlayedDate}
+					</p>
 				</div>
-				{hoursPlayed > 0 &&
-					<SpecificGameDataPoint title='Hours Played' data={hoursPlayed} />
-				}
+				{hoursPlayed > 0 && (
+					<SpecificGameDataPoint title="Hours Played" data={hoursPlayed} />
+				)}
 			</div>
-			<SpecificGameDataPoint title='Current Players' data={playerCount} />
-			<SpecificGameDataPoint title='Total Reviews' data={total_reviews} />
-			<div className='specificGameDataPoint' style={{ backgroundColor: colorFill, color: 'black' }}>
+			<SpecificGameDataPoint title="Current Players" data={playerCount} />
+			<SpecificGameDataPoint title="Total Reviews" data={total_reviews} />
+			<div
+				className="specificGameDataPoint"
+				style={{ backgroundColor: colorFill, color: 'black' }}
+			>
 				<h4>Positive Reviews</h4>
 				<p>{reviewPercentPositive}%</p>
 			</div>
 		</div>
-	)
-}
+	);
+};
